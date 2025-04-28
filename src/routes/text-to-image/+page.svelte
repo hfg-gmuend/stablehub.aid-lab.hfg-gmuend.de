@@ -1,10 +1,12 @@
 <script>
   import MinimalSidebar from "$lib/components/MinimalSidebar.svelte";
+  import PromptResultCard from "$lib/components/PromptResultCard.svelte";
   import { onMount, onDestroy } from "svelte";
   
   // Parameter für die API
   let prompt = "cat with dog";
   let negativePrompt = "";
+  let variants = 1; // Neue Einstellung für Anzahl der Varianten
   let cfg = 2;
   let steps = 6;
   let seed = 0;
@@ -28,6 +30,9 @@
   let imageUrl = null;
   let error = null;
   
+  // Historie der generierten Bilder
+  let generatedResults = [];
+  
   // API URL Basis
   const apiBaseUrl = "https://aid-playground.hfg-gmuend.de/api/txt2img";
   
@@ -43,34 +48,63 @@
     }
     
     try {
-      // URL mit Parametern erstellen
-      const url = new URL(apiBaseUrl);
-      url.searchParams.append("prompt", prompt);
-      if (negativePrompt) {
-        url.searchParams.append("negative_prompt", negativePrompt);
+      const variantImages = []; // Array für mehrere Bilder
+      
+      // Generiere die gewählte Anzahl an Varianten
+      for (let i = 0; i < variants; i++) {
+        // URL mit Parametern erstellen
+        const url = new URL(apiBaseUrl);
+        url.searchParams.append("prompt", prompt);
+        if (negativePrompt) {
+          url.searchParams.append("negative_prompt", negativePrompt);
+        }
+        url.searchParams.append("cfg", cfg);
+        url.searchParams.append("steps", steps);
+        
+        // Für verschiedene Varianten unterschiedliche Seeds verwenden
+        const currentSeed = i === 0 ? seed : seed + i;
+        url.searchParams.append("seed", currentSeed);
+        url.searchParams.append("uid", uid);
+        
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+          throw new Error(`API Fehler: ${response.status}`);
+        }
+        
+        // Die Antwort als Blob behandeln (Binärdaten/Bild)
+        const blob = await response.blob();
+        
+        // Objekt-URL für den Blob erstellen
+        const variantUrl = URL.createObjectURL(blob);
+        variantImages.push(variantUrl);
       }
-      url.searchParams.append("cfg", cfg);
-      url.searchParams.append("steps", steps);
-      url.searchParams.append("seed", seed);
-      url.searchParams.append("uid", uid);
       
-      const response = await fetch(url);
+      // Zum Verlauf hinzufügen
+      generatedResults = [
+        { 
+          id: Date.now(), 
+          prompt: prompt,
+          imageUrls: variantImages, // Mehrere Bilder statt einem
+          timestamp: new Date()
+        },
+        ...generatedResults
+      ];
       
-      if (!response.ok) {
-        throw new Error(`API Fehler: ${response.status}`);
-      }
-      
-      // Die Antwort als Blob behandeln (Binärdaten/Bild)
-      const blob = await response.blob();
-      
-      // Objekt-URL für den Blob erstellen
-      imageUrl = URL.createObjectURL(blob);
     } catch (e) {
       error = e.message;
       console.error("Fehler beim Generieren des Bildes:", e);
     } finally {
       loading = false;
     }
+  }
+  
+  // Funktion zum Bearbeiten eines vorherigen Prompts
+  function editPrompt(oldPrompt) {
+    prompt = oldPrompt;
+    // Scrolle zum Prompt-Eingabefeld
+    document.querySelector('#main-prompt').scrollIntoView({ behavior: 'smooth' });
+    document.querySelector('#main-prompt').focus();
   }
   
   // Parameter aus URL auslesen, wenn die Seite geladen wird
@@ -101,6 +135,10 @@
       uid = url.searchParams.get("uid");
     }
     
+    if (url.searchParams.has("variants")) {
+      variants = Math.min(3, Math.max(1, parseInt(url.searchParams.get("variants"))));
+    }
+    
     // Automatisch Bild generieren, wenn Parameter in der URL vorhanden sind
     if (url.searchParams.has("prompt")) {
       generateImage();
@@ -110,9 +148,15 @@
   // Aufräumen bei Komponenten-Zerstörung
   onDestroy(() => {
     // Objekt-URL freigeben, wenn vorhanden
-    if (imageUrl && imageUrl.startsWith('blob:')) {
-      URL.revokeObjectURL(imageUrl);
-    }
+    generatedResults.forEach(result => {
+      if (result.imageUrls) {
+        result.imageUrls.forEach(url => {
+          if (url.startsWith('blob:')) {
+            URL.revokeObjectURL(url);
+          }
+        });
+      }
+    });
   });
 </script>
 
@@ -127,6 +171,26 @@
       <!-- Parameter Panel (links) -->
       <div class="parameters-panel">
         <h2>Parameter</h2>
+        
+        <!-- Varianten-Auswahl (volle Breite, ganz oben) -->
+        <div class="parameter-group full-width">
+          <div class="label-container">
+            <label for="variants">Varianten</label>
+            <div class="info-icon" 
+                on:mouseenter={() => activeTooltip = 'variants'}
+                on:mouseleave={() => activeTooltip = null}>
+              i
+              {#if activeTooltip === 'variants'}
+                <div class="tooltip">Generiere mehrere Bildvarianten gleichzeitig. Mehr Varianten bedeuten längere Ladezeit.</div>
+              {/if}
+            </div>
+          </div>
+          <div class="variant-selector">
+            <button class="variant-button {variants === 1 ? 'active' : ''}" on:click={() => variants = 1}>1</button>
+            <button class="variant-button {variants === 2 ? 'active' : ''}" on:click={() => variants = 2}>2</button>
+            <button class="variant-button {variants === 3 ? 'active' : ''}" on:click={() => variants = 3}>3</button>
+          </div>
+        </div>
         
         <!-- Negatives Prompt (volle Breite) -->
         <div class="parameter-group full-width">
@@ -240,15 +304,21 @@
         {#if loading}
           <div class="loading-indicator">
             <div class="spinner"></div>
-            <p>Generiere Bild...</p>
+            <p>Generiere {variants} Bild{variants > 1 ? 'er' : ''}...</p>
           </div>
         {:else if error}
           <div class="error-message">
             <p>Fehler: {error}</p>
           </div>
-        {:else if imageUrl}
-          <div class="image-result">
-            <img src={imageUrl} alt="Generiertes Bild" />
+        {:else if generatedResults.length > 0}
+          <div class="results-container">
+            {#each generatedResults as result (result.id)}
+              <PromptResultCard 
+                prompt={result.prompt}
+                imageUrls={result.imageUrls}
+                onEdit={editPrompt}
+              />
+            {/each}
           </div>
         {:else}
           <div class="empty-state">
@@ -271,9 +341,12 @@
           </div>
         </div>
         <textarea id="main-prompt" bind:value={prompt}></textarea>
-        <button on:click={generateImage} disabled={loading}>
-          {loading ? 'Generiere...' : 'Generieren'}
-        </button>
+        <div class="button-container">
+          <button on:click={generateImage} disabled={loading}>
+            <img src="/icon/rightIcon.svg" alt="Pfeil Icon" class="button-icon-inside" />
+            <span>{loading ? 'Generiere...' : 'Generieren'}</span>
+          </button>
+        </div>
       </div>
     </div>
   </main>
@@ -510,52 +583,13 @@
     background-color: #ffe566;
   }
   
-  .button-icon {
-    font-size: 1.2rem;
-  }
-  
-  /* API URL Box */
-  .api-url-display {
-    margin-top: 2rem;
-    padding: 1.2rem;
-    background-color: #262626;
-    border-radius: 8px;
-  }
-  
-  .api-url-display h3 {
-    margin-top: 0;
-    margin-bottom: 0.75rem;
-    font-size: 1rem;
-  }
-  
-  .url-box {
-    padding: 0.75rem;
-    background-color: #1a1a1a;
-    border-radius: 6px;
-    font-family: monospace;
-    font-size: 0.85rem;
-    overflow-wrap: break-word;
-    word-break: break-all;
-    color: #aaaaaa;
-    border-left: 3px solid #FCEA2B;
-  }
-  
-  .method {
-    background-color: #FCEA2B;
-    color: #121212;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-weight: bold;
-    margin-right: 6px;
-  }
-  
   /* Prompt Panel */
   .prompt-panel {
     grid-column: 2;
     grid-row: 2;
     background-color: #1e1e1e;
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: 2rem; /* Erhöht von 1.5rem auf 2rem */
     display: flex;
     flex-direction: column;
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
@@ -564,19 +598,32 @@
   .prompt-panel textarea {
     width: 100%;
     height: 100px;
-    padding: 0.75rem;
+    padding: 1rem; /* Erhöht von 0.75rem auf 1rem */
     border: 1px solid #444444;
     border-radius: 6px;
     resize: none;
     font-family: 'Inter', sans-serif;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem; /* Erhöht von 1rem auf 1.5rem */
     background-color: #2a2a2a;
     color: #ffffff;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
   
+  .button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+    padding: 0 1rem; /* Fügt horizontalen Innenabstand hinzu */
+  }
+  
+  .button-icon-inside {
+    width: 24px;
+    height: 24px;
+    margin-right: 12px; /* Erhöht von 8px auf 12px */
+  }
+  
   .prompt-panel button {
-    padding: 0.75rem 1.5rem;
+    padding: 0.85rem 2rem; /* Horizontales Padding auf 2rem erhöht */
     background-color: #FCEA2B;
     color: #121212;
     border: none;
@@ -585,7 +632,8 @@
     font-family: 'IBM Plex Mono', monospace;
     font-weight: 500;
     transition: background-color 0.2s;
-    align-self: flex-end;
+    display: flex;
+    align-items: center;
   }
   
   .prompt-panel button:hover {
@@ -614,6 +662,14 @@
   .output-area h1 {
     align-self: flex-start;
     margin-bottom: 1.5rem;
+  }
+  
+  .results-container {
+    width: 100%;
+    max-width: 768px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
   }
   
   .image-result {
@@ -668,5 +724,36 @@
     align-items: center;
     height: 300px;
     color: #888888;
+  }
+  
+  /* Varianten-Auswahl */
+  .variant-selector {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .variant-button {
+    flex: 1;
+    padding: 0.75rem;
+    background-color: #262626;
+    border: none;
+    border-radius: 6px;
+    color: #b0b0b0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .variant-button:hover {
+    background-color: #333;
+    color: white;
+  }
+  
+  .variant-button.active {
+    background-color: #FCEA2B;
+    color: #121212;
+    box-shadow: 0 2px 8px rgba(252, 234, 43, 0.3);
   }
 </style>
