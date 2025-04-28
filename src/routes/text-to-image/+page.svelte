@@ -1,5 +1,5 @@
 <script>
-  import Sidebar from "$lib/components/Sidebar.svelte";
+  import MinimalSidebar from "$lib/components/MinimalSidebar.svelte";
   import { onMount, onDestroy } from "svelte";
   
   // Parameter für die API
@@ -121,7 +121,7 @@
 </svelte:head>
 
 <div class="app-container">
-  <Sidebar />
+  <MinimalSidebar />
   <main>
     <div class="content-wrapper">
       <!-- Parameter Panel (links) -->
@@ -135,14 +135,13 @@
             <div class="info-icon" 
                 on:mouseenter={() => activeTooltip = 'negativePrompt'}
                 on:mouseleave={() => activeTooltip = null}>
-              ⓘ
+              i
               {#if activeTooltip === 'negativePrompt'}
                 <div class="tooltip">{tooltips.negativePrompt}</div>
               {/if}
             </div>
           </div>
           <textarea id="negative-prompt" bind:value={negativePrompt} rows="2"></textarea>
-          <p class="parameter-description">Elemente, die im Bild vermieden werden sollen</p>
         </div>
         
         <!-- Zwei-Spalten-Layout für Parameter -->
@@ -153,7 +152,7 @@
               <div class="info-icon" 
                   on:mouseenter={() => activeTooltip = 'steps'}
                   on:mouseleave={() => activeTooltip = null}>
-                ⓘ
+                i
                 {#if activeTooltip === 'steps'}
                   <div class="tooltip">{tooltips.steps}</div>
                 {/if}
@@ -166,16 +165,15 @@
                 <button class="control-button" on:click={() => steps = Math.min(50, steps + 1)}>+</button>
               </div>
             </div>
-            <p class="parameter-description">Anzahl der Diffusionsschritte (1-50)</p>
           </div>
           
           <div class="parameter-grid-item">
             <div class="label-container">
-              <label for="cfg">CFG Scale</label>
+              <label for="cfg">CFG</label>
               <div class="info-icon" 
                   on:mouseenter={() => activeTooltip = 'cfg'}
                   on:mouseleave={() => activeTooltip = null}>
-                ⓘ
+                i
                 {#if activeTooltip === 'cfg'}
                   <div class="tooltip">{tooltips.cfg}</div>
                 {/if}
@@ -188,7 +186,6 @@
                 <button class="control-button" on:click={() => cfg = Math.min(20, parseFloat((cfg + 0.1).toFixed(1)))}>+</button>
               </div>
             </div>
-            <p class="parameter-description">Stärke der Prompt-Führung (1-20)</p>
           </div>
           
           <div class="parameter-grid-item">
@@ -197,7 +194,7 @@
               <div class="info-icon" 
                   on:mouseenter={() => activeTooltip = 'seed'}
                   on:mouseleave={() => activeTooltip = null}>
-                ⓘ
+                i
                 {#if activeTooltip === 'seed'}
                   <div class="tooltip">{tooltips.seed}</div>
                 {/if}
@@ -209,7 +206,6 @@
                 <span class="button-icon">🎲</span>
               </button>
             </div>
-            <p class="parameter-description">Seed-Wert für reproduzierbare Ergebnisse</p>
           </div>
           
           <div class="parameter-grid-item">
@@ -218,14 +214,13 @@
               <div class="info-icon" 
                   on:mouseenter={() => activeTooltip = 'uid'}
                   on:mouseleave={() => activeTooltip = null}>
-                ⓘ
+                i
                 {#if activeTooltip === 'uid'}
                   <div class="tooltip">{tooltips.uid}</div>
                 {/if}
               </div>
             </div>
             <input type="text" id="uid" bind:value={uid}>
-            <p class="parameter-description">Benutzer-ID für die API</p>
           </div>
         </div>
         
@@ -269,7 +264,7 @@
           <div class="info-icon" 
               on:mouseenter={() => activeTooltip = 'prompt'}
               on:mouseleave={() => activeTooltip = null}>
-            ⓘ
+            i
             {#if activeTooltip === 'prompt'}
               <div class="tooltip tooltip-bottom">{tooltips.prompt}</div>
             {/if}
@@ -372,50 +367,61 @@
     color: #ffffff;
   }
   
-  /* Verbesserte Info Icons und Tooltips */
+  /* Überarbeitetes Info-Icon ohne Kreis und ohne kursiven Stil */
   .info-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background-color: #FCEA2B;
-    color: #121212;
-    font-size: 0.7rem;
-    font-weight: bold;
+    width: 16px;
+    height: 16px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+    font-weight: 500;
+    font-style: normal; /* Normaler Stil statt kursiv */
     cursor: help;
     position: relative;
-    transition: background-color 0.2s;
+    transition: color 0.2s;
+    margin-left: 4px;
   }
   
   .info-icon:hover {
-    background-color: #ffe566;
+    color: #ffffff; /* Hellere Farbe beim Hover */
   }
   
   .tooltip {
-    position: absolute;
-    top: -6px;
-    left: 24px;
-    width: 220px;
-    background-color: #FCEA2B;
-    color: #121212;
-    padding: 8px 10px;
-    border-radius: 6px;
-    font-size: 0.8rem;
+    position: fixed; /* Ändert zu fixed, um Overflow zu ermöglichen */
+    width: 250px;
+    background-color: rgba(30, 30, 30, 0.85); /* Dunkler, transparenter Hintergrund */
+    backdrop-filter: blur(10px); /* Glaseffekt */
+    -webkit-backdrop-filter: blur(10px); /* Für Safari */
+    color: #ffffff;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
     font-weight: normal;
     font-family: 'Inter', sans-serif;
-    z-index: 100;
-    transform: translateY(-50%);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000; /* Höherer z-index für Overlay über alles */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 
+                0 0 0 1px rgba(255, 255, 255, 0.1); /* Glasartiger Rand */
     pointer-events: none;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    max-width: calc(100vw - 40px); /* Verhindert Überlauf aus dem Viewport */
   }
   
-  .tooltip-bottom {
-    top: auto;
-    bottom: -6px;
-    left: 24px;
-    transform: translateY(100%);
+  /* Entfernung der Parameter-Beschreibungstexte */
+  .parameter-description {
+    display: none;
+  }
+  
+  /* Platzierung der Tooltips nahe am Info-Icon aber nicht zu weit weg */
+  [class*="info-icon"]:hover + .tooltip {
+    display: block;
+  }
+  
+  /* Größerer Abstand zwischen den Parameter-Gruppen wegen entfernter Beschreibungstexte */
+  .parameter-grid-item {
+    margin-bottom: 1rem;
   }
   
   /* Eingabefelder */
@@ -443,12 +449,6 @@
   textarea {
     resize: vertical;
     min-height: 70px;
-  }
-  
-  .parameter-description {
-    margin-top: 0.5rem;
-    font-size: 0.85rem;
-    color: #888888;
   }
   
   /* Inputs mit Icons/Buttons */

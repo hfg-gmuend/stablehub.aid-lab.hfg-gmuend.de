@@ -4,19 +4,16 @@
 
 <aside class="sidebar">
   <div class="sidebar-header">
-    <div class="logo">
-      <svg viewBox="0 0 24 24" width="24" height="24">
-        <path fill="currentColor" d="M12 2l9 5v10l-9 5-9-5V7l9-5zm0 2.5L5.5 8 12 11.5 18.5 8 12 4.5zm-6.5 6.5v4.7L11 19v-4.9L5.5 11zm13 0l-5.5 3.1V19l5.5-2.8v-4.7z"/>
-      </svg>
+    <a href="/" class="logo">
+      <img src="/icon/icon.svg" alt="HfG Ai-Hub Logo" width="24" height="24" />
       <span>HfG Ai-Hub</span>
-    </div>
+    </a>
   </div>
   
   <nav>
     <div class="section">
       <h3>Collection</h3>
       <ul>
-        <li><a href="/" class:active={$page.url.pathname === '/'}>Dashboard</a></li>
         <li><a href="/text-to-image" class:active={$page.url.pathname === '/text-to-image'}>Text To Image</a></li>
         <li><a href="/image-to-image" class:active={$page.url.pathname === '/image-to-image'}>Image To Image</a></li>
         <li><a href="/control-net" class:active={$page.url.pathname === '/control-net'}>ControlNet</a></li>
@@ -50,8 +47,8 @@
 <style>
   .sidebar {
     width: 280px;
-    background-color: #1a1a1a; /* Dunklerer Hintergrund */
-    border-right: 1px solid #333333; /* Dunklere Trennlinie */
+    background-color: #1a1a1a;
+    border-right: 1px solid #333333;
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -61,7 +58,7 @@
   
   .sidebar-header {
     padding: 1.5rem;
-    border-bottom: 1px solid #333333; /* Dunklere Trennlinie */
+    border-bottom: 1px solid #333333;
   }
   
   .logo {
@@ -71,7 +68,17 @@
     font-family: 'IBM Plex Mono', monospace;
     font-weight: 600;
     font-size: 1.2rem;
-    color: #ffffff; /* Weiße Textfarbe */
+    color: #ffffff;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  
+  .logo:hover {
+    opacity: 0.8;
+  }
+  
+  .logo img {
+    object-fit: contain;
   }
   
   nav {
@@ -90,7 +97,7 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 0.75rem;
-    color: #888888; /* Gedämpftes Grau für Überschriften */
+    color: #888888;
   }
   
   ul {
@@ -108,33 +115,33 @@
     padding: 0.5rem 0.75rem;
     border-radius: 4px;
     text-decoration: none;
-    color: #b0b0b0; /* Hellgrau für Links */
+    color: #b0b0b0;
     font-family: 'Inter', sans-serif;
     transition: background-color 0.2s, color 0.2s;
   }
   
   a:hover {
-    background-color: #333333; /* Dunkleres Hover */
-    color: #ffffff; /* Weiß beim Hover */
+    background-color: #333333;
+    color: #ffffff;
   }
   
   a.active {
-    background-color: #333333; /* Dunkleres Grau für aktiven Zustand */
-    color: #ffffff; /* Weiß für aktiven Zustand */
+    background-color: #333333;
+    color: #ffffff;
     font-weight: 500;
   }
   
   .vpn-section {
     padding: 1.5rem;
-    border-top: 1px solid #333333; /* Dunklere Trennlinie */
+    border-top: 1px solid #333333;
     margin-top: auto;
-    background-color: #1e1e1e; /* Etwas hellerer Hintergrund */
+    background-color: #1e1e1e;
   }
   
   .vpn-button {
     display: inline-block;
-    background-color: #FCEA2B; /* Gelbe Akzentfarbe */
-    color: #121212; /* Dunkle Textfarbe für Kontrast */
+    background-color: #FCEA2B;
+    color: #121212;
     padding: 0.5rem 1rem;
     border-radius: 4px;
     text-align: center;
@@ -144,6 +151,6 @@
   }
   
   .vpn-button:hover {
-    background-color: #ffe566; /* Helleres Gelb beim Hover */
+    background-color: #ffe566;
   }
 </style>

@@ -1,9 +1,10 @@
 <script>
-  import "../app.css";
+  // Layout script kann später erweitert werden
 </script>
 
 <svelte:head>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="/icon/icon.svg">
 </svelte:head>
 
 <slot />

@@ -1,5 +1,6 @@
 <script>
-  import Sidebar from "$lib/components/Sidebar.svelte";
+  import MinimalSidebar from "$lib/components/MinimalSidebar.svelte";
+  // Weitere Importe und Skriptlogik hier...
 </script>
 
 <svelte:head>
@@ -7,7 +8,7 @@
 </svelte:head>
 
 <div class="app-container">
-  <Sidebar />
+  <MinimalSidebar />
   <main>
     <h1>Image To Image</h1>
     <p>Diese Seite wird später implementiert.</p>
@@ -27,9 +28,11 @@
   
   h1 {
     font-family: 'IBM Plex Mono', monospace;
+    color: #ffffff;
   }
   
   p {
     font-family: 'Inter', sans-serif;
+    color: #b0b0b0;
   }
 </style>
