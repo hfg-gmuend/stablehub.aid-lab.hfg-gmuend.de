@@ -1,6 +1,7 @@
 <script>
   import MinimalSidebar from "$lib/components/MinimalSidebar.svelte";
   import PromptResultCard from "$lib/components/PromptResultCard.svelte";
+  import NavigationBar from "$lib/components/NavigationBar.svelte";
   import { onMount, onDestroy } from "svelte";
   
   // Parameter für die API
@@ -167,6 +168,8 @@
 <div class="app-container">
   <MinimalSidebar />
   <main>
+    <NavigationBar active="generate" />
+    
     <div class="content-wrapper">
       <!-- Parameter Panel (links) -->
       <div class="parameters-panel">
@@ -322,26 +325,31 @@
           </div>
         {:else}
           <div class="empty-state">
-            <p>Gib einen Prompt ein und klicke auf "Generieren", um ein Bild zu erzeugen.</p>
+            <div class="empty-state-content">
+              <p>Gib einen Prompt ein und klicke auf "Generieren", um ein Bild zu erzeugen.</p>
+            </div>
           </div>
         {/if}
       </div>
       
       <!-- Prompt-Panel (unten rechts) -->
       <div class="prompt-panel">
-        <div class="label-container">
-          <label for="main-prompt">Prompt</label>
-          <div class="info-icon" 
-              on:mouseenter={() => activeTooltip = 'prompt'}
-              on:mouseleave={() => activeTooltip = null}>
-            i
-            {#if activeTooltip === 'prompt'}
-              <div class="tooltip tooltip-bottom">{tooltips.prompt}</div>
-            {/if}
+        <div class="prompt-input-container">
+          <div class="label-container">
+            <label for="main-prompt">Prompt</label>
+            <div class="info-icon" 
+                on:mouseenter={() => activeTooltip = 'prompt'}
+                on:mouseleave={() => activeTooltip = null}>
+              i
+              {#if activeTooltip === 'prompt'}
+                <div class="tooltip tooltip-bottom">{tooltips.prompt}</div>
+              {/if}
+            </div>
           </div>
+          <textarea id="main-prompt" bind:value={prompt}></textarea>
         </div>
-        <textarea id="main-prompt" bind:value={prompt}></textarea>
-        <div class="button-container">
+        
+        <div class="generate-button-container">
           <button on:click={generateImage} disabled={loading}>
             <img src="/icon/rightIcon.svg" alt="Pfeil Icon" class="button-icon-inside" />
             <span>{loading ? 'Generiere...' : 'Generieren'}</span>
@@ -362,7 +370,7 @@
   
   main {
     flex: 1;
-    padding: 1rem;
+    padding: 0 1rem 1rem; /* Entfernt den oberen Abstand, behält aber die Seitenränder */
     display: flex;
     flex-direction: column;
   }
@@ -381,8 +389,8 @@
     display: grid;
     grid-template-columns: 300px 1fr;
     grid-template-rows: 1fr auto;
-    gap: 1rem;
-    height: calc(100vh - 2rem);
+    gap: 0.75rem; /* Reduziert von 1rem auf 0.75rem */
+    height: calc(100vh - 3.5rem); /* Angepasst für mehr Platz für das Prompt-Panel */
   }
   
   /* Parameter Panel - modernisiertes Design */
@@ -391,7 +399,7 @@
     grid-row: 1 / span 2;
     background-color: #1e1e1e;
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 1.25rem; /* Reduziert von 1.5rem auf 1.25rem */
     overflow-y: auto;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
   }
@@ -583,47 +591,44 @@
     background-color: #ffe566;
   }
   
-  /* Prompt Panel */
+  /* Prompt Panel mit 2-Spalten-Layout */
   .prompt-panel {
     grid-column: 2;
     grid-row: 2;
     background-color: #1e1e1e;
     border-radius: 8px;
-    padding: 2rem; /* Erhöht von 1.5rem auf 2rem */
-    display: flex;
-    flex-direction: column;
+    padding: 1rem 1.25rem; /* Reduziert von 1.5rem auf 1rem/1.25rem */
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1.25rem; /* Reduziert von 1.5rem */
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+    align-items: center;
+    /* Minimale Höhe festlegen für konsistentes Layout */
+    min-height: 110px;
   }
   
   .prompt-panel textarea {
     width: 100%;
-    height: 100px;
-    padding: 1rem; /* Erhöht von 0.75rem auf 1rem */
+    height: 70px; /* Reduziert von 80px */
+    padding: 0.75rem;
     border: 1px solid #444444;
     border-radius: 6px;
     resize: none;
     font-family: 'Inter', sans-serif;
-    margin-bottom: 1.5rem; /* Erhöht von 1rem auf 1.5rem */
+    margin-bottom: 0; /* Kein Abstand nach unten mehr nötig */
     background-color: #2a2a2a;
     color: #ffffff;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
   
-  .button-container {
+  .generate-button-container {
     display: flex;
-    justify-content: flex-end;
-    margin-top: 0.5rem;
-    padding: 0 1rem; /* Fügt horizontalen Innenabstand hinzu */
-  }
-  
-  .button-icon-inside {
-    width: 24px;
-    height: 24px;
-    margin-right: 12px; /* Erhöht von 8px auf 12px */
+    align-items: center; /* Vertikale Zentrierung */
+    height: 100%;
   }
   
   .prompt-panel button {
-    padding: 0.85rem 2rem; /* Horizontales Padding auf 2rem erhöht */
+    padding: 0.85rem 1.25rem; /* Etwas schmaleres Padding */
     background-color: #FCEA2B;
     color: #121212;
     border: none;
@@ -634,23 +639,20 @@
     transition: background-color 0.2s;
     display: flex;
     align-items: center;
+    white-space: nowrap; /* Verhindert Umbruch des Textes */
   }
   
-  .prompt-panel button:hover {
-    background-color: #ffe566;
-  }
-  
-  .prompt-panel button:disabled {
-    background-color: #4a4a4a;
-    cursor: not-allowed;
-    color: #888888;
+  .button-icon-inside {
+    width: 18px; /* Etwas kleiner für das kompaktere Layout */
+    height: 18px;
+    margin-right: 8px;
   }
   
   /* Ausgabebereich */
   .output-area {
     grid-column: 2;
     grid-row: 1;
-    padding: 1rem;
+    padding: 0.75rem; /* Reduziert von 1rem auf 0.75rem */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -661,7 +663,8 @@
   
   .output-area h1 {
     align-self: flex-start;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem; /* Reduziert von 1.5rem auf 1rem */
+    font-size: 1.75rem; /* Leicht verkleinert */
   }
   
   .results-container {
@@ -690,7 +693,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 300px;
+    height: 250px; /* Reduziert von 300px */
   }
   
   .spinner {
@@ -722,8 +725,24 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 300px;
+    height: 250px; /* Reduziert von 300px */
+    width: 100%;
     color: #888888;
+  }
+  
+  .empty-state-content {
+    text-align: center;
+    max-width: 400px;
+    padding: 2rem;
+    background-color: rgba(30, 30, 30, 0.5); /* Subtiler Hintergrund */
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .empty-state-content p {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
   }
   
   /* Varianten-Auswahl */
@@ -755,5 +774,51 @@
     background-color: #FCEA2B;
     color: #121212;
     box-shadow: 0 2px 8px rgba(252, 234, 43, 0.3);
+  }
+  
+  /* API URL Box mit verbessertem Design */
+  .api-url-display {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #262626;
+    border-radius: 10px; /* Erhöht für weicheres Erscheinungsbild */
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2); /* Subtiler Schatten für Tiefe */
+    border-left: 3px solid #FCEA2B; /* Gelber Akzent auf der linken Seite */
+  }
+  
+  .api-url-display h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #FCEA2B; /* Überschrift in Akzentfarbe */
+    letter-spacing: 0.03em;
+  }
+  
+  .url-box {
+    padding: 1rem;
+    background-color: rgba(26, 26, 26, 0.5); /* Transparenter Hintergrund */
+    border-radius: 8px;
+    font-family: 'IBM Plex Mono', monospace; /* Konsistente Schriftart für Code */
+    font-size: 0.85rem;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    color: #aaaaaa;
+    line-height: 1.5;
+    border: 1px solid #333333; /* Subtile Umrandung */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3); /* Innerer Schatten für Tiefe */
+  }
+  
+  .method {
+    display: inline-block;
+    background-color: #FCEA2B;
+    color: #121212;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    margin-right: 8px;
+    letter-spacing: 0.05em;
+    font-size: 0.75rem;
+    text-transform: uppercase;
   }
 </style>

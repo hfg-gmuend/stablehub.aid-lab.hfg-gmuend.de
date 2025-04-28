@@ -1,6 +1,8 @@
 <script>
+  import { favorites } from '$lib/stores/favorites';
+  
   export let prompt = "";
-  export let imageUrls = []; // Mehrere Bilder als Array
+  export let imageUrls = [];
   export let onEdit = () => {};
   
   // Funktion zum Herunterladen eines Bildes
@@ -12,6 +14,27 @@
     link.click();
     document.body.removeChild(link);
   }
+  
+  // Initialisierung des Favoriten-Status für jedes Bild
+  let favoriteStatus = imageUrls.map(url => $favorites.some(fav => fav.imageUrl === url));
+  
+  // Funktion zum Umschalten des Favoriten-Status
+  function toggleFavorite(imageUrl, index) {
+    const isFavorite = $favorites.some(fav => fav.imageUrl === imageUrl);
+    
+    if (isFavorite) {
+      favorites.remove(imageUrl);
+    } else {
+      favorites.add({
+        imageUrl,
+        prompt,
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    // Favoriten-Status aktualisieren
+    favoriteStatus[index] = !favoriteStatus[index];
+  }
 </script>
 
 <div class="prompt-result-card">
@@ -20,12 +43,19 @@
     <h3 class="prompt-text">{prompt}</h3>
   </div>
   
-  <div class="images-grid" style="grid-template-columns: repeat({imageUrls.length}, 1fr);">
+  <div class="images-grid" class:single-image={imageUrls.length === 1}>
     {#each imageUrls as imageUrl, index}
       <div class="image-container">
         <img src={imageUrl} alt="Generiertes Bild {index + 1}" class="generated-image" />
         
         <div class="image-overlay">
+          <div class="action-buttons top-left">
+            <button class="action-button favorite-button {favoriteStatus[index] ? 'active' : ''}" 
+                    on:click={() => toggleFavorite(imageUrl, index)}>
+              <span class="favorite-icon">{favoriteStatus[index] ? '★' : '☆'}</span>
+            </button>
+          </div>
+          
           <div class="action-buttons">
             <button class="action-button edit-button" on:click={() => onEdit(prompt)}>
               <img src="/icon/penIcon.svg" alt="Bearbeiten" />
@@ -76,13 +106,21 @@
     display: grid;
     gap: 8px;
     padding: 8px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+  
+  /* Spezielles Styling für einzelne Bilder */
+  .single-image {
+    grid-template-columns: 1fr;
+    max-width: 65%; /* Kleinere Skalierung für einzelne Bilder */
+    margin: 0 auto; /* Zentrieren des einzelnen Bildes */
+    padding: 1.5rem; /* Mehr Padding für ein einzelnes Bild */
   }
   
   .image-container {
     position: relative;
     width: 100%;
     aspect-ratio: 1; /* Quadratische Thumbnails */
-    margin: 0 auto;
     overflow: hidden;
   }
   
@@ -146,5 +184,24 @@
   
   .image-container:hover .image-overlay {
     opacity: 1;
+  }
+  
+  .top-left {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+  }
+  
+  .favorite-button {
+    color: #FCEA2B;
+  }
+  
+  .favorite-button.active {
+    background-color: rgba(252, 234, 43, 0.2);
+  }
+  
+  .favorite-icon {
+    font-size: 1.2rem;
+    line-height: 1;
   }
 </style>
