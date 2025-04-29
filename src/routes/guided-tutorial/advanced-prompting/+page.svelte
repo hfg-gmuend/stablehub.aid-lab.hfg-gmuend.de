@@ -14,6 +14,7 @@
       prompt: "cartoon style, anime, 3d render, painting, drawing, sketch, illustration, low detail face"
     }
   ];
+  import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
 </script>
 
 <svelte:head>
@@ -380,6 +381,13 @@
         <h4>Kursabschluss:</h4>
         <p>Herzlichen Glückwunsch! Du hast alle Tutorial-Module abgeschlossen und verfügst nun über ein solides Fundament an Wissen zu Stable Diffusion und fortgeschrittenen Prompting-Techniken.</p>
       </div>
+      
+      <!-- Navigation buttons -->
+      <TutorialNavigation 
+        previousPath="/guided-tutorial/prompt-weighting"
+        nextPath="/guided-tutorial/advanced/ai-models"
+        nextLabel="Weiter zum Zusatzbereich"
+      />
     </section>
   </div>
 </div>

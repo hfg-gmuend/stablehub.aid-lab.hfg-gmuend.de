@@ -25,6 +25,7 @@
     { name: "Dreamshaper", focus: "Kreativität", description: "Fantasievolle, kunstvolle Bildkreationen" },
     { name: "AbsoluteReality", focus: "Hyperrealismus", description: "Extrem detaillierte fotorealistische Bilder" }
   ];
+  import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
 </script>
 
 <svelte:head>
@@ -266,13 +267,11 @@
         <p>Du verstehst nun die Unterschiede zwischen verschiedenen KI-Bildgenerierungsmodellen und kannst fundierte Entscheidungen treffen, welches Modell für deine Projekte am besten geeignet ist.</p>
       </div>
       
-      <div class="next-section">
-        <p>Im nächsten Zusatzthema lernst du, wie du deinen Workflow optimieren und effizienter gestalten kannst.</p>
-        <a href="/guided-tutorial/advanced/workflow-optimization" class="next-button">
-          Weiter zum nächsten Thema
-          <span class="arrow">→</span>
-        </a>
-      </div>
+      <!-- Navigation buttons -->
+      <TutorialNavigation 
+        previousPath="/guided-tutorial/advanced-prompting"
+        nextPath="/guided-tutorial/advanced/workflow-optimization"
+      />
     </section>
   </div>
 </div>

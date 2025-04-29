@@ -17,6 +17,7 @@
       parameters: { cfgScale: 8, steps: 30, sampler: "DPM++ SDE Karras" }
     }
   ];
+  import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
 </script>
 
 <svelte:head>
@@ -323,15 +324,13 @@
         <h4>Lernziel erreicht:</h4>
         <p>Du weißt nun, wie du deine eigenen Stil-Bibliotheken anlegen, organisieren und effizient nutzen kannst. Dies beschleunigt deinen Workflow und sorgt für konsistentere Ergebnisse.</p>
       </div>
+      
+      <!-- Navigation buttons -->
+      <TutorialNavigation 
+        previousPath="/guided-tutorial/core-parameters"
+        nextPath="/guided-tutorial/prompt-weighting"
+      />
     </section>
-
-    <div class="next-section">
-      <p>Im nächsten Tutorial lernst du, wie du mit Prompt-Priorisierung und Gewichtung noch präzisere Bilder erzeugen kannst.</p>
-      <a href="/guided-tutorial/prompt-weighting" class="next-button">
-        Weiter zum nächsten Thema
-        <span class="arrow">→</span>
-      </a>
-    </div>
   </div>
 </div>
 

@@ -16,6 +16,7 @@
     { category: "Grafik & Design", 
       keywords: ["vector art", "flat design", "minimalist", "isometric", "3D render", "pixel art"] }
   ];
+  import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
 </script>
 
 <svelte:head>
@@ -239,13 +240,11 @@
         <p>Du solltest jetzt in der Lage sein, einen strukturierten Prompt zu schreiben, der alle wichtigen Elemente enthält und ein erwartbares Ergebnis liefert.</p>
       </div>
       
-      <div class="next-section">
-        <p>Im nächsten Tutorial lernst du mehr über die Kernparameter und wie sie deine Bilder beeinflussen.</p>
-        <a href="/guided-tutorial/core-parameters" class="next-button">
-          Weiter zum nächsten Thema
-          <span class="arrow">→</span>
-        </a>
-      </div>
+      <!-- Navigation buttons -->
+      <TutorialNavigation 
+        previousPath="/guided-tutorial/stable-diffusion-intro"
+        nextPath="/guided-tutorial/core-parameters"
+      />
     </section>
   </div>
 </div>

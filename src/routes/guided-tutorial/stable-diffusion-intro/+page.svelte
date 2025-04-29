@@ -1,5 +1,6 @@
 <script>
   import TutorialPanel from "$lib/components/TutorialPanel.svelte";
+  import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
 </script>
 
 <svelte:head>
@@ -135,13 +136,11 @@
         </ul>
       </div>
       
-      <div class="next-section">
-        <p>Im nächsten Tutorial lernst du mehr über die Grundlagen des Prompt-Schreibens.</p>
-        <a href="/guided-tutorial/prompt-basics" class="next-button">
-          Weiter zum nächsten Thema
-          <span class="arrow">→</span>
-        </a>
-      </div>
+      <!-- Navigation buttons -->
+      <TutorialNavigation 
+        nextPath="/guided-tutorial/prompt-basics"
+        nextLabel="Weiter zum nächsten Thema"
+      />
     </section>
   </div>
 </div>

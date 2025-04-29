@@ -236,8 +236,11 @@
         <p>Du verstehst nun, wie Wortposition und Gewichtungssyntax die Aufmerksamkeit des Modells lenken und wie du mehrere Themen in deinen Prompts ausbalancieren kannst.</p>
       </div>
       
-      <div class="next-section">
-        <p>Im nächsten Tutorial lernst du fortgeschrittene Prompting-Techniken für komplexe Szenen und hochauflösende Bilder.</p>
+      <div class="navigation-buttons">
+        <a href="/guided-tutorial/manage-styles" class="back-button">
+          <span class="arrow back-arrow">←</span>
+          Zurück zum vorherigen Thema
+        </a>
         <a href="/guided-tutorial/advanced-prompting" class="next-button">
           Weiter zum nächsten Thema
           <span class="arrow">→</span>
@@ -718,25 +721,34 @@
   }
   
   /* Navigation */
-  .next-section {
+  .navigation-buttons {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
+    justify-content: space-between;
+    align-items: center;
     margin-top: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
   }
   
-  .next-button {
+  .next-button, .back-button {
     display: inline-flex;
     align-items: center;
-    background-color: #FCEA2B;
-    color: #000;
     padding: 0.8rem 1.2rem;
     border-radius: 6px;
     text-decoration: none;
     font-family: 'IBM Plex Mono', monospace;
     font-weight: 500;
-    margin-top: 1rem;
     transition: all 0.2s;
+  }
+  
+  .next-button {
+    background-color: #FCEA2B;
+    color: #000;
+  }
+  
+  .back-button {
+    background-color: #333;
+    color: #e0e0e0;
   }
   
   .next-button:hover {
@@ -744,7 +756,28 @@
     transform: translateX(3px);
   }
   
+  .back-button:hover {
+    background-color: #444;
+    transform: translateX(-3px);
+  }
+  
   .arrow {
     margin-left: 10px;
+  }
+  
+  .back-arrow {
+    margin-left: 0;
+    margin-right: 10px;
+  }
+  
+  @media (max-width: 600px) {
+    .navigation-buttons {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .back-button {
+      order: 2;
+    }
   }
 </style>

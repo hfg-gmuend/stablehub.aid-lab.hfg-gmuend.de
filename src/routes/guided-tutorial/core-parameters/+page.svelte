@@ -12,6 +12,7 @@
     { name: "DPM++ 2M Karras", description: "Hoch detailliert, gut für fotorealistische Bilder", startwert: "25-30 Steps" },
     { name: "DDIM", description: "Sehr stabil, gut für Inpainting", startwert: "30-40 Steps" }
   ];
+  import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
 </script>
 
 <svelte:head>
@@ -240,13 +241,11 @@
         <p>Du verstehst jetzt, wie CFG, Steps und Seed das Ergebnis beeinflussen und kannst bewusste Entscheidungen für deine Generierungen treffen.</p>
       </div>
       
-      <div class="next-section">
-        <p>Im nächsten Tutorial lernst du, wie du deine eigenen Stil-Bibliotheken erstellen und verwalten kannst.</p>
-        <a href="/guided-tutorial/manage-styles" class="next-button">
-          Weiter zum nächsten Thema
-          <span class="arrow">→</span>
-        </a>
-      </div>
+      <!-- Navigation buttons -->
+      <TutorialNavigation 
+        previousPath="/guided-tutorial/prompt-basics"
+        nextPath="/guided-tutorial/manage-styles"
+      />
     </section>
   </div>
 </div>

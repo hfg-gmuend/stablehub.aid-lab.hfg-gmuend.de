@@ -360,6 +360,13 @@
         <h4>Herzlichen Glückwunsch!</h4>
         <p>Du hast alle Zusatzbereiche des Tutorials absolviert und verfügst nun über umfassende Ressourcen für dein fortgeschrittenes Lernen im Bereich der KI-Bildgenerierung.</p>
       </div>
+      
+      <!-- Navigation buttons -->
+      <TutorialNavigation 
+        previousPath="/guided-tutorial/advanced/ai-models"
+        nextPath="/guided-tutorial"
+        nextLabel="Zurück zur Tutorial-Übersicht"
+      />
     </section>
   </div>
 </div>
