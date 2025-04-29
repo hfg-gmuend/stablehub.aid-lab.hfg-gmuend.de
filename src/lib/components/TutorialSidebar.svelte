@@ -4,12 +4,35 @@
   // Aktuelle Route für Hervorhebung
   $: currentPath = $page.url.pathname;
   
-  // Tutorial-Themen
-  const tutorialTopics = [
-    { name: 'Was ist Stable Diffusion?', path: '/guided-tutorial/stable-diffusion-intro' },
-    { name: 'Prompt-Grundlagen', path: '/guided-tutorial/prompt-basics' },
-    { name: 'Kernparameter', path: '/guided-tutorial/core-parameters' },
-    { name: 'Stile verwalten', path: '/guided-tutorial/manage-styles' }
+  // Tutorial-Themen in Kategorien
+  const tutorialCategories = [
+    {
+      title: "Grundlagen",
+      topics: [
+        { name: 'Was ist Stable Diffusion?', path: '/guided-tutorial/stable-diffusion-intro' },
+        { name: 'Prompt-Grundlagen', path: '/guided-tutorial/prompt-basics' }
+      ]
+    },
+    {
+      title: "Fortgeschritten",
+      topics: [
+        { name: 'Kernparameter', path: '/guided-tutorial/core-parameters' },
+        { name: 'Stile verwalten', path: '/guided-tutorial/manage-styles' }
+      ]
+    },
+    {
+      title: "Profi",
+      topics: [
+        { name: 'Prompt-Priorisierung', path: '/guided-tutorial/prompt-weighting' },
+        { name: 'Fortgeschrittenes Prompting', path: '/guided-tutorial/advanced-prompting' }
+      ]
+    }
+  ];
+  
+  // Zusatzbereich-Themen
+  const advancedTopics = [
+    { name: 'KI-Modelle verstehen', path: '/guided-tutorial/advanced/ai-models' },
+    { name: 'Ressourcen & Deep-Dive', path: '/guided-tutorial/advanced/workflow-optimization' }
   ];
 </script>
 
@@ -18,25 +41,39 @@
     <h2>Guided Tutorials</h2>
   </div>
   
-  <div class="tutorial-navigation">
-    <h3>Tutorial-Themen</h3>
-    <div class="topic-buttons">
-      {#each tutorialTopics as topic}
-        <a 
-          href={topic.path} 
-          class="topic-button" 
-          class:active={currentPath === topic.path}
-        >
-          {topic.name}
-        </a>
-      {/each}
-    </div>
-  </div>
-  
-  <div class="tutorial-info">
-    <div class="info-box">
-      <h4>Tipp des Tages</h4>
-      <p>Verwende spezifische Adjektive in deinen Prompts, um präzisere Bilder zu generieren.</p>
+  <div class="sidebar-content">
+    <!-- Tutorial-Kategorien -->
+    {#each tutorialCategories as category}
+      <div class="tutorial-navigation">
+        <h3>{category.title}</h3>
+        <div class="topic-buttons">
+          {#each category.topics as topic}
+            <a 
+              href={topic.path} 
+              class="topic-button" 
+              class:active={currentPath === topic.path}
+            >
+              {topic.name}
+            </a>
+          {/each}
+        </div>
+      </div>
+    {/each}
+    
+    <!-- Zusatzbereich -->
+    <div class="tutorial-navigation">
+      <h3>Zusatzbereich</h3>
+      <div class="topic-buttons">
+        {#each advancedTopics as topic}
+          <a 
+            href={topic.path} 
+            class="topic-button" 
+            class:active={currentPath === topic.path}
+          >
+            {topic.name}
+          </a>
+        {/each}
+      </div>
     </div>
   </div>
 </aside>
@@ -57,7 +94,7 @@
   .sidebar-header {
     padding: 1.5rem;
     border-bottom: 1px solid #333333;
-    margin-bottom: 1rem;
+    flex-shrink: 0;
   }
   
   h2 {
@@ -68,9 +105,38 @@
     color: #FCEA2B;
   }
   
+  .sidebar-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    /* Scrollbar stylen */
+    scrollbar-width: thin;
+    scrollbar-color: #333 #161616;
+  }
+  
+  /* Webkit Scrollbar für Chrome, Safari, etc. */
+  .sidebar-content::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .sidebar-content::-webkit-scrollbar-track {
+    background: #161616;
+  }
+  
+  .sidebar-content::-webkit-scrollbar-thumb {
+    background-color: #333;
+    border-radius: 3px;
+  }
+  
   .tutorial-navigation {
-    padding: 0 1.5rem;
     margin-bottom: 1.5rem;
+  }
+  
+  /* Kategorie-Stil */
+  .tutorial-navigation:not(:first-of-type) {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #333333;
   }
   
   h3 {
@@ -112,32 +178,5 @@
     color: #ffffff;
     border-left: 3px solid #FCEA2B;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .tutorial-info {
-    margin-top: auto;
-    padding: 1.5rem;
-  }
-  
-  .info-box {
-    background-color: #1d1d1d;
-    border-radius: 6px;
-    padding: 1rem;
-    border: 1px solid #333;
-  }
-  
-  h4 {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.9rem;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-    color: #a0a0a0;
-  }
-  
-  .info-box p {
-    font-size: 0.85rem;
-    color: #888;
-    margin: 0;
-    line-height: 1.4;
   }
 </style>

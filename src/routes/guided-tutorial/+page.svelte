@@ -1,8 +1,9 @@
 <script>
-  // Statische Tutorial-Daten
-  const tutorialSections = [
+  // Tutorial-Daten in Kategorien
+  const tutorialCategories = [
     {
       title: "Grundlagen der KI-Bildgenerierung",
+      level: "Grundlagen",
       topics: [
         { 
           name: "Was ist Stable Diffusion?", 
@@ -18,6 +19,7 @@
     },
     {
       title: "Fortgeschrittene Techniken",
+      level: "Fortgeschritten",
       topics: [
         { 
           name: "Kernparameter", 
@@ -30,8 +32,41 @@
           description: "Eigene Stil-Bibliotheken anlegen, verwenden und mit einem Klick wechseln"
         }
       ]
+    },
+    {
+      title: "Profi-Techniken",
+      level: "Profi",
+      topics: [
+        { 
+          name: "Prompt-Priorisierung", 
+          path: "/guided-tutorial/prompt-weighting",
+          description: "Wortposition und Gewichtungssyntax für ausbalancierte und präzise Bilder"
+        },
+        { 
+          name: "Fortgeschrittenes Prompting", 
+          path: "/guided-tutorial/advanced-prompting",
+          description: "Multi-Prompt, Upscaling und weiterführende Techniken für komplexe Szenen"
+        }
+      ]
     }
   ];
+
+  // Zusatzbereich
+  const additionalResources = {
+    title: "Zusatzbereich",
+    topics: [
+      { 
+        name: "KI-Modelle verstehen", 
+        path: "/guided-tutorial/advanced/ai-models",
+        description: "Ein tieferer Einblick in verschiedene Bildgenerierungsmodelle und ihre Anwendungsbereiche"
+      },
+      { 
+        name: "Ressourcen & Deep-Dive", 
+        path: "/guided-tutorial/advanced/workflow-optimization",
+        description: "Weiterführende Materialien, Cheatsheets und Links für das selbstständige Lernen"
+      }
+    ]
+  };
 </script>
 
 <svelte:head>
@@ -44,12 +79,16 @@
     <p>Lerne Schritt für Schritt die wichtigsten Aspekte der KI-Bildgenerierung</p>
   </div>
 
+  <!-- Tutorial-Kategorien -->
   <div class="tutorial-content">
-    {#each tutorialSections as section}
+    {#each tutorialCategories as category}
       <div class="tutorial-section">
-        <h2>{section.title}</h2>
+        <div class="section-header">
+          <h2>{category.title}</h2>
+          <span class="level-badge level-{category.level.toLowerCase()}">{category.level}</span>
+        </div>
         <div class="topic-cards">
-          {#each section.topics as topic}
+          {#each category.topics as topic}
             <a href={topic.path} class="topic-card">
               <h3>{topic.name}</h3>
               <p>{topic.description}</p>
@@ -62,6 +101,26 @@
         </div>
       </div>
     {/each}
+
+    <!-- Zusatzbereich -->
+    <div class="tutorial-section additional-section">
+      <div class="section-header">
+        <h2>{additionalResources.title}</h2>
+        <span class="level-badge level-zusatz">Erweitert</span>
+      </div>
+      <div class="topic-cards">
+        {#each additionalResources.topics as topic}
+          <a href={topic.path} class="topic-card additional-card">
+            <h3>{topic.name}</h3>
+            <p>{topic.description}</p>
+            <div class="card-footer">
+              <span class="start-button">Erkunden</span>
+              <span class="arrow-icon">→</span>
+            </div>
+          </a>
+        {/each}
+      </div>
+    </div>
   </div>
 </div>
 
@@ -97,13 +156,50 @@
     margin-bottom: 3rem;
   }
   
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  
   h2 {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 1.5rem;
-    margin-bottom: 1.5rem;
     color: #e0e0e0;
-    border-bottom: 1px solid #333;
     padding-bottom: 0.5rem;
+    border-bottom: 1px solid #333;
+    flex-grow: 1;
+    margin: 0;
+  }
+  
+  .level-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 20px;
+    font-weight: 500;
+    margin-left: 1rem;
+  }
+  
+  .level-grundlagen {
+    background-color: #4da6ff;
+    color: #000;
+  }
+  
+  .level-fortgeschritten {
+    background-color: #FFC107;
+    color: #000;
+  }
+  
+  .level-profi {
+    background-color: #F44336;
+    color: #fff;
+  }
+  
+  .level-zusatz {
+    background-color: #9C27B0;
+    color: #fff;
   }
   
   .topic-cards {
@@ -128,6 +224,14 @@
   .topic-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    border-color: #FCEA2B;
+  }
+  
+  .additional-card {
+    border-left: 3px solid #9C27B0;
+  }
+  
+  .additional-card:hover {
     border-color: #FCEA2B;
   }
   
@@ -170,5 +274,9 @@
   
   .topic-card:hover .arrow-icon {
     transform: translateX(5px);
+  }
+  
+  .additional-section {
+    margin-top: 4rem;
   }
 </style>
