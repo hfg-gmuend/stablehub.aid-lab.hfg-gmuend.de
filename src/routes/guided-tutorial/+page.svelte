@@ -5,14 +5,14 @@
       title: "Grundlagen der KI-Bildgenerierung",
       topics: [
         { 
-          name: "Prompt - Wie geht's?", 
-          path: "/guided-tutorial/prompt-basics",
-          description: "Grundlagen des Prompt-Schreibens für KI-Bildgenerierung"
+          name: "Was ist Stable Diffusion?", 
+          path: "/guided-tutorial/stable-diffusion-intro",
+          description: "Einführung in Stable Diffusion: Modellübersicht, Betrieb & Promptgestaltung"
         },
         { 
-          name: "CFG - Was ist das?", 
-          path: "/guided-tutorial/cfg-explained",
-          description: "Verstehe den Classifier Free Guidance Parameter und seine Auswirkungen"
+          name: "Prompt-Grundlagen", 
+          path: "/guided-tutorial/prompt-basics",
+          description: "Aufbau erfolgreicher Prompts: Struktur, Reihenfolge und Stilelemente"
         }
       ]
     },

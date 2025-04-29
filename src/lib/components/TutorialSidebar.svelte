@@ -6,8 +6,8 @@
   
   // Tutorial-Themen
   const tutorialTopics = [
-    { name: 'Prompt - Wie geht\'s?', path: '/guided-tutorial/prompt-basics' },
-    { name: 'CFG - Was ist das?', path: '/guided-tutorial/cfg-explained' },
+    { name: 'Was ist Stable Diffusion?', path: '/guided-tutorial/stable-diffusion-intro' },
+    { name: 'Prompt-Grundlagen', path: '/guided-tutorial/prompt-basics' },
     { name: 'Steps - Wofür?', path: '/guided-tutorial/steps-purpose' },
     { name: 'Prompt Advanced', path: '/guided-tutorial/prompt-advanced' }
   ];
