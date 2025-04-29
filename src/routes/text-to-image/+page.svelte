@@ -2,18 +2,23 @@
   import MinimalSidebar from "$lib/components/MinimalSidebar.svelte";
   import PromptResultCard from "$lib/components/PromptResultCard.svelte";
   import NavigationBar from "$lib/components/NavigationBar.svelte";
+  import TokenizedPromptArea from "$lib/components/TokenizedPromptArea.svelte";
   import { onMount, onDestroy } from "svelte";
+  import { styles } from "$lib/config/styles.js";
   
   // Parameter für die API
   let prompt = "cat with dog";
   let negativePrompt = "";
-  let variants = 1; // Neue Einstellung für Anzahl der Varianten
+  let variants = 1;
   let cfg = 2;
   let steps = 6;
   let seed = 0;
   let uid = "default";
   
-  // Zustand für Tooltips
+  // Ausgewählte Stile
+  let selectedStyles = [];
+  
+  // Tooltip und Style-Operationen
   let activeTooltip = null;
   
   // Tooltip-Texte
@@ -23,7 +28,8 @@
     steps: "Mehr Steps bedeuten eine längere Renderzeit, aber oft ein detaillierteres Bild. Übliche Werte liegen zwischen 5 und 50.",
     cfg: "Steuert, wie stark sich das Modell an den Prompt halten soll. Höhere Werte bedeuten mehr Prompt-Treue, aber manchmal weniger Kreativität.",
     seed: "Ein bestimmter Seed erzeugt immer das gleiche Bild bei identischen anderen Parametern. Nützlich, um Ergebnisse zu reproduzieren oder leichte Variationen zu erzeugen.",
-    uid: "Identifiziert den Benutzer für die API. Kann für Tracking und Limitierungen verwendet werden."
+    uid: "Identifiziert den Benutzer für die API. Kann für Tracking und Limitierungen verwendet werden.",
+    styles: "Wähle vordefinierte Stile, die deinem Prompt als Tags hinzugefügt werden."
   };
   
   // Zustand der Anwendung
@@ -86,8 +92,9 @@
         { 
           id: Date.now(), 
           prompt: prompt,
-          imageUrls: variantImages, // Mehrere Bilder statt einem
-          timestamp: new Date()
+          imageUrls: variantImages,
+          timestamp: new Date(),
+          styles: [...selectedStyles] // Speichern der verwendeten Stile
         },
         ...generatedResults
       ];
@@ -159,6 +166,35 @@
       }
     });
   });
+  
+  // Hilfsfunktion zum Anpassen des Style-Prompts
+  function addStyle(style) {
+    if (!selectedStyles.includes(style.id)) {
+      selectedStyles = [...selectedStyles, style.id];
+      
+      // Style-Prompt zum Hauptprompt hinzufügen
+      // Füge das Motiv-Keyword hinzu, wenn es sich um App Design handelt
+      let stylePrompt = style.prompt;
+      if (style.id === 'appdesign') {
+        // Ersetze {Motiv} mit dem ersten Teil des aktuellen Prompts, falls vorhanden
+        const mainSubject = prompt.split(',')[0].trim();
+        stylePrompt = stylePrompt.replace('{Motiv}', mainSubject);
+      }
+      
+      prompt = prompt.trim() + `, ${stylePrompt}`;
+    }
+  }
+  
+  function removeStyle(styleId) {
+    const styleToRemove = styles.find(s => s.id === styleId);
+    if (styleToRemove) {
+      // Entferne den Style-Prompt aus dem Hauptprompt
+      prompt = prompt.replace(`, ${styleToRemove.prompt}`, '');
+      
+      // Entferne den Style aus der Liste der ausgewählten Stile
+      selectedStyles = selectedStyles.filter(id => id !== styleId);
+    }
+  }
 </script>
 
 <svelte:head>
@@ -291,6 +327,53 @@
           </div>
         </div>
         
+        <!-- Styles-Auswahl -->
+        <div class="parameter-group full-width">
+          <div class="label-container">
+            <label for="styles">Styles</label>
+            <div class="info-icon" 
+                on:mouseenter={() => activeTooltip = 'styles'}
+                on:mouseleave={() => activeTooltip = null}>
+              i
+              {#if activeTooltip === 'styles'}
+                <div class="tooltip">{tooltips.styles}</div>
+              {/if}
+            </div>
+          </div>
+          
+          <div class="styles-grid">
+            {#each styles as style}
+              <div 
+                class="style-thumbnail {selectedStyles.includes(style.id) ? 'selected' : ''}" 
+                on:click={() => addStyle(style)}
+              >
+                <img src={style.thumbnail} alt={style.name} />
+                
+                {#if selectedStyles.includes(style.id)}
+                  <button 
+                    class="remove-style-btn" 
+                    on:click|stopPropagation={() => removeStyle(style.id)}
+                  >×</button>
+                {/if}
+              </div>
+            {/each}
+          </div>
+          
+          <!-- Ausgewählte Stil-Tags -->
+          {#if selectedStyles.length > 0}
+            <div class="selected-styles">
+              {#each selectedStyles as styleId}
+                {#if styles.find(s => s.id === styleId)}
+                  <div class="style-tag">
+                    {styles.find(s => s.id === styleId).name}
+                    <button class="tag-remove-btn" on:click={() => removeStyle(styleId)}>×</button>
+                  </div>
+                {/if}
+              {/each}
+            </div>
+          {/if}
+        </div>
+        
         <div class="api-url-display">
           <h3>API Anfrage</h3>
           <div class="url-box">
@@ -320,6 +403,7 @@
                 prompt={result.prompt}
                 imageUrls={result.imageUrls}
                 onEdit={editPrompt}
+                usedStyles={result.styles || []}
               />
             {/each}
           </div>
@@ -346,7 +430,13 @@
               {/if}
             </div>
           </div>
-          <textarea id="main-prompt" bind:value={prompt}></textarea>
+          
+          <!-- Ersetzen des traditionellen Textareas durch die neue TokenizedPromptArea -->
+          <TokenizedPromptArea
+            bind:value={prompt}
+            id="main-prompt"
+            placeholder="Beschreibe, was du generieren möchtest..."
+          />
         </div>
         
         <div class="generate-button-container">
@@ -597,28 +687,18 @@
     grid-row: 2;
     background-color: #1e1e1e;
     border-radius: 8px;
-    padding: 1rem 1.25rem; /* Reduziert von 1.5rem auf 1rem/1.25rem */
+    padding: 1rem 1.25rem;
     display: grid;
     grid-template-columns: 1fr auto;
-    gap: 1.25rem; /* Reduziert von 1.5rem */
+    gap: 1.25rem;
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
     align-items: center;
-    /* Minimale Höhe festlegen für konsistentes Layout */
-    min-height: 110px;
   }
   
-  .prompt-panel textarea {
-    width: 100%;
-    height: 70px; /* Reduziert von 80px */
-    padding: 0.75rem;
-    border: 1px solid #444444;
-    border-radius: 6px;
-    resize: none;
-    font-family: 'Inter', sans-serif;
-    margin-bottom: 0; /* Kein Abstand nach unten mehr nötig */
-    background-color: #2a2a2a;
-    color: #ffffff;
-    transition: border-color 0.2s, box-shadow 0.2s;
+  .prompt-input-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
   }
   
   .generate-button-container {
@@ -636,14 +716,26 @@
     cursor: pointer;
     font-family: 'IBM Plex Mono', monospace;
     font-weight: 500;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
     display: flex;
     align-items: center;
     white-space: nowrap; /* Verhindert Umbruch des Textes */
+    box-shadow: 0 2px 5px rgba(252, 234, 43, 0.2);
+  }
+  
+  .prompt-panel button:hover {
+    background-color: #ffe566;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(252, 234, 43, 0.3);
+  }
+  
+  .prompt-panel button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 3px rgba(252, 234, 43, 0.2);
   }
   
   .button-icon-inside {
-    width: 18px; /* Etwas kleiner für das kompaktere Layout */
+    width: 18px;
     height: 18px;
     margin-right: 8px;
   }
@@ -776,6 +868,113 @@
     box-shadow: 0 2px 8px rgba(252, 234, 43, 0.3);
   }
   
+  /* Styles-Grid mit 3 Elementen pro Zeile */
+  .styles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)); /* Genau 3 Spalten pro Zeile */
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    width: 100%;
+  }
+  
+  .style-thumbnail {
+    position: relative;
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    width: 100%; /* Nutzt die verfügbare Breite */
+    aspect-ratio: 1.2; /* Etwas höher als breit */
+    transition: all 0.2s;
+    border: 2px solid transparent;
+    box-sizing: border-box; /* Stellt sicher, dass Padding und Border in die Größe eingerechnet werden */
+    max-width: 75px; /* Etwas größer, da nur 3 pro Zeile */
+    margin: 0 auto; /* Zentrieren */
+  }
+  
+  .style-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.2s;
+  }
+  
+  .style-thumbnail:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .style-thumbnail.selected {
+    border-color: #FCEA2B;
+    box-shadow: 0 0 0 2px rgba(252, 234, 43, 0.3);
+  }
+  
+  /* Style-Name entfernen */
+  .style-name {
+    display: none; /* Labels nicht mehr anzeigen */
+  }
+  
+  /* Remove-Button */
+  .remove-style-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px; /* Kleinerer Button */
+    height: 20px; /* Kleinerer Button */
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px; /* Kleinere Schrift */
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0; /* Kein Padding */
+  }
+  
+  .remove-style-btn:hover {
+    background: rgba(220, 53, 69, 0.8);
+  }
+  
+  /* Ausgewählte Style-Tags */
+  .selected-styles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  
+  .style-tag {
+    background-color: rgba(252, 234, 43, 0.15);
+    color: #FCEA2B;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid rgba(252, 234, 43, 0.3);
+  }
+  
+  .tag-remove-btn {
+    background: none;
+    border: none;
+    color: #FCEA2B;
+    cursor: pointer;
+    padding: 0;
+    font-size: 1.2rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .tag-remove-btn:hover {
+    color: #fff;
+  }
+  
   /* API URL Box mit verbessertem Design */
   .api-url-display {
     margin-top: 2rem;
@@ -820,5 +1019,17 @@
     letter-spacing: 0.05em;
     font-size: 0.75rem;
     text-transform: uppercase;
+  }
+  
+  /* Header Bar und Navigation Tabs */
+  .header-bar {
+    background-color: #1e1e1e;
+    padding: 0.4rem 0.5rem;
+    border-radius: 0 0 6px 6px;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 </style>

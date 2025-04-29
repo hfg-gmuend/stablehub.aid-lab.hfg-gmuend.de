@@ -1,9 +1,12 @@
 <script>
   import { favorites } from '$lib/stores/favorites';
+  import { styles } from "$lib/config/styles.js";
   
   export let prompt = "";
   export let imageUrls = [];
   export let onEdit = () => {};
+  // Neue Prop für die Styles
+  export let usedStyles = [];
   
   // Funktion zum Herunterladen eines Bildes
   function downloadImage(imageUrl) {
@@ -68,6 +71,19 @@
       </div>
     {/each}
   </div>
+  
+  <!-- Anzeige der verwendeten Stile -->
+  {#if usedStyles && usedStyles.length > 0}
+    <div class="used-styles">
+      {#each usedStyles as styleId}
+        {#if styles.find(s => s.id === styleId)}
+          <div class="used-style-tag">
+            {styles.find(s => s.id === styleId).name}
+          </div>
+        {/if}
+      {/each}
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -203,5 +219,25 @@
   .favorite-icon {
     font-size: 1.2rem;
     line-height: 1;
+  }
+  
+  /* Stil-Tags unter dem Bild */
+  .used-styles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border-top: 1px solid #333;
+  }
+  
+  .used-style-tag {
+    background-color: rgba(252, 234, 43, 0.15);
+    color: #FCEA2B;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(252, 234, 43, 0.3);
   }
 </style>

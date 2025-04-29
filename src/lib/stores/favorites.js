@@ -1,48 +1,88 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 
-// Funktion zum Laden der gespeicherten Favoriten aus dem LocalStorage
+// Funktion zum Laden der gespeicherten Favoriten aus dem Local Storage
 const loadFavorites = () => {
   if (browser) {
-    const storedFavorites = localStorage.getItem('favoriteImages');
-    return storedFavorites ? JSON.parse(storedFavorites) : [];
+    try {
+      const storedFavorites = localStorage.getItem('favoriteImages');
+      console.log("Geladene Favoriten:", storedFavorites);
+      return storedFavorites ? JSON.parse(storedFavorites) : [];
+    } catch (e) {
+      console.error("Fehler beim Laden der Favoriten:", e);
+      return [];
+    }
   }
   return [];
 };
 
 // Erstellen des Stores mit den gespeicherten Favoriten
 const createFavoritesStore = () => {
-  const { subscribe, update } = writable(loadFavorites());
+  const { subscribe, update, set } = writable(loadFavorites());
 
   return {
     subscribe,
     
-    // Favorit hinzufügen
-    add: (item) => {
+    // Favorit hinzufügen oder entfernen
+    toggle: (image) => {
       update(favorites => {
+        console.log("Toggle Favorit:", image);
+        
         // Prüfen, ob das Bild bereits in den Favoriten ist
-        if (!favorites.some(fav => fav.imageUrl === item.imageUrl)) {
-          const updatedFavorites = [...favorites, item];
+        const existingIndex = favorites.findIndex(fav => fav.imageUrl === image.imageUrl);
+        
+        if (existingIndex >= 0) {
+          // Bild aus Favoriten entfernen
+          const updatedFavorites = [
+            ...favorites.slice(0, existingIndex),
+            ...favorites.slice(existingIndex + 1)
+          ];
           
-          // Im LocalStorage speichern
+          // Im Local Storage speichern
           if (browser) {
-            localStorage.setItem('favoriteImages', JSON.stringify(updatedFavorites));
+            try {
+              localStorage.setItem('favoriteImages', JSON.stringify(updatedFavorites));
+              console.log("Favorit entfernt, neue Liste:", updatedFavorites);
+            } catch (e) {
+              console.error("Fehler beim Speichern der Favoriten:", e);
+            }
+          }
+          
+          return updatedFavorites;
+        } else {
+          // Bild zu Favoriten hinzufügen
+          const updatedFavorites = [...favorites, image];
+          
+          // Im Local Storage speichern
+          if (browser) {
+            try {
+              localStorage.setItem('favoriteImages', JSON.stringify(updatedFavorites));
+              console.log("Favorit hinzugefügt, neue Liste:", updatedFavorites);
+            } catch (e) {
+              console.error("Fehler beim Speichern der Favoriten:", e);
+            }
           }
           
           return updatedFavorites;
         }
-        return favorites;
       });
     },
     
-    // Favorit entfernen
+    // Favorit entfernen (wird in der Gallerie-Ansicht verwendet)
     remove: (imageUrl) => {
       update(favorites => {
+        console.log("Entferne Favorit mit URL:", imageUrl);
+        
         const updatedFavorites = favorites.filter(fav => fav.imageUrl !== imageUrl);
         
-        // Im LocalStorage speichern
+        // Im Local Storage speichern
         if (browser) {
-          localStorage.setItem('favoriteImages', JSON.stringify(updatedFavorites));
+          try {
+            localStorage.setItem('favoriteImages', JSON.stringify(updatedFavorites));
+            console.log("Favorit entfernt, neue Liste:", updatedFavorites);
+          } catch (e) {
+            console.error("Fehler beim Speichern der Favoriten:", e);
+          }
         }
         
         return updatedFavorites;

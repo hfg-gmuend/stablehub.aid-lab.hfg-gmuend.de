@@ -1,7 +1,7 @@
 <script>
   import { goto } from '$app/navigation';
   
-  // Props: aktiver Tab (entweder 'generate' oder 'gallery')
+  // Props: aktiver Tab (erweitert um 'controlnet')
   export let active = 'generate';
 </script>
 
@@ -10,7 +10,17 @@
     <button 
       class="tab-button {active === 'generate' ? 'active' : ''}" 
       on:click={() => goto('/text-to-image')}>
-      Generieren
+      Text → Bild
+    </button>
+    <button 
+      class="tab-button {active === 'image-to-image' ? 'active' : ''}" 
+      on:click={() => goto('/image-to-image')}>
+      Bild → Bild
+    </button>
+    <button 
+      class="tab-button {active === 'controlnet' ? 'active' : ''}" 
+      on:click={() => goto('/control-net')}>
+      ControlNet
     </button>
     <button 
       class="tab-button {active === 'gallery' ? 'active' : ''}" 
