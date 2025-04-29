@@ -13,7 +13,6 @@
   let cfg = 2;
   let steps = 6;
   let seed = 0;
-  let uid = "default";
   
   // Ausgewählte Stile
   let selectedStyles = [];
@@ -28,7 +27,6 @@
     steps: "Mehr Steps bedeuten eine längere Renderzeit, aber oft ein detaillierteres Bild. Übliche Werte liegen zwischen 5 und 50.",
     cfg: "Steuert, wie stark sich das Modell an den Prompt halten soll. Höhere Werte bedeuten mehr Prompt-Treue, aber manchmal weniger Kreativität.",
     seed: "Ein bestimmter Seed erzeugt immer das gleiche Bild bei identischen anderen Parametern. Nützlich, um Ergebnisse zu reproduzieren oder leichte Variationen zu erzeugen.",
-    uid: "Identifiziert den Benutzer für die API. Kann für Tracking und Limitierungen verwendet werden.",
     styles: "Wähle vordefinierte Stile, die deinem Prompt als Tags hinzugefügt werden."
   };
   
@@ -71,7 +69,7 @@
         // Für verschiedene Varianten unterschiedliche Seeds verwenden
         const currentSeed = i === 0 ? seed : seed + i;
         url.searchParams.append("seed", currentSeed);
-        url.searchParams.append("uid", uid);
+        url.searchParams.append("uid", "default"); // Standardwert verwenden
         
         const response = await fetch(url);
         
@@ -137,10 +135,6 @@
     
     if (url.searchParams.has("seed")) {
       seed = parseInt(url.searchParams.get("seed"));
-    }
-    
-    if (url.searchParams.has("uid")) {
-      uid = url.searchParams.get("uid");
     }
     
     if (url.searchParams.has("variants")) {
@@ -310,21 +304,6 @@
               </button>
             </div>
           </div>
-          
-          <div class="parameter-grid-item">
-            <div class="label-container">
-              <label for="uid">User ID</label>
-              <div class="info-icon" 
-                  on:mouseenter={() => activeTooltip = 'uid'}
-                  on:mouseleave={() => activeTooltip = null}>
-                i
-                {#if activeTooltip === 'uid'}
-                  <div class="tooltip">{tooltips.uid}</div>
-                {/if}
-              </div>
-            </div>
-            <input type="text" id="uid" bind:value={uid}>
-          </div>
         </div>
         
         <!-- Styles-Auswahl -->
@@ -374,11 +353,12 @@
           {/if}
         </div>
         
+        <!-- API URL Anzeige aktualisieren -->
         <div class="api-url-display">
           <h3>API Anfrage</h3>
           <div class="url-box">
             <span class="method">GET</span> 
-            {`${apiBaseUrl}?prompt=${encodeURIComponent(prompt)}${negativePrompt ? `&negative_prompt=${encodeURIComponent(negativePrompt)}` : ''}&cfg=${cfg}&steps=${steps}&seed=${seed}&uid=${uid}`}
+            {`${apiBaseUrl}?prompt=${encodeURIComponent(prompt)}${negativePrompt ? `&negative_prompt=${encodeURIComponent(negativePrompt)}` : ''}&cfg=${cfg}&steps=${steps}&seed=${seed}&uid=default`}
           </div>
         </div>
       </div>

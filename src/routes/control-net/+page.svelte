@@ -11,7 +11,7 @@
   let cfg = 1.3;
   let steps = 6;
   let seed = 0;
-  let uid = "default";
+  // Entferne uid
   
   // ControlNet-spezifische Parameter
   let controlnetStrength = 0.75;
@@ -35,7 +35,7 @@
     steps: "Mehr Steps bedeuten eine längere Renderzeit, aber oft ein detaillierteres Bild. Übliche Werte liegen zwischen 5 und 50.",
     cfg: "Steuert, wie stark sich das Modell an den Prompt halten soll. Höhere Werte bedeuten mehr Prompt-Treue, aber manchmal weniger Kreativität.",
     seed: "Ein bestimmter Seed erzeugt immer das gleiche Bild bei identischen anderen Parametern. Nützlich, um Ergebnisse zu reproduzieren.",
-    uid: "Identifiziert den Benutzer für die API. Kann für Tracking und Limitierungen verwendet werden.",
+    // Entferne uid
     controlnetStrength: "Steuert, wie stark sich das Modell an die Vorlage halten soll. Höhere Werte bedeuten mehr Kontrolle durch die Vorlage.",
     startPercent: "Prozentualer Wert, ab dem die Kontrolle durch die Vorlage beginnen soll (0 bedeutet direkt zu Beginn der Bildgenerierung).",
     endPercent: "Prozentualer Wert, bis zu dem die Kontrolle durch die Vorlage angewendet werden soll (1 bedeutet bis zum Ende der Bildgenerierung).",
@@ -119,7 +119,7 @@
       url.searchParams.append("cfg", cfg);
       url.searchParams.append("steps", steps);
       url.searchParams.append("seed", seed);
-      url.searchParams.append("uid", uid);
+      url.searchParams.append("uid", "default"); // Standardwert verwenden
       if (negativePrompt) url.searchParams.append("negative_prompt", negativePrompt);
       
       // POST-Request mit FormData
@@ -191,10 +191,6 @@
     
     if (url.searchParams.has("seed")) {
       seed = parseInt(url.searchParams.get("seed"));
-    }
-    
-    if (url.searchParams.has("uid")) {
-      uid = url.searchParams.get("uid");
     }
     
     if (url.searchParams.has("controlnet_strength")) {
@@ -449,28 +445,13 @@
               </button>
             </div>
           </div>
-          
-          <div class="parameter-grid-item">
-            <div class="label-container">
-              <label for="uid">User ID</label>
-              <div class="info-icon" 
-                  on:mouseenter={() => activeTooltip = 'uid'}
-                  on:mouseleave={() => activeTooltip = null}>
-                i
-                {#if activeTooltip === 'uid'}
-                  <div class="tooltip">{tooltips.uid}</div>
-                {/if}
-              </div>
-            </div>
-            <input type="text" id="uid" bind:value={uid}>
-          </div>
         </div>
         
         <div class="api-url-display">
           <h3>API Anfrage</h3>
           <div class="url-box">
             <span class="method">POST</span> 
-            {`${apiBaseUrl}?controlnet_strength=${controlnetStrength}&start_percent=${startPercent}&end_percent=${endPercent}&prompt=${encodeURIComponent(prompt)}${negativePrompt ? `&negative_prompt=${encodeURIComponent(negativePrompt)}` : ''}&cfg=${cfg}&steps=${steps}&seed=${seed}&uid=${uid}`}
+            {`${apiBaseUrl}?controlnet_strength=${controlnetStrength}&start_percent=${startPercent}&end_percent=${endPercent}&prompt=${encodeURIComponent(prompt)}${negativePrompt ? `&negative_prompt=${encodeURIComponent(negativePrompt)}` : ''}&cfg=${cfg}&steps=${steps}&seed=${seed}&uid=default`}
             <div class="post-data">
               <span class="post-label">Form Data:</span>
               <span class="post-field">image1: {image ? image.name : 'Kein Bild ausgewählt'}</span>
