@@ -1,5 +1,5 @@
 <script>
-  import Sidebar from "$lib/components/Sidebar.svelte";
+  import MinimalSidebar from "$lib/components/MinimalSidebar.svelte";
   import ImageCard from "$lib/components/ImageCard.svelte";
 </script>
 
@@ -9,7 +9,7 @@
 </svelte:head>
 
 <div class="app-container">
-  <Sidebar />
+  <MinimalSidebar />
   <main>
     <h1 class="main-title">Willkommen im HfG Ai-Hub</h1>
     <p class="subtitle">Entdecke die Möglichkeiten der künstlichen Intelligenz für deine Projekte</p>
@@ -42,6 +42,8 @@
     margin: 0;
     padding: 0;
     font-family: 'Inter', sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
   }
   
   .app-container {
@@ -52,18 +54,23 @@
   main {
     flex: 1;
     padding: 2rem;
+    background-color: #121212;
+    background-image: 
+      radial-gradient(circle at 25% 25%, rgba(60, 60, 60, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(40, 40, 40, 0.15) 0%, transparent 50%);
   }
   
   .main-title {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 2.5rem;
     margin-bottom: 1rem;
+    color: #f0f0f0;
   }
   
   .subtitle {
     font-family: 'Inter', sans-serif;
     font-size: 1.2rem;
-    color: #555;
+    color: #a0a0a0;
     margin-bottom: 2rem;
   }
   
