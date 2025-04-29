@@ -13,6 +13,9 @@
   
   // Prüfung, ob wir uns im Tutorial-Bereich befinden
   $: isInTutorialSection = currentPath.startsWith('/guided-tutorial');
+  
+  // Prüfung, ob wir uns im VPN-Bereich befinden
+  $: isInVpnSection = currentPath === '/vpn-install';
 </script>
 
 <aside class="minimal-sidebar">
@@ -48,6 +51,20 @@
         class:active={isInTutorialSection}
       >
         Guided Tutorials
+      </a>
+    </div>
+  </div>
+  
+  <!-- Neuer Abschnitt für USE FROM HOME -->
+  <div class="mode-navigation tutorial-section">
+    <h3>USE FROM HOME</h3>
+    <div class="mode-buttons">
+      <a 
+        href="/vpn-install" 
+        class="mode-button" 
+        class:active={isInVpnSection}
+      >
+        VPN Install
       </a>
     </div>
   </div>
