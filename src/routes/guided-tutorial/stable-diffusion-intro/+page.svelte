@@ -136,8 +136,8 @@
       </div>
       
       <div class="next-section">
-        <p>Im nächsten Tutorial lernst du mehr über den CFG Parameter und seine Auswirkungen auf deine Bilder.</p>
-        <a href="/guided-tutorial/cfg-explained" class="next-button">
+        <p>Im nächsten Tutorial lernst du mehr über die Grundlagen des Prompt-Schreibens.</p>
+        <a href="/guided-tutorial/prompt-basics" class="next-button">
           Weiter zum nächsten Thema
           <span class="arrow">→</span>
         </a>

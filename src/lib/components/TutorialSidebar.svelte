@@ -8,8 +8,8 @@
   const tutorialTopics = [
     { name: 'Was ist Stable Diffusion?', path: '/guided-tutorial/stable-diffusion-intro' },
     { name: 'Prompt-Grundlagen', path: '/guided-tutorial/prompt-basics' },
-    { name: 'Steps - Wofür?', path: '/guided-tutorial/steps-purpose' },
-    { name: 'Prompt Advanced', path: '/guided-tutorial/prompt-advanced' }
+    { name: 'Kernparameter', path: '/guided-tutorial/core-parameters' },
+    { name: 'Stile verwalten', path: '/guided-tutorial/manage-styles' }
   ];
 </script>
 

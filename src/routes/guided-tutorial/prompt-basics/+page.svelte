@@ -240,8 +240,8 @@
       </div>
       
       <div class="next-section">
-        <p>Im nächsten Tutorial lernst du mehr über den CFG-Parameter und wie er deine Bilder beeinflusst.</p>
-        <a href="/guided-tutorial/cfg-explained" class="next-button">
+        <p>Im nächsten Tutorial lernst du mehr über die Kernparameter und wie sie deine Bilder beeinflussen.</p>
+        <a href="/guided-tutorial/core-parameters" class="next-button">
           Weiter zum nächsten Thema
           <span class="arrow">→</span>
         </a>

@@ -20,14 +20,14 @@
       title: "Fortgeschrittene Techniken",
       topics: [
         { 
-          name: "Steps - Wofür?", 
-          path: "/guided-tutorial/steps-purpose",
-          description: "Rolle der Diffusionsschritte bei der Bildqualität und Generierungszeit"
+          name: "Kernparameter", 
+          path: "/guided-tutorial/core-parameters",
+          description: "CFG-Scale, Sampling-Steps und Seed: Die wichtigsten Parameter verstehen und steuern"
         },
         { 
-          name: "Prompt Advanced", 
-          path: "/guided-tutorial/prompt-advanced",
-          description: "Fortgeschrittene Techniken für präzise und kreative Prompts"
+          name: "Stile verwalten", 
+          path: "/guided-tutorial/manage-styles",
+          description: "Eigene Stil-Bibliotheken anlegen, verwenden und mit einem Klick wechseln"
         }
       ]
     }
