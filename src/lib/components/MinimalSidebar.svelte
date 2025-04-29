@@ -10,6 +10,9 @@
     { name: 'Image To Image', path: '/image-to-image' },
     { name: 'ControlNet', path: '/control-net' }
   ];
+  
+  // Prüfung, ob wir uns im Tutorial-Bereich befinden
+  $: isInTutorialSection = currentPath.startsWith('/guided-tutorial');
 </script>
 
 <aside class="minimal-sidebar">
@@ -32,6 +35,20 @@
           {mode.name}
         </a>
       {/each}
+    </div>
+  </div>
+  
+  <!-- Separater Abschnitt für Tutorials -->
+  <div class="mode-navigation tutorial-section">
+    <h3>Lernbereich</h3>
+    <div class="mode-buttons">
+      <a 
+        href="/guided-tutorial" 
+        class="mode-button" 
+        class:active={isInTutorialSection}
+      >
+        Guided Tutorials
+      </a>
     </div>
   </div>
 </aside>
@@ -119,5 +136,11 @@
     color: #ffffff;
     border-right: 3px solid #FCEA2B; /* Änderung: Border rechts statt links */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .tutorial-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #333333;
   }
 </style>
