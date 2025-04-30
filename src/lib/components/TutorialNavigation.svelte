@@ -1,39 +1,37 @@
-<script>
-  export let previousPath = null;
-  export let previousLabel = "Zurück zum vorherigen Thema";
-  export let nextPath = null;
-  export let nextLabel = "Weiter zum nächsten Thema";
+<script lang="ts">
+  // Props mit korrekten TypeScript-Typen
+  export let nextPath: string | undefined | null = undefined;
+  export let previousPath: string | undefined | null = undefined;
+  export let nextLabel: string = "Weiter";
+  export let previousLabel: string = "Zurück";
 </script>
 
-<div class="navigation-buttons">
+<div class="navigation-controls">
   {#if previousPath}
-    <a href={previousPath} class="back-button">
-      <span class="arrow back-arrow">←</span>
+    <a href={previousPath} class="nav-button previous">
+      <svg viewBox="0 0 24 24" class="nav-icon"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12l4.58-4.59z"/></svg>
       {previousLabel}
     </a>
   {:else}
-    <div></div> <!-- Platzhalter für Flexbox-Layout -->
+    <div></div> <!-- Platzhalter für die Flex-Ausrichtung -->
   {/if}
   
   {#if nextPath}
-    <a href={nextPath} class="next-button">
+    <a href={nextPath} class="nav-button next">
       {nextLabel}
-      <span class="arrow">→</span>
+      <svg viewBox="0 0 24 24" class="nav-icon"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12l-4.58 4.59z"/></svg>
     </a>
   {/if}
 </div>
 
 <style>
-  .navigation-buttons {
+  .navigation-controls {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     margin-top: 2rem;
-    flex-wrap: wrap;
-    gap: 1rem;
   }
   
-  .next-button, .back-button {
+  .nav-button {
     display: inline-flex;
     align-items: center;
     padding: 0.8rem 1.2rem;
@@ -44,43 +42,40 @@
     transition: all 0.2s;
   }
   
-  .next-button {
+  .nav-button.previous {
+    background-color: #333;
+    color: #d0d0d0;
+  }
+  
+  .nav-button.next {
     background-color: #FCEA2B;
     color: #000;
   }
   
-  .back-button {
-    background-color: #333;
-    color: #e0e0e0;
+  .nav-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
   
-  .next-button:hover {
-    background-color: #ffed5c;
-    transform: translateX(3px);
-  }
-  
-  .back-button:hover {
+  .nav-button.previous:hover {
     background-color: #444;
-    transform: translateX(-3px);
   }
   
-  .arrow {
-    margin-left: 10px;
+  .nav-button.next:hover {
+    background-color: #ffed5c;
   }
   
-  .back-arrow {
-    margin-left: 0;
-    margin-right: 10px;
+  .nav-icon {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
   }
   
-  @media (max-width: 600px) {
-    .navigation-buttons {
-      flex-direction: column;
-      align-items: stretch;
-    }
-    
-    .back-button {
-      order: 2;
-    }
+  .previous .nav-icon {
+    margin-right: 8px;
+  }
+  
+  .next .nav-icon {
+    margin-left: 8px;
   }
 </style>

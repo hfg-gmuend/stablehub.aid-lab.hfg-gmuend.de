@@ -1,12 +1,31 @@
-<script>
+<script lang="ts">
   import MinimalSidebar from "$lib/components/MinimalSidebar.svelte";
   import { onMount } from 'svelte';
   
+  // Types
+  interface Step {
+    id: number;
+    title: string;
+  }
+  
+  interface DownloadLinks {
+    mac: string;
+    windows: string;
+  }
+  
+  interface ConfigLinks {
+    client201: string;
+    client202: string;
+  }
+  
+  type OperatingSystem = 'mac' | 'windows';
+  type ConfigType = 'client201' | 'client202';
+  
   // Aktiver Schritt des Steppers
-  let activeStep = 0;
+  let activeStep: number = 0;
   
   // Definition der Schritte
-  const steps = [
+  const steps: Step[] = [
     { id: 0, title: "VPN Client\ninstallieren" },
     { id: 1, title: "Dateien\nherunterladen" },
     { id: 2, title: "Profil\nimportieren" },
@@ -14,32 +33,32 @@
   ];
   
   // Navigation zwischen den Schritten
-  function nextStep() {
+  function nextStep(): void {
     if (activeStep < steps.length - 1) {
       activeStep++;
     }
   }
   
-  function prevStep() {
+  function prevStep(): void {
     if (activeStep > 0) {
       activeStep--;
     }
   }
   
   // Download-Links für VPN-Clients
-  const downloadLinks = {
+  const downloadLinks: DownloadLinks = {
     mac: "https://tunnelblick.net/iprelease/Latest_Tunnelblick_Stable.dmg",
     windows: "https://openvpn.net/downloads/openvpn-connect-v3-windows.msi"
   };
   
   // Download-Links für VPN-Konfigurationsdateien
-  const configLinks = {
+  const configLinks: ConfigLinks = {
     client201: "https://intranet.hfg-gmuend.de/vpn-clients/client.201.zip",
     client202: "https://intranet.hfg-gmuend.de/vpn-clients/client.202.zip"
   };
   
   // Herunterladen der Client-Software
-  function downloadClient(os) {
+  function downloadClient(os: OperatingSystem): void {
     // Direkte Weiterleitung zur Download-URL
     if (os === 'mac' || os === 'windows') {
       window.open(downloadLinks[os], '_blank');
@@ -47,7 +66,7 @@
   }
   
   // Herunterladen der Konfigurationsdateien
-  function downloadConfig(client) {
+  function downloadConfig(client: ConfigType): void {
     // Direkte Weiterleitung zur Download-URL
     window.open(configLinks[client], '_blank');
   }
@@ -73,11 +92,13 @@
         <!-- Stepper -->
         <div class="stepper">
           {#each steps as step, index}
-            <div 
+            <button 
+              type="button"
               class="step" 
               class:active={activeStep === index}
               class:completed={activeStep > index}
               on:click={() => activeStep = index}
+              aria-label={`Step ${index + 1}: ${step.title}`}
             >
               <div class="step-number">
                 {#if activeStep > index}
@@ -90,7 +111,7 @@
               {#if index < steps.length - 1}
                 <div class="step-line"></div>
               {/if}
-            </div>
+            </button>
           {/each}
         </div>
         
@@ -103,21 +124,21 @@
               <p>Wähle dein Betriebssystem und lade den entsprechenden VPN-Client herunter:</p>
               
               <div class="os-selection">
-                <div class="os-card" on:click={() => downloadClient('mac')}>
+                <button class="os-card" on:click={() => downloadClient('mac')} on:keydown={e => e.key === 'Enter' && downloadClient('mac')}>
                   <img src="/vpn/apple-icon.svg" alt="Apple Logo" class="os-icon">
                   <div class="os-info">
                     <h3>macOS</h3>
                     <p>Tunnelblick</p>
                   </div>
-                </div>
+                </button>
                 
-                <div class="os-card" on:click={() => downloadClient('windows')}>
+                <button class="os-card" on:click={() => downloadClient('windows')} on:keydown={e => e.key === 'Enter' && downloadClient('windows')}>
                   <img src="/vpn/windows-icon.svg" alt="Windows Logo" class="os-icon">
                   <div class="os-info">
                     <h3>Windows</h3>
                     <p>OpenVPN</p>
                   </div>
-                </div>
+                </button>
               </div>
               
               <p class="help-text">Folge den Installationsanweisungen des Installers. Nach der Installation kannst du zum nächsten Schritt übergehen.</p>
@@ -310,13 +331,22 @@
     position: relative;
     flex: 1;
     cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+    outline: none;
   }
+  
+  /* .step:hover .step-number {
+    background-color: #444;
+    color: #ffffff;
+  } */
   
   .step-number {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: #333;
+    background-color: #333; /* Dunkler Hintergrund wieder hergestellt */
     color: #a0a0a0;
     display: flex;
     align-items: center;

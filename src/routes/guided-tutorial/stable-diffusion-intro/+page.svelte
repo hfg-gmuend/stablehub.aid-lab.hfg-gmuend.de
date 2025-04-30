@@ -1,7 +1,61 @@
-<script>
+<script lang="ts">
   import TutorialPanel from "$lib/components/TutorialPanel.svelte";
   import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
+  
+  // Define navigation path types
+  interface NavigationProps {
+    nextPath: string | null | undefined;
+    nextLabel: string;
+    previousPath?: string;
+    previousLabel?: string;
+  }
+
+  
+  // Define parameter types
+  interface Parameter {
+    name: string;
+    value: string | number;
+    description: string;
+  }
+  
+  // Define learning objective types
+  type LearningObjective = string;
+  
+  // Parameters for display
+  const parameters: Parameter[] = [
+    {
+      name: "CFG Scale",
+      value: 7.5,
+      description: "Steuert, wie stark der Prompt befolgt wird. Höhere Werte = mehr Prompttreue."
+    },
+    {
+      name: "Steps",
+      value: 30,
+      description: "Anzahl der Diffusionsschritte. Mehr Steps = mehr Details, aber längere Generierung."
+    },
+    {
+      name: "Seed",
+      value: 1234567890,
+      description: "Startpunkt für den Zufallsgenerator. Gleicher Seed = reproduzierbare Bilder."
+    }
+  ];
+  
+  // Learning objectives
+  const learningObjectives: LearningObjective[] = [
+    "Was Stable Diffusion ist und wie es grundlegend funktioniert",
+    "Unterschiede zwischen Online-Diensten und lokaler Installation",
+    "Die Rolle von positiven und negativen Prompts",
+    "Warum Parameter wichtig sind und wie sie das Ergebnis beeinflussen"
+  ];
+  
+  // Navigation props
+  const navigationProps: NavigationProps = {
+    nextPath: "/guided-tutorial/prompt-basics",
+    nextLabel: "Weiter zum nächsten Thema"
+  };
 </script>
+
+
 
 <svelte:head>
   <title>Was ist Stable Diffusion? | Guided Tutorial | HfG Ai-Hub</title>
@@ -96,29 +150,15 @@
         
         <div class="parameter-sidebar">
           <h3>Parameter-Steuerung</h3>
-          <div class="parameter-item">
-            <div class="param-header">
-              <span class="param-name">CFG Scale</span>
-              <span class="param-value">7.5</span>
+          {#each parameters as param}
+            <div class="parameter-item">
+              <div class="param-header">
+                <span class="param-name">{param.name}</span>
+                <span class="param-value">{param.value}</span>
+              </div>
+              <p class="param-desc">{param.description}</p>
             </div>
-            <p class="param-desc">Steuert, wie stark der Prompt befolgt wird. Höhere Werte = mehr Prompttreue.</p>
-          </div>
-          
-          <div class="parameter-item">
-            <div class="param-header">
-              <span class="param-name">Steps</span>
-              <span class="param-value">30</span>
-            </div>
-            <p class="param-desc">Anzahl der Diffusionsschritte. Mehr Steps = mehr Details, aber längere Generierung.</p>
-          </div>
-          
-          <div class="parameter-item">
-            <div class="param-header">
-              <span class="param-name">Seed</span>
-              <span class="param-value">1234567890</span>
-            </div>
-            <p class="param-desc">Startpunkt für den Zufallsgenerator. Gleicher Seed = reproduzierbare Bilder.</p>
-          </div>
+          {/each}
         </div>
       </div>
     </section>
@@ -129,17 +169,16 @@
       <div class="info-box success">
         <h4>Du solltest jetzt verstehen:</h4>
         <ul>
-          <li>Was Stable Diffusion ist und wie es grundlegend funktioniert</li>
-          <li>Unterschiede zwischen Online-Diensten und lokaler Installation</li>
-          <li>Die Rolle von positiven und negativen Prompts</li>
-          <li>Warum Parameter wichtig sind und wie sie das Ergebnis beeinflussen</li>
+          {#each learningObjectives as objective}
+            <li>{objective}</li>
+          {/each}
         </ul>
       </div>
       
       <!-- Navigation buttons -->
       <TutorialNavigation 
-        nextPath="/guided-tutorial/prompt-basics"
-        nextLabel="Weiter zum nächsten Thema"
+        nextPath={navigationProps.nextPath}
+        nextLabel={navigationProps.nextLabel}
       />
     </section>
   </div>
@@ -384,33 +423,6 @@
     margin: 0;
   }
   
-  .next-section {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    margin-top: 2rem;
-  }
+
   
-  .next-button {
-    display: inline-flex;
-    align-items: center;
-    background-color: #FCEA2B;
-    color: #000;
-    padding: 0.8rem 1.2rem;
-    border-radius: 6px;
-    text-decoration: none;
-    font-family: 'IBM Plex Mono', monospace;
-    font-weight: 500;
-    margin-top: 1rem;
-    transition: all 0.2s;
-  }
-  
-  .next-button:hover {
-    background-color: #ffed5c;
-    transform: translateX(3px);
-  }
-  
-  .arrow {
-    margin-left: 10px;
-  }
 </style>

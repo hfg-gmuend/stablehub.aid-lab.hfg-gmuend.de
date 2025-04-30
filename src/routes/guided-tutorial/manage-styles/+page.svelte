@@ -1,23 +1,59 @@
-<script>
-  // Beispiel Stil-Presets
-  const stylePresets = [
-    { name: "Fotorealistisch", 
+<script lang="ts">
+  import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
+
+  // TypeScript Interfaces definieren
+  interface StyleParameter {
+    cfgScale: number;
+    steps: number;
+    sampler: string;
+  }
+
+  interface StylePreset {
+    name: string;
+    prompt: string;
+    negative: string;
+    parameters: StyleParameter;
+  }
+
+  // Beispiel Stil-Presets mit TypeScript Typisierung
+  const stylePresets: StylePreset[] = [
+    { 
+      name: "Fotorealistisch", 
       prompt: "photorealistic, detailed, 8k, high quality, sharp focus", 
       negative: "cartoon, painting, illustration, drawing, anime, blur",
       parameters: { cfgScale: 7.5, steps: 30, sampler: "DPM++ 2M Karras" }
     },
-    { name: "Anime", 
+    { 
+      name: "Anime", 
       prompt: "anime style, vibrant colors, cel shading, high quality digital art", 
       negative: "photorealistic, 3d render, photograph",
       parameters: { cfgScale: 9, steps: 25, sampler: "Euler a" }
     },
-    { name: "Ölgemälde", 
+    { 
+      name: "Ölgemälde", 
       prompt: "oil painting, masterpiece, intricate brushwork, artistic, highly detailed", 
       negative: "digital art, 3d render, photograph, sketch",
       parameters: { cfgScale: 8, steps: 30, sampler: "DPM++ SDE Karras" }
     }
   ];
-  import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
+
+  // Hilfsfunktion zum Formatieren von JSON für die Beispiel-Anzeige
+  function formatJsonExample(obj: any): string {
+    return JSON.stringify(obj, null, 2);
+  }
+
+  // Typisierte Parameter für Template-Beispiele
+  interface TemplateParams {
+    cfgValue: number;
+    stepsValue: number;
+    samplerValue: string;
+  }
+
+  const templateParams: TemplateParams = {
+    cfgValue: 7.5,
+    stepsValue: 30,
+    samplerValue: "DPM++ 2M Karras"
+  };
 </script>
 
 <svelte:head>
@@ -169,7 +205,7 @@
       <div class="code-example wide">
         <p class="example-title">Parameter-Set JSON Beispiel:</p>
         <div class="code-block">
-          <code>{`{
+          <code>{formatJsonExample({
   "fotorealistisch": {
     "prompt_prefix": "photorealistic, detailed, 8k",
     "negative_prefix": "cartoon, painting, drawing",
@@ -181,7 +217,7 @@
       "height": 1024
     }
   }
-}`}</code>
+})}</code>
         </div>
       </div>
     </section>
@@ -291,29 +327,29 @@
           <h4>Stil-Template zum Ausfüllen:</h4>
           <div class="template-form">
             <div class="form-group">
-              <label>Stil-Name:</label>
+              <span class="form-label">Stil-Name:</span>
               <div class="template-input">Mein erster Stil</div>
             </div>
             <div class="form-group">
-              <label>Positiver Prompt:</label>
+              <span class="form-label">Positiver Prompt:</span>
               <div class="template-input">[Stileigenschaften], [Qualitätsverbesserungen]</div>
             </div>
             <div class="form-group">
-              <label>Negativer Prompt:</label>
+              <span class="form-label">Negativer Prompt:</span>
               <div class="template-input">[Unerwünschte Eigenschaften]</div>
             </div>
             <div class="form-group params">
               <div class="param-group">
-                <label>CFG:</label>
-                <div class="template-input small">7.5</div>
+                <span class="form-label">CFG:</span>
+                <div class="template-input small">{templateParams.cfgValue}</div>
               </div>
               <div class="param-group">
-                <label>Steps:</label>
-                <div class="template-input small">30</div>
+                <span class="form-label">Steps:</span>
+                <div class="template-input small">{templateParams.stepsValue}</div>
               </div>
               <div class="param-group">
-                <label>Sampler:</label>
-                <div class="template-input">DPM++ 2M Karras</div>
+                <span class="form-label">Sampler:</span>
+                <div class="template-input">{templateParams.samplerValue}</div>
               </div>
             </div>
           </div>
@@ -809,7 +845,7 @@
     gap: 0.5rem;
   }
   
-  label {
+  .form-label {
     font-size: 0.9rem;
     color: #888;
     font-family: 'IBM Plex Mono', monospace;

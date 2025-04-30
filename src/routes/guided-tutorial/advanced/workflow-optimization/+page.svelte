@@ -1,6 +1,34 @@
-<script>
+<script lang="ts">
+  import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
+
+  // Typdefinitionen
+  interface SamplerInfo {
+    name: string;
+    geschwindigkeit: string;
+    detailgrad: string;
+    eignung: string[];
+    steps: string;
+    kommentar: string;
+  }
+  
+  interface StyleKeyword {
+    word: string;
+    description: string;
+  }
+  
+  interface StyleCategory {
+    category: string;
+    keywords: StyleKeyword[];
+  }
+  
+  interface Resource {
+    name: string;
+    url: string;
+    description: string;
+  }
+
   // Sampler-Vergleichsdaten
-  const samplerComparison = [
+  const samplerComparison: SamplerInfo[] = [
     { 
       name: "Euler a", 
       geschwindigkeit: "Schnell", 
@@ -36,7 +64,7 @@
   ];
 
   // Stil-Keywords nach Kategorien
-  const styleKeywords = [
+  const styleKeywords: StyleCategory[] = [
     {
       category: "Fotografischer Realismus",
       keywords: [
@@ -70,7 +98,7 @@
   ];
 
   // Community-Ressourcen
-  const communityResources = [
+  const communityResources: Resource[] = [
     { name: "Civitai", url: "https://civitai.com", description: "Community-Hub für Models, LoRAs und Prompts" },
     { name: "Lexica", url: "https://lexica.art", description: "Suchmaschine für AI-generierte Bilder mit Prompts" },
     { name: "PromptHero", url: "https://prompthero.com", description: "Kuratierte Prompts und Tutorials" },
@@ -78,12 +106,17 @@
   ];
 
   // Technische Ressourcen
-  const technicalResources = [
+  const technicalResources: Resource[] = [
     { name: "Stable Diffusion Web UI Wiki", url: "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki", description: "Offizielle Dokumentation für A1111 UI" },
     { name: "Hugging Face", url: "https://huggingface.co/models", description: "Offizielle Model-Repository" },
     { name: "Papers With Code", url: "https://paperswithcode.com/task/text-to-image-generation", description: "Wissenschaftliche Paper zu Text-to-Image" },
     { name: "ComfyUI Documentation", url: "https://github.com/comfyanonymous/ComfyUI", description: "Node-basierte UI für Stable Diffusion" }
   ];
+  
+  // Navigation paths
+  const previousPath: string = "/guided-tutorial/advanced/ai-models";
+  const nextPath: string = "/guided-tutorial";
+  const nextLabel: string = "Zurück zur Tutorial-Übersicht";
 </script>
 
 <svelte:head>
@@ -363,9 +396,9 @@
       
       <!-- Navigation buttons -->
       <TutorialNavigation 
-        previousPath="/guided-tutorial/advanced/ai-models"
-        nextPath="/guided-tutorial"
-        nextLabel="Zurück zur Tutorial-Übersicht"
+        previousPath={previousPath}
+        nextPath={nextPath}
+        nextLabel={nextLabel}
       />
     </section>
   </div>

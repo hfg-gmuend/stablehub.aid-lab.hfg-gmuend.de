@@ -1,6 +1,21 @@
-<script>
+<script lang="ts">
+  import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
+  
+  // Interfaces und Types
+  interface ExamplePrompts {
+    basic: string;
+    improved: string;
+    detailed: string;
+    structured: string;
+  }
+  
+  interface StyleCategory {
+    category: string;
+    keywords: string[];
+  }
+  
   // Beispiel-Prompts für die Demonstration
-  const examplePrompts = {
+  const examplePrompts: ExamplePrompts = {
     basic: "ein Schloss",
     improved: "ein mittelalterliches Schloss auf einem Hügel",
     detailed: "ein mittelalterliches Schloss auf einem Hügel, umgeben von einem nebligen Wald, bei Sonnenuntergang, fotorealistische Darstellung, detaillierte Architektur",
@@ -8,7 +23,7 @@
   };
 
   // Stil-Keywords für die Demonstration
-  const styleKeywords = [
+  const styleKeywords: StyleCategory[] = [
     { category: "Fotorealismus", 
       keywords: ["photorealistic", "hyperrealistic", "8k", "detailed", "cinematic", "professional photography"] },
     { category: "Kunst & Illustration", 
@@ -16,7 +31,10 @@
     { category: "Grafik & Design", 
       keywords: ["vector art", "flat design", "minimalist", "isometric", "3D render", "pixel art"] }
   ];
-  import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
+  
+  // Navigations-Props (explizit als Strings typisiert)
+  const navigationPrevPath: string = "/guided-tutorial/stable-diffusion-intro";
+  const navigationNextPath: string = "/guided-tutorial/core-parameters";
 </script>
 
 <svelte:head>
@@ -119,7 +137,6 @@
         </div>
         <div class="flow-arrow">→</div>
         <div class="flow-item">
-          <div class="flow-number">4</div>
           <div class="flow-content">
             <h4>Stil & Details</h4>
             <p>Künstlerische Elemente</p>
@@ -242,8 +259,8 @@
       
       <!-- Navigation buttons -->
       <TutorialNavigation 
-        previousPath="/guided-tutorial/stable-diffusion-intro"
-        nextPath="/guided-tutorial/core-parameters"
+        previousPath={navigationPrevPath}
+        nextPath={navigationNextPath}
       />
     </section>
   </div>

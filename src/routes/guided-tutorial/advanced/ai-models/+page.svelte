@@ -1,6 +1,21 @@
-<script>
+<script lang="ts">
+  import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
+  
+  // Types for model data
+  interface ModelComparison {
+    name: string;
+    stärken: string[];
+    schwächen: string[];
+  }
+  
+  interface Checkpoint {
+    name: string;
+    focus: string;
+    description: string;
+  }
+
   // Modell-Daten für die Vergleichstabelle
-  const modelComparisons = [
+  const modelComparisons: ModelComparison[] = [
     { 
       name: "Stable Diffusion 1.5", 
       stärken: ["Ausgereift und stabil", "Viele Trainingsressourcen", "Gute Alltagsfotos"],
@@ -19,13 +34,12 @@
   ];
   
   // Beispiel-Checkpoints
-  const checkpoints = [
+  const checkpoints: Checkpoint[] = [
     { name: "Realistic Vision", focus: "Fotorealismus", description: "Optimiert für realistische Porträts und Szenen" },
     { name: "Deliberate", focus: "Balance", description: "Ausgewogen zwischen Realismus und künstlerischem Stil" },
     { name: "Dreamshaper", focus: "Kreativität", description: "Fantasievolle, kunstvolle Bildkreationen" },
     { name: "AbsoluteReality", focus: "Hyperrealismus", description: "Extrem detaillierte fotorealistische Bilder" }
   ];
-  import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
 </script>
 
 <svelte:head>
@@ -743,44 +757,9 @@
   }
   
   .info-box h4 {
-    margin-top: 0;
-    margin-bottom: 0.7rem;
-    color: #e0e0e0;
-    font-family: 'IBM Plex Mono', monospace;
-  }
-  
-  .info-box p {
-    margin-bottom: 0;
-  }
-  
-  /* Navigation */
-  .next-section {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    margin-top: 2rem;
-  }
-  
-  .next-button {
-    display: inline-flex;
-    align-items: center;
-    background-color: #FCEA2B;
-    color: #000;
-    padding: 0.8rem 1.2rem;
-    border-radius: 6px;
-    text-decoration: none;
-    font-family: 'IBM Plex Mono', monospace;
-    font-weight: 500;
+    margin-top: 0;    margin-bottom: 0.7rem;    color: #e0e0e0;    font-family: 'IBM Plex Mono', monospace;  }    .info-box p {    margin-bottom: 0;  }    /* Navigation */  .next-section {    display: flex;    flex-direction: column;    align-items: flex-end;    margin-top: 2rem;  }    .next-button {    display: inline-flex;    align-items: center;    background-color: #FCEA2B;    color: #000;    padding: 0.8rem 1.2rem;    border-radius: 6px;    text-decoration: none;    font-family: 'IBM Plex Mono', monospace;    font-weight: 500;
     margin-top: 1rem;
     transition: all 0.2s;
   }
   
-  .next-button:hover {
-    background-color: #ffed5c;
-    transform: translateX(3px);
-  }
-  
-  .arrow {
-    margin-left: 10px;
-  }
 </style>
