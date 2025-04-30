@@ -3,6 +3,8 @@
   import PromptResultCard from "$lib/components/PromptResultCard.svelte";
   import NavigationBar from "$lib/components/NavigationBar.svelte";
   import TokenizedPromptArea from "$lib/components/TokenizedPromptArea.svelte";
+  import CopilotButton from "$lib/components/CopilotButton.svelte";
+  import StyleCopilot from "$lib/components/StyleCopilot.svelte";
   import { onMount, onDestroy } from "svelte";
   import { styles } from "$lib/config/styles.js";
   
@@ -187,6 +189,22 @@
       
       // Entferne den Style aus der Liste der ausgewählten Stile
       selectedStyles = selectedStyles.filter(id => id !== styleId);
+    }
+  }
+  
+  // Copilot State
+  let isStyleCopilotOpen = false;
+  
+  // Funktion zum Öffnen des Style-Copilots
+  function openStyleCopilot() {
+    isStyleCopilotOpen = true;
+  }
+  
+  // Funktion zum Hinzufügen des generierten Stils zum Prompt
+  function addGeneratedStyle(event) {
+    const style = event.detail.style;
+    if (style) {
+      prompt = prompt.trim() + (prompt ? ', ' : '') + style;
     }
   }
 </script>
@@ -409,6 +427,7 @@
                 <div class="tooltip tooltip-bottom">{tooltips.prompt}</div>
               {/if}
             </div>
+            <CopilotButton on:click={openStyleCopilot} />
           </div>
           
           <!-- Ersetzen des traditionellen Textareas durch die neue TokenizedPromptArea -->
@@ -426,6 +445,13 @@
           </button>
         </div>
       </div>
+
+      <!-- Style-Copilot Modal -->
+      <StyleCopilot 
+        isOpen={isStyleCopilotOpen}
+        on:close={() => isStyleCopilotOpen = false}
+        on:addStyle={addGeneratedStyle}
+      />
     </div>
   </main>
 </div>
