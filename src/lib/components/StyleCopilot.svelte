@@ -1,12 +1,16 @@
-<script>
+<script lang="ts">
   import { fade, scale } from 'svelte/transition';
   import { createEventDispatcher } from 'svelte';
+  import { browser } from '$app/environment';
   
   const dispatch = createEventDispatcher();
   
   // Props
   export let isOpen = false;
-  export let apiKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjkyZjMwM2I0LTQyNjItNGE0Ny04OGI0LTM0MDdlNWI1ZDUxYiJ9.jQtuPVfaBxWqRagyYbbc4onmx3oSpyHHpyOPEYNQ0Fc';
+  
+  // Zugriff auf die Umgebungsvariable für den API-Key
+  // Mit Fallback für den Fall, dass die Umgebungsvariable nicht verfügbar ist
+  const apiKey = browser ? import.meta.env.VITE_CHAT_API_KEY || '' : '';
   
   // State
   let userPrompt = '';
@@ -45,6 +49,11 @@
   async function generateStyle() {
     if (!userPrompt.trim()) {
       error = 'Bitte gib eine Beschreibung für den gewünschten Stil ein.';
+      return;
+    }
+    
+    if (!apiKey) {
+      error = 'API-Schlüssel nicht gefunden. Bitte überprüfe deine Umgebungsvariablen.';
       return;
     }
     
