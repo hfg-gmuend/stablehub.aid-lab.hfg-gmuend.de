@@ -1,4 +1,5 @@
 <script>
+  //MrNoLook
   import { favorites } from '$lib/stores/favorites';
   import { styles } from "$lib/config/styles.js";
   
