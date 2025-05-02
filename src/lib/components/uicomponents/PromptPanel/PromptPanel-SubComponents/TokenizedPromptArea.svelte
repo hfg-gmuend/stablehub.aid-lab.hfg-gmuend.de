@@ -3,43 +3,38 @@
   export let value: string = "";
   export let placeholder: string = "Prompt eingeben...";
   export let id: string = "prompt-input";
+  export let tokenLimit: number = 77; // TokenLimit als Prop
 
   // Für Berechnungen zugängliche Variablen
   let textareaElement: HTMLTextAreaElement;
   let overlayElement: HTMLDivElement;
-  let tokenLimit: number = 77;
-  let isOverLimit: boolean = false;
+
+  // Exportiere die Token-Anzahl
+  export let tokenCount: number = 0;
+
+  // Berechne isOverLimit basierend auf dem aktuellen tokenCount und dem Limit
+  $: isOverLimit = tokenCount > tokenLimit;
 
   // Berechnung des tokenisierten Inhalts mit Transparenz
   $: tokenizedContent = tokenizeContent(value);
-  // Explizite Typisierung für isOverLimit, obwohl sie durch die Berechnung inferiert wird
-  $: isOverLimit = value ? value.split(/\s+/).filter(word => word.length > 0).length > tokenLimit : false;
+  // Aktualisiere tokenCount reaktiv
+  $: tokenCount = value ? value.split(/\s+/).filter(word => word.length > 0).length : 0;
 
   // Funktion zur Tokenisierung des Inhalts
   function tokenizeContent(text: string): string {
     if (!text) return '';
-
-    // Text in Wörter aufteilen (leere Strings herausfiltern)
     const words = text.split(/\s+/).filter(word => word.length > 0);
-
-    // HTML für die Anzeige mit abgestufter Transparenz generieren
     return words.map((word, index) => {
-      // Progressive Transparenz:
-      // - Erste 25 Tokens: 100% Opazität
-      // - Token 25-77: Linear abnehmend von 100% auf 40%
-      // - Ab Token 77: 10% Opazität
+      const opacityStartFade = 25;
       let opacity: number;
-
-      if (index < 25) {
-        opacity = 1.0; // Volle Opazität für die ersten 25 Tokens
+      if (index < opacityStartFade) {
+        opacity = 1.0;
       } else if (index < tokenLimit) {
-        // Linearer Übergang von 100% bis 40% für Tokens 25 bis 77
-        opacity = 1.0 - (index - 25) * (0.6 / (tokenLimit - 25));
+        const fadeRange = tokenLimit - opacityStartFade;
+        opacity = fadeRange > 0 ? 1.0 - (index - opacityStartFade) * (0.6 / fadeRange) : 0.4;
       } else {
-        opacity = 0.1; // Ab 77 Tokens: 10% Opazität
+        opacity = 0.1;
       }
-
-      // HTML-Entitäten escapen, um XSS zu verhindern, falls der Text HTML enthalten könnte
       const escapedWord = word.replace(/</g, "&lt;").replace(/>/g, "&gt;");
       return `<span style="opacity: ${opacity};">${escapedWord}</span>`;
     }).join(' ');
@@ -64,11 +59,12 @@
       {id}
       on:scroll={syncScroll}
       on:input={syncScroll}
+      on:input={() => { /* Trigger reactive update for tokenCount */ }}
     ></textarea>
-    
+
     <!-- Overlay mit tokenisierten Wörtern oder Platzhaltertext -->
-    <div 
-      class="textarea-overlay" 
+    <div
+      class="textarea-overlay"
       bind:this={overlayElement}
       aria-hidden="true"
     >
@@ -79,10 +75,6 @@
       {/if}
     </div>
   </div>
-  
-  <div class="token-counter {isOverLimit ? 'warning' : ''}">
-    {value ? value.split(/\s+/).filter(word => word.length > 0).length : 0}/{tokenLimit}
-  </div>
 </div>
 
 <style>
@@ -90,7 +82,7 @@
     position: relative;
     width: 100%;
   }
-  
+
   .textarea-wrapper {
     position: relative;
     width: 100%;
@@ -99,12 +91,12 @@
     background-color: #2a2a2a;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
-  
+
   .textarea-wrapper.over-limit {
     border-color: #FCEA2B;
     box-shadow: 0 0 0 2px rgba(252, 234, 43, 0.3);
   }
-  
+
   textarea {
     width: 100%;
     height: 100px;
@@ -120,11 +112,11 @@
     z-index: 2;
     position: relative;
   }
-  
+
   textarea:focus {
     outline: none;
   }
-  
+
   .textarea-overlay {
     position: absolute;
     top: 0;
@@ -142,28 +134,10 @@
     word-wrap: break-word;
     z-index: 1;
   }
-  
+
   /* Stilisierung des Platzhaltertextes */
   .placeholder {
     color: #888;
     opacity: 1 !important; /* Wichtig, um die volle Opazität zu erzwingen */
-  }
-  
-  .token-counter {
-    position: absolute;
-    right: 10px;
-    top: -24px;
-    font-size: 0.8rem;
-    padding: 0.2rem 0.4rem;
-    border-radius: 4px;
-    background-color: rgba(0, 0, 0, 0.2);
-    color: #aaa;
-  }
-  
-  /* Verstärkung der visuellen Hinweise auf Token-Limitierung */
-  .token-counter.warning {
-    color: #FCEA2B;
-    background-color: rgba(252, 234, 43, 0.25);
-    font-weight: bold;
   }
 </style>

@@ -1,22 +1,21 @@
-<script>
+<script lang="ts">
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();
-  
-  // Tooltip anzeigen oder verbergen
-  let showTooltip = false;
+
+  export let ariaDescribedby: string | null = null; // Prop für aria-describedby
 </script>
 
-<div class="copilot-button-container" 
-     on:mouseenter={() => showTooltip = true}
-     on:mouseleave={() => showTooltip = false}>
-  <button class="copilot-button" on:click={() => dispatch('click')}>
-    <svg viewBox="0 0 24 24" class="copilot-icon">
+<div class="copilot-button-container">
+  <button
+    class="copilot-button"
+    on:click={() => dispatch('click')}
+    aria-label="Open Style Copilot"
+    aria-describedby={ariaDescribedby} 
+  >
+    <svg viewBox="0 0 24 24" class="copilot-icon" aria-hidden="true">
       <path d="M12,3C17.5,3 22,6.58 22,11C22,15.42 17.5,19 12,19C10.76,19 9.57,18.82 8.47,18.5C5.55,21 2,21 2,21C4.33,18.67 4.7,17.1 4.75,16.5C3.05,15.07 2,13.13 2,11C2,6.58 6.5,3 12,3M17,12V10H15V12H17M13,12V10H11V12H13M9,12V10H7V12H9Z" />
     </svg>
   </button>
-  {#if showTooltip}
-    <div class="tooltip">Style-Copilot verwenden</div>
-  {/if}
 </div>
 
 <style>
@@ -49,32 +48,5 @@
     width: 20px;
     height: 20px;
     fill: #FCEA2B;
-  }
-  
-  .tooltip {
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-bottom: 10px;
-    background-color: #333;
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    white-space: nowrap;
-    pointer-events: none;
-    z-index: 100;
-  }
-  
-  .tooltip::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 5px;
-    border-style: solid;
-    border-color: #333 transparent transparent transparent;
   }
 </style>
