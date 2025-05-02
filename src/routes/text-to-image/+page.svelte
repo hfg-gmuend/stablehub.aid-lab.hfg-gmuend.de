@@ -2,9 +2,8 @@
   import MinimalSidebar from "$lib/components/MinimalSidebar.svelte";
   import PromptResultCard from "$lib/components/PromptResultCard.svelte";
   import NavigationBar from "$lib/components/NavigationBar.svelte";
-  import TokenizedPromptArea from "$lib/components/TokenizedPromptArea.svelte";
-  import CopilotButton from "$lib/components/CopilotButton.svelte";
   import StyleCopilot from "$lib/components/StyleCopilot.svelte";
+  import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte';
   import { onMount, onDestroy } from "svelte";
   import { styles } from "$lib/config/styles.js";
   
@@ -415,43 +414,27 @@
       </div>
       
       <!-- Prompt-Panel (unten rechts) -->
-      <div class="prompt-panel">
-        <div class="prompt-input-container">
-          <div class="label-container">
-            <label for="main-prompt">Prompt</label>
-            <div class="info-icon" 
-                on:mouseenter={() => activeTooltip = 'prompt'}
-                on:mouseleave={() => activeTooltip = null}>
-              i
-              {#if activeTooltip === 'prompt'}
-                <div class="tooltip tooltip-bottom">{tooltips.prompt}</div>
-              {/if}
-            </div>
-            <CopilotButton on:click={openStyleCopilot} />
-          </div>
-          
-          <!-- Ersetzen des traditionellen Textareas durch die neue TokenizedPromptArea -->
-          <TokenizedPromptArea
-            bind:value={prompt}
-            id="main-prompt"
-            placeholder="Beschreibe, was du generieren möchtest..."
-          />
-        </div>
-        
-        <div class="generate-button-container">
-          <button on:click={generateImage} disabled={loading}>
-            <img src="/icon/rightIcon.svg" alt="Pfeil Icon" class="button-icon-inside" />
-            <span>{loading ? 'Generiere...' : 'Generieren'}</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Style-Copilot Modal -->
-      <StyleCopilot 
-        isOpen={isStyleCopilotOpen}
-        on:close={() => isStyleCopilotOpen = false}
-        on:addStyle={addGeneratedStyle}
+      <PromptPanel
+        bind:promptValue={prompt}
+        generateLabel="Generate"
+        generateLoadingLabel="Generating..."
+        generateIconSrc="/icon/rightIcon.svg"
+        generateLoading={loading}
+        generateDisabled={loading}
+        on:generate={generateImage}
+        on:copilot={openStyleCopilot}
+        placeholder="Describe what you want to generate..."
+        promptId="main-prompt"
       />
+
+      <!-- Style Copilot Modal bleibt -->
+      {#if isStyleCopilotOpen}
+        <StyleCopilot
+          isOpen={isStyleCopilotOpen}
+          on:close={() => isStyleCopilotOpen = false}
+          on:addStyle={addGeneratedStyle}
+        />
+      {/if}
     </div>
   </main>
 </div>
@@ -586,23 +569,12 @@
     max-width: calc(100vw - 40px); /* Verhindert Überlauf aus dem Viewport */
   }
   
-  /* Entfernung der Parameter-Beschreibungstexte */
-  .parameter-description {
-    display: none;
-  }
-  
-  /* Platzierung der Tooltips nahe am Info-Icon aber nicht zu weit weg */
-  [class*="info-icon"]:hover + .tooltip {
-    display: block;
-  }
   
   /* Größerer Abstand zwischen den Parameter-Gruppen wegen entfernter Beschreibungstexte */
   .parameter-grid-item {
     margin-bottom: 1rem;
   }
   
-  /* Eingabefelder */
-  input[type="text"], 
   input[type="number"], 
   textarea {
     width: 100%;
@@ -615,7 +587,6 @@
     transition: border-color 0.2s, box-shadow 0.2s;
   }
   
-  input[type="text"]:focus, 
   input[type="number"]:focus, 
   textarea:focus {
     border-color: #FCEA2B;
@@ -773,18 +744,7 @@
     flex-direction: column;
   }
   
-  .image-result {
-    width: 100%;
-    max-width: 768px;
-    display: flex;
-    justify-content: center;
-  }
-  
-  .image-result img {
-    max-width: 100%;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  }
+
   
   .loading-indicator {
     display: flex;
@@ -915,10 +875,7 @@
     box-shadow: 0 0 0 2px rgba(252, 234, 43, 0.3);
   }
   
-  /* Style-Name entfernen */
-  .style-name {
-    display: none; /* Labels nicht mehr anzeigen */
-  }
+
   
   /* Remove-Button */
   .remove-style-btn {
@@ -1027,15 +984,4 @@
     text-transform: uppercase;
   }
   
-  /* Header Bar und Navigation Tabs */
-  .header-bar {
-    background-color: #1e1e1e;
-    padding: 0.4rem 0.5rem;
-    border-radius: 0 0 6px 6px;
-    margin-bottom: 0.5rem;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
 </style>

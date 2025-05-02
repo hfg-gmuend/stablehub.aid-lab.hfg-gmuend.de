@@ -1,151 +1,165 @@
-<script>
+<script lang="ts"> // Add lang="ts"
   import MinimalSidebar from "$lib/components/MinimalSidebar.svelte";
   import NavigationBar from "$lib/components/NavigationBar.svelte";
   import PromptResultCard from "$lib/components/PromptResultCard.svelte";
-  import TokenizedPromptArea from "$lib/components/TokenizedPromptArea.svelte";
+  import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte'; // Aktualisierter Importpfad
   import { onMount, onDestroy } from "svelte";
-  
+
+  // --- Type Definitions ---
+  interface ControlNetParams {
+    strength: number;
+    startPercent: number;
+    endPercent: number;
+  }
+
+  interface GeneratedResult {
+    id: number;
+    prompt: string;
+    imageUrls: string[];
+    sourceImage: string | ArrayBuffer | null;
+    controlnetParams: ControlNetParams;
+    timestamp: Date;
+  }
+
+  interface TooltipData {
+    [key: string]: string;
+  }
+
+  // --- Component State ---
   // Parameter für die API
-  let prompt = "More Bubbles";
-  let negativePrompt = "";
-  let cfg = 1.3;
-  let steps = 6;
-  let seed = 0;
-  // Entferne uid
-  
+  let prompt: string = "More Bubbles";
+  let negativePrompt: string = "";
+  let cfg: number = 1.3;
+  let steps: number = 6;
+  let seed: number = 0;
+
   // ControlNet-spezifische Parameter
-  let controlnetStrength = 0.75;
-  let startPercent = 0;
-  let endPercent = 1;
-  
+  let controlnetStrength: number = 0.75;
+  let startPercent: number = 0;
+  let endPercent: number = 1;
+
   // Zustand für Bild
-  let image = null;
-  let imagePreview = null;
-  
-  // Zustand für Icons
-  let buttonIconError = false;
-  
+  let image: File | null = null;
+  let imagePreview: string | ArrayBuffer | null = null;
+
   // Tooltip und Operationen
-  let activeTooltip = null;
-  
+  let activeTooltip: string | null = null;
+
   // Tooltip-Texte
-  const tooltips = {
+  const tooltips: TooltipData = {
     prompt: "Beschreibe, wie das Bild verändert werden soll.",
     negativePrompt: "Ein negativer Prompt beschreibt, was im Bild nicht erscheinen soll. Dies hilft, unerwünschte Elemente zu vermeiden.",
     steps: "Mehr Steps bedeuten eine längere Renderzeit, aber oft ein detaillierteres Bild. Übliche Werte liegen zwischen 5 und 50.",
     cfg: "Steuert, wie stark sich das Modell an den Prompt halten soll. Höhere Werte bedeuten mehr Prompt-Treue, aber manchmal weniger Kreativität.",
     seed: "Ein bestimmter Seed erzeugt immer das gleiche Bild bei identischen anderen Parametern. Nützlich, um Ergebnisse zu reproduzieren.",
-    // Entferne uid
     controlnetStrength: "Steuert, wie stark sich das Modell an die Vorlage halten soll. Höhere Werte bedeuten mehr Kontrolle durch die Vorlage.",
     startPercent: "Prozentualer Wert, ab dem die Kontrolle durch die Vorlage beginnen soll (0 bedeutet direkt zu Beginn der Bildgenerierung).",
     endPercent: "Prozentualer Wert, bis zu dem die Kontrolle durch die Vorlage angewendet werden soll (1 bedeutet bis zum Ende der Bildgenerierung).",
-    image: "Lade ein Bild hoch, das als Vorlage/Kontrolle für den ControlNet-Prozess dienen soll."
+    image: "Lade ein Bild hoch, das als Vorlage/Kontrolle für den ControlNet-Prozess dienen soll.",
+    percentRange: "Bestimmt, in welchem Bereich des Generierungsprozesses die Kontrolle angewendet wird." // Added tooltip key
   };
-  
+
   // Zustand der Anwendung
-  let loading = false;
-  let imageUrl = null;
-  let error = null;
-  
+  let loading: boolean = false;
+  // let imageUrl: string | null = null; // Seems unused, consider removing
+  let error: string | null = null;
+
   // Historie der generierten Bilder
-  let generatedResults = [];
-  
+  let generatedResults: GeneratedResult[] = [];
+
   // API URL Basis
-  const apiBaseUrl = "https://aid-playground.hfg-gmuend.de/api/controlnet";
-  
+  const apiBaseUrl: string = "https://aid-playground.hfg-gmuend.de/api/controlnet";
+
+  // --- Functions ---
   // Funktionen zum Verarbeiten des Bild-Uploads
-  function handleImageUpload(event) {
-    const file = event.target.files[0];
+  function handleImageUpload(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
     if (file) {
       image = file;
       const reader = new FileReader();
       reader.onload = (e) => {
-        imagePreview = e.target.result;
+        imagePreview = e.target?.result ?? null;
       };
       reader.readAsDataURL(file);
     }
   }
-  
-  function handleImageDrop(event) {
+
+  function handleImageDrop(event: DragEvent) {
     event.preventDefault();
-    const file = event.dataTransfer.files[0];
+    const file = event.dataTransfer?.files[0];
     if (file) {
       image = file;
       const reader = new FileReader();
       reader.onload = (e) => {
-        imagePreview = e.target.result;
+        imagePreview = e.target?.result ?? null;
       };
       reader.readAsDataURL(file);
     }
   }
-  
-  function preventDefaults(event) {
+
+  function preventDefaults(event: Event) {
     event.preventDefault();
     event.stopPropagation();
   }
-  
-  // Funktion zum Behandeln von Icon-Ladefehlern
-  function handleIconError() {
-    buttonIconError = true;
-  }
-  
+
   // Funktion zum Generieren des ControlNet-Bildes
-  async function processWithControlNet() {
+  async function processWithControlNet(): Promise<void> {
     if (!image) {
       error = "Bitte lade ein Bild hoch, um ControlNet zu nutzen.";
       return;
     }
-    
+
     loading = true;
     error = null;
-    
+
     // Alte Bild-URL bereinigen, falls vorhanden
-    if (imageUrl && imageUrl.startsWith('blob:')) {
-      URL.revokeObjectURL(imageUrl);
-      imageUrl = null;
-    }
-    
+    // if (imageUrl && imageUrl.startsWith('blob:')) { // Consider removing if imageUrl is unused
+    //   URL.revokeObjectURL(imageUrl);
+    //   imageUrl = null;
+    // }
+
     try {
       // FormData für den POST-Request erstellen
       const formData = new FormData();
-      formData.append("image1", image);
-      
+      formData.append("image1", image); // API expects 'image1'
+
       // URL mit Parametern erstellen
       const url = new URL(apiBaseUrl);
-      url.searchParams.append("controlnet_strength", controlnetStrength);
-      url.searchParams.append("start_percent", startPercent);
-      url.searchParams.append("end_percent", endPercent);
+      url.searchParams.append("controlnet_strength", controlnetStrength.toString());
+      url.searchParams.append("start_percent", startPercent.toString());
+      url.searchParams.append("end_percent", endPercent.toString());
       url.searchParams.append("prompt", prompt);
-      url.searchParams.append("cfg", cfg);
-      url.searchParams.append("steps", steps);
-      url.searchParams.append("seed", seed);
+      url.searchParams.append("cfg", cfg.toString());
+      url.searchParams.append("steps", steps.toString());
+      url.searchParams.append("seed", seed.toString());
       url.searchParams.append("uid", "default"); // Standardwert verwenden
       if (negativePrompt) url.searchParams.append("negative_prompt", negativePrompt);
-      
+
       // POST-Request mit FormData
       const response = await fetch(url, {
         method: "POST",
         body: formData
       });
-      
+
       if (!response.ok) {
         throw new Error(`API Fehler: ${response.status}`);
       }
-      
+
       // Die Antwort als Blob behandeln (Binärdaten/Bild)
       const blob = await response.blob();
-      
+
       // Objekt-URL für den Blob erstellen
       const resultUrl = URL.createObjectURL(blob);
-      
+
       // Zum Verlauf hinzufügen
       generatedResults = [
-        { 
-          id: Date.now(), 
+        {
+          id: Date.now(),
           prompt: prompt,
           imageUrls: [resultUrl],
-          sourceImage: imagePreview, // Speichern des Quellbilds für die Anzeige
-          controlnetParams: { // Speichern der ControlNet-Parameter für die Anzeige
+          sourceImage: imagePreview,
+          controlnetParams: {
             strength: controlnetStrength,
             startPercent: startPercent,
             endPercent: endPercent
@@ -154,59 +168,58 @@
         },
         ...generatedResults
       ];
-      
+
     } catch (e) {
-      error = e.message;
+      error = e instanceof Error ? e.message : "Unbekannter Fehler";
       console.error("Fehler bei der ControlNet-Verarbeitung:", e);
     } finally {
       loading = false;
     }
   }
-  
-  // Funktion zum Bearbeiten eines vorherigen Prompts
-  function editPrompt(oldPrompt) {
-    prompt = oldPrompt;
-    document.querySelector('#main-prompt').scrollIntoView({ behavior: 'smooth' });
-  }
-  
-  // Parameter aus URL auslesen, wenn die Seite geladen wird
+
+  // --- Lifecycle ---
   onMount(() => {
     const url = new URL(window.location.href);
-    
+
     if (url.searchParams.has("prompt")) {
-      prompt = url.searchParams.get("prompt");
+      prompt = url.searchParams.get("prompt") || "More Bubbles";
     }
-    
+
     if (url.searchParams.has("negative_prompt")) {
-      negativePrompt = url.searchParams.get("negative_prompt");
+      negativePrompt = url.searchParams.get("negative_prompt") || "";
     }
-    
+
     if (url.searchParams.has("cfg")) {
-      cfg = parseFloat(url.searchParams.get("cfg"));
+      const cfgParam = url.searchParams.get("cfg");
+      if (cfgParam) cfg = parseFloat(cfgParam);
     }
-    
+
     if (url.searchParams.has("steps")) {
-      steps = parseInt(url.searchParams.get("steps"));
+      const stepsParam = url.searchParams.get("steps");
+      if (stepsParam) steps = parseInt(stepsParam);
     }
-    
+
     if (url.searchParams.has("seed")) {
-      seed = parseInt(url.searchParams.get("seed"));
+      const seedParam = url.searchParams.get("seed");
+      if (seedParam) seed = parseInt(seedParam);
     }
-    
+
     if (url.searchParams.has("controlnet_strength")) {
-      controlnetStrength = parseFloat(url.searchParams.get("controlnet_strength"));
+      const strengthParam = url.searchParams.get("controlnet_strength");
+      if (strengthParam) controlnetStrength = parseFloat(strengthParam);
     }
-    
+
     if (url.searchParams.has("start_percent")) {
-      startPercent = parseFloat(url.searchParams.get("start_percent"));
+      const startParam = url.searchParams.get("start_percent");
+      if (startParam) startPercent = parseFloat(startParam);
     }
-    
+
     if (url.searchParams.has("end_percent")) {
-      endPercent = parseFloat(url.searchParams.get("end_percent"));
+      const endParam = url.searchParams.get("end_percent");
+      if (endParam) endPercent = parseFloat(endParam);
     }
   });
-  
-  // Aufräumen bei Komponenten-Zerstörung
+
   onDestroy(() => {
     // Objekt-URL freigeben, wenn vorhanden
     generatedResults.forEach(result => {
@@ -219,6 +232,7 @@
       }
     });
   });
+
 </script>
 
 <svelte:head>
@@ -229,7 +243,7 @@
   <MinimalSidebar />
   <main>
     <NavigationBar active="controlnet" />
-    
+
     <div class="content-wrapper">
       <!-- Parameter Panel (links) -->
       <div class="parameters-panel">
@@ -496,7 +510,7 @@
                 <PromptResultCard 
                   prompt={result.prompt}
                   imageUrls={result.imageUrls}
-                  onEdit={editPrompt}
+                  onEdit={(oldPrompt) => prompt = oldPrompt}
                 />
               </div>
             {/each}
@@ -511,43 +525,18 @@
       </div>
       
       <!-- Prompt-Panel (unten rechts) -->
-      <div class="prompt-panel">
-        <div class="prompt-input-container">
-          <div class="label-container">
-            <label for="main-prompt">Prompt</label>
-            <div class="info-icon" 
-                on:mouseenter={() => activeTooltip = 'prompt'}
-                on:mouseleave={() => activeTooltip = null}>
-              i
-              {#if activeTooltip === 'prompt'}
-                <div class="tooltip tooltip-bottom">{tooltips.prompt}</div>
-              {/if}
-            </div>
-          </div>
-          
-          <TokenizedPromptArea
-            bind:value={prompt}
-            id="main-prompt"
-            placeholder="Beschreibe, wie das Bild verändert werden soll..."
-          />
-        </div>
-        
-        <div class="generate-button-container">
-          <button 
-            on:click={processWithControlNet}
-            disabled={loading || !image}
-            class={!image ? "disabled" : ""}
-          >
-            <img 
-              src={buttonIconError ? "/icon/rightIcon.svg" : "/icon/controlnetIcon.svg"} 
-              alt="ControlNet Icon" 
-              class="button-icon-inside" 
-              on:error={handleIconError}
-            />
-            <span>{loading ? 'Verarbeite...' : 'Anwenden'}</span>
-          </button>
-        </div>
-      </div>
+      <!-- Ersetze den alten Block durch die neue Komponente -->
+      <PromptPanel
+        bind:promptValue={prompt}
+        generateLabel="Generate"
+        generateLoadingLabel="Generating..."
+        generateIconSrc="/icon/rightIcon.svg" 
+        generateLoading={loading}
+        generateDisabled={loading || !image} 
+        on:generate={processWithControlNet}
+        placeholder="Describe how the image should be modified..."
+        promptId="main-prompt"
+      />
     </div>
   </main>
 </div>
@@ -1021,47 +1010,22 @@
     height: 100%;
   }
   
-  .prompt-panel button {
-    padding: 0.85rem 1.25rem;
-    background-color: #FCEA2B;
-    color: #121212;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: 'IBM Plex Mono', monospace;
-    font-weight: 500;
-    transition: all 0.2s;
+  /* Remove CSS rules specific to the old button */
+  /*
+  .prompt-panel button { ... }
+  .prompt-panel button:hover:not(.disabled) { ... }
+  .prompt-panel button:active:not(.disabled) { ... }
+  .prompt-panel button.disabled { ... }
+  .button-icon-inside { ... }
+  */
+
+  /* Keep this rule if needed for layout */
+  .generate-button-container {
     display: flex;
     align-items: center;
-    white-space: nowrap;
-    box-shadow: 0 2px 5px rgba(252, 234, 43, 0.2);
+    height: 100%;
   }
-  
-  .prompt-panel button:hover:not(.disabled) {
-    background-color: #ffe566;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(252, 234, 43, 0.3);
-  }
-  
-  .prompt-panel button:active:not(.disabled) {
-    transform: translateY(0);
-    box-shadow: 0 2px 3px rgba(252, 234, 43, 0.2);
-  }
-  
-  .prompt-panel button.disabled {
-    background-color: #444;
-    color: #888;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-  
-  .button-icon-inside {
-    width: 18px;
-    height: 18px;
-    margin-right: 8px;
-  }
-  
-  /* Ausgabebereich */
+
   .output-area {
     grid-column: 2;
     grid-row: 1;

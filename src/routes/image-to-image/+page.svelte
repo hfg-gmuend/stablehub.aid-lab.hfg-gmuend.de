@@ -2,8 +2,8 @@
   import MinimalSidebar from "$lib/components/MinimalSidebar.svelte";
   import NavigationBar from "$lib/components/NavigationBar.svelte";
   import PromptResultCard from "$lib/components/PromptResultCard.svelte";
-  import TokenizedPromptArea from "$lib/components/TokenizedPromptArea.svelte";
   import { onMount, onDestroy } from "svelte";
+  import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte';
   
   // Parameter für die API
   let prompt = "combine these images";
@@ -18,9 +18,6 @@
   let image2 = null;
   let image1Preview = null;
   let image2Preview = null;
-  
-  // Zustand für Icons
-  let combineIconError = false;
   
   // Tooltip und Operationen
   let activeTooltip = null;
@@ -210,11 +207,6 @@
       }
     });
   });
-  
-  // Funktion zum Behandeln von Bild-Ladefehlern
-  function handleImageError() {
-    combineIconError = true;
-  }
 </script>
 
 <svelte:head>
@@ -440,43 +432,18 @@
       </div>
       
       <!-- Prompt-Panel (unten rechts) -->
-      <div class="prompt-panel">
-        <div class="prompt-input-container">
-          <div class="label-container">
-            <label for="main-prompt">Prompt</label>
-            <div class="info-icon" 
-                on:mouseenter={() => activeTooltip = 'prompt'}
-                on:mouseleave={() => activeTooltip = null}>
-              i
-              {#if activeTooltip === 'prompt'}
-                <div class="tooltip tooltip-bottom">{tooltips.prompt}</div>
-              {/if}
-            </div>
-          </div>
-          
-          <TokenizedPromptArea
-            bind:value={prompt}
-            id="main-prompt"
-            placeholder="Beschreibe, wie die Bilder kombiniert werden sollen..."
-          />
-        </div>
-        
-        <div class="generate-button-container">
-          <button 
-            on:click={combineImages}
-            disabled={loading || !image1 || !image2}
-            class={!image1 || !image2 ? "disabled" : ""}
-          >
-            <img 
-              src={combineIconError ? "/icon/rightIcon.svg" : "/icon/combineIcon.svg"} 
-              alt="Kombinieren Icon" 
-              class="button-icon-inside" 
-              on:error={handleImageError}
-            />
-            <span>{loading ? 'Kombiniere...' : 'Kombinieren'}</span>
-          </button>
-        </div>
-      </div>
+      <PromptPanel
+        bind:promptValue={prompt}
+        generateLabel="Generate"
+        generateLoadingLabel="Generating..."
+        generateIconSrc="/icon/combineIcon.svg"
+        generateFallbackIconSrc="/icon/rightIcon.svg"
+        generateLoading={loading}
+        generateDisabled={loading || !image1 || !image2} 
+        on:generate={combineImages}
+        placeholder="Describe how the images should be combined or modified..."
+        promptId="main-prompt"
+      />
     </div>
   </main>
 </div>
@@ -698,12 +665,9 @@
     max-width: calc(100vw - 40px);
   }
   
-  [class*="info-icon"]:hover + .tooltip {
-    display: block;
-  }
+
   
-  /* Eingabefelder */
-  input[type="text"], 
+
   input[type="number"], 
   textarea {
     width: 100%;
@@ -715,8 +679,7 @@
     color: #ffffff;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
-  
-  input[type="text"]:focus, 
+
   input[type="number"]:focus, 
   textarea:focus {
     border-color: #FCEA2B;
@@ -878,46 +841,9 @@
     align-items: center;
     height: 100%;
   }
+
   
-  .prompt-panel button {
-    padding: 0.85rem 1.25rem;
-    background-color: #FCEA2B;
-    color: #121212;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: 'IBM Plex Mono', monospace;
-    font-weight: 500;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-    box-shadow: 0 2px 5px rgba(252, 234, 43, 0.2);
-  }
-  
-  .prompt-panel button:hover:not(.disabled) {
-    background-color: #ffe566;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(252, 234, 43, 0.3);
-  }
-  
-  .prompt-panel button:active:not(.disabled) {
-    transform: translateY(0);
-    box-shadow: 0 2px 3px rgba(252, 234, 43, 0.2);
-  }
-  
-  .prompt-panel button.disabled {
-    background-color: #444;
-    color: #888;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-  
-  .button-icon-inside {
-    width: 18px;
-    height: 18px;
-    margin-right: 8px;
-  }
+
   
   /* Ausgabebereich */
   .output-area {
