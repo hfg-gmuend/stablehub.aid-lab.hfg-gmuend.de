@@ -1,5 +1,5 @@
 <script lang="ts">
-  import MinimalSidebar from "$lib/components/MinimalSidebar.svelte";
+  import MinimalSidebar from "$lib/components/uicomponents/SidePanel/MinimalSidebar.svelte";
   import { onMount } from 'svelte';
   
   // Types

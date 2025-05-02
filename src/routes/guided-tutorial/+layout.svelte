@@ -1,5 +1,5 @@
 <script>
-  import MinimalSidebar from "$lib/components/MinimalSidebar.svelte";
+  import MinimalSidebar from "$lib/components/uicomponents/SidePanel/MinimalSidebar.svelte";
   import TutorialSidebar from "$lib/components/TutorialSidebar.svelte";
 </script>
 
