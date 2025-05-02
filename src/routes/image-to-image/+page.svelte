@@ -4,6 +4,7 @@
   import PromptResultCard from "$lib/components/PromptResultCard.svelte";
   import { onMount, onDestroy } from "svelte";
   import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte';
+  import StyleCopilot from "$lib/components/StyleCopilot.svelte"; // Import StyleCopilot
   
   // Parameter für die API
   let prompt = "combine these images";
@@ -169,6 +170,22 @@
     document.querySelector('#main-prompt').scrollIntoView({ behavior: 'smooth' });
   }
   
+  // --- Copilot State ---
+  let isStyleCopilotOpen = false; // State for modal visibility
+
+  // --- Copilot Functions ---
+  function openStyleCopilot() { // Function to open the modal
+    isStyleCopilotOpen = true;
+  }
+
+  function addGeneratedStyle(event) { // Function to handle adding the style
+    const style = event.detail.style;
+    if (style) {
+      // Füge den Style zum Prompt hinzu (ggf. anpassen, wie es für Image-to-Image sinnvoll ist)
+      prompt = prompt.trim() + (prompt ? ', ' : '') + style;
+    }
+  }
+
   // Parameter aus URL auslesen, wenn die Seite geladen wird
   onMount(() => {
     const url = new URL(window.location.href);
@@ -441,9 +458,19 @@
         generateLoading={loading}
         generateDisabled={loading || !image1 || !image2} 
         on:generate={combineImages}
+        on:copilot={openStyleCopilot} 
         placeholder="Describe how the images should be combined or modified..."
         promptId="main-prompt"
       />
+
+      <!-- Style Copilot Modal -->
+      {#if isStyleCopilotOpen}
+        <StyleCopilot
+          isOpen={isStyleCopilotOpen}
+          on:close={() => isStyleCopilotOpen = false}
+          on:addStyle={addGeneratedStyle}
+        />
+      {/if}
     </div>
   </main>
 </div>
