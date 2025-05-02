@@ -1,5 +1,5 @@
 <script>
-  import MinimalSidebar from "$lib/components/MinimalSidebar.svelte";
+  import MinimalSidebar from "$lib/components/uicomponents/SidePanel/MinimalSidebar.svelte";
   import NavigationBar from "$lib/components/NavigationBar.svelte";
   import PromptResultCard from "$lib/components/PromptResultCard.svelte";
   import { onMount, onDestroy } from "svelte";

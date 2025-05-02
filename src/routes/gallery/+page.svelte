@@ -1,5 +1,5 @@
 <script>
-  import Sidebar from "$lib/components/Sidebar.svelte";
+  import MinimalSidebar from "$lib/components/uicomponents/SidePanel/MinimalSidebar.svelte";
   import NavigationBar from "$lib/components/NavigationBar.svelte";
   import { favorites } from '$lib/stores/favorites';
   
@@ -28,7 +28,7 @@
 </svelte:head>
 
 <div class="app-container">
-  <Sidebar />
+  <MinimalSidebar />
   <main>
     <NavigationBar active="gallery" />
     

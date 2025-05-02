@@ -1,5 +1,5 @@
 <script lang="ts"> // Add lang="ts"
-  import MinimalSidebar from "$lib/components/MinimalSidebar.svelte";
+  import MinimalSidebar from "$lib/components/uicomponents/SidePanel/MinimalSidebar.svelte";
   import NavigationBar from "$lib/components/NavigationBar.svelte";
   import PromptResultCard from "$lib/components/PromptResultCard.svelte";
   import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte'; // Aktualisierter Importpfad
