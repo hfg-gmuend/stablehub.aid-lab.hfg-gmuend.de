@@ -1,13 +1,22 @@
-<script>
+<script lang="ts">
   import NavigationButton from './NavigationButton.svelte';
 
-  export let title = '';
-  export let items = []; // Array von { name: string, path: string }
-  export let currentPath = '';
-  // Optionale Funktion zur Bestimmung des aktiven Zustands, 
+  // Definiere einen Typ für die Navigationsitems
+  type NavItem = {
+    name: string;
+    path: string;
+  };
+
+  // Definiere einen Typ für die Funktion zur Aktivitätsprüfung
+  type ActiveCheckFunction = (itemPath: string, currentPath: string) => boolean;
+
+  export let title: string = '';
+  export let items: NavItem[] = []; // Array von NavItem
+  export let currentPath: string = '';
+  // Optionale Funktion zur Bestimmung des aktiven Zustands,
   // standardmäßig wird auf exakte Pfadübereinstimmung geprüft.
-  export let activeCheckFn = (itemPath, currentPath) => itemPath === currentPath; 
-  export let isBorderTop = false; // Für Trennlinie oben
+  export let activeCheckFn: ActiveCheckFunction = (itemPath, currentPath) => itemPath === currentPath;
+  export let isBorderTop: boolean = false; // Für Trennlinie oben
 </script>
 
 <div class="mode-navigation" class:border-top={isBorderTop}>

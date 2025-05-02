@@ -1,31 +1,40 @@
-<script>
+<script lang="ts">
   import { page } from '$app/stores';
   // Annahme: SidebarHeader.svelte und NavigationSection.svelte befinden sich 
   // weiterhin in einem Unterordner 'subcomponents' relativ zu dieser Datei.
   import SidebarHeader from './subcomponents/SidebarHeader.svelte';
   import NavigationSection from './subcomponents/NavigationSection.svelte';
   
+  // Definiere den Typ für Navigationsitems (könnte auch aus NavigationSection importiert werden, falls dort exportiert)
+  type NavItem = {
+    name: string;
+    path: string;
+  };
+
+  // Definiere den Typ für die Funktion zur Aktivitätsprüfung (könnte auch aus NavigationSection importiert werden)
+  type ActiveCheckFunction = (itemPath: string, currentPath: string) => boolean;
+
   // Aktuelle Route für Hervorhebung
   $: currentPath = $page.url.pathname;
   
   // Navigation für die Modi (Routenpfade bleiben unverändert)
-  const modes = [
+  const modes: NavItem[] = [
     { name: 'Text To Image', path: '/text-to-image' },
     { name: 'Image To Image', path: '/image-to-image' },
     { name: 'ControlNet', path: '/control-net' }
   ];
 
   // Tutorial-Bereich Daten (Routenpfade bleiben unverändert)
-  const tutorialItems = [
+  const tutorialItems: NavItem[] = [
     { name: 'Guided Tutorials', path: '/guided-tutorial' }
   ];
-  const isTutorialActive = (itemPath, currentPath) => currentPath.startsWith(itemPath);
+  const isTutorialActive: ActiveCheckFunction = (itemPath, currentPath) => currentPath.startsWith(itemPath);
 
   // VPN-Bereich Daten (Routenpfade bleiben unverändert)
-  const vpnItems = [
+  const vpnItems: NavItem[] = [
     { name: 'VPN Install', path: '/vpn-install' }
   ];
-  const isVpnActive = (itemPath, currentPath) => currentPath === itemPath;
+  const isVpnActive: ActiveCheckFunction = (itemPath, currentPath) => currentPath === itemPath;
 
 </script>
 

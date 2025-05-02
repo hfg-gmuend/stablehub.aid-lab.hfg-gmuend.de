@@ -1,34 +1,35 @@
-<script>
+<script lang="ts">
   // Eingabe-Prompt als bindbare Eigenschaft
-  export let value = "";
-  export let placeholder = "Prompt eingeben...";
-  export let id = "prompt-input";
-  
+  export let value: string = "";
+  export let placeholder: string = "Prompt eingeben...";
+  export let id: string = "prompt-input";
+
   // Für Berechnungen zugängliche Variablen
-  let textareaElement;
-  let overlayElement;
-  let tokenLimit = 77;
-  let isOverLimit = false;
-  
+  let textareaElement: HTMLTextAreaElement;
+  let overlayElement: HTMLDivElement;
+  let tokenLimit: number = 77;
+  let isOverLimit: boolean = false;
+
   // Berechnung des tokenisierten Inhalts mit Transparenz
   $: tokenizedContent = tokenizeContent(value);
-  $: isOverLimit = value.split(/\s+/).length > tokenLimit;
-  
+  // Explizite Typisierung für isOverLimit, obwohl sie durch die Berechnung inferiert wird
+  $: isOverLimit = value ? value.split(/\s+/).filter(word => word.length > 0).length > tokenLimit : false;
+
   // Funktion zur Tokenisierung des Inhalts
-  function tokenizeContent(text) {
+  function tokenizeContent(text: string): string {
     if (!text) return '';
-    
-    // Text in Wörter aufteilen
-    const words = text.split(/\s+/);
-    
+
+    // Text in Wörter aufteilen (leere Strings herausfiltern)
+    const words = text.split(/\s+/).filter(word => word.length > 0);
+
     // HTML für die Anzeige mit abgestufter Transparenz generieren
     return words.map((word, index) => {
       // Progressive Transparenz:
       // - Erste 25 Tokens: 100% Opazität
       // - Token 25-77: Linear abnehmend von 100% auf 40%
       // - Ab Token 77: 10% Opazität
-      let opacity;
-      
+      let opacity: number;
+
       if (index < 25) {
         opacity = 1.0; // Volle Opazität für die ersten 25 Tokens
       } else if (index < tokenLimit) {
@@ -37,13 +38,15 @@
       } else {
         opacity = 0.1; // Ab 77 Tokens: 10% Opazität
       }
-      
-      return `<span style="opacity: ${opacity};">${word}</span>`;
+
+      // HTML-Entitäten escapen, um XSS zu verhindern, falls der Text HTML enthalten könnte
+      const escapedWord = word.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return `<span style="opacity: ${opacity};">${escapedWord}</span>`;
     }).join(' ');
   }
 
   // Synchronisierung von Scroll-Position zwischen Textarea und Overlay
-  function syncScroll() {
+  function syncScroll(): void {
     if (overlayElement && textareaElement) {
       overlayElement.scrollTop = textareaElement.scrollTop;
       overlayElement.scrollLeft = textareaElement.scrollLeft;
@@ -78,7 +81,7 @@
   </div>
   
   <div class="token-counter {isOverLimit ? 'warning' : ''}">
-    {value ? value.split(/\s+/).length : 0}/{tokenLimit}
+    {value ? value.split(/\s+/).filter(word => word.length > 0).length : 0}/{tokenLimit}
   </div>
 </div>
 
