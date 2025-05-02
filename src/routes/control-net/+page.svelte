@@ -3,7 +3,9 @@
   import NavigationBar from "$lib/components/NavigationBar.svelte";
   import PromptResultCard from "$lib/components/PromptResultCard.svelte";
   import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte'; // Aktualisierter Importpfad
+  import StyleCopilot from "$lib/components/StyleCopilot.svelte"; // Import StyleCopilot
   import { onMount, onDestroy } from "svelte";
+  import type { GeneratedResult } from '$lib/types'; // Assuming types are defined
 
   // --- Type Definitions ---
   interface ControlNetParams {
@@ -69,6 +71,9 @@
 
   // API URL Basis
   const apiBaseUrl: string = "https://aid-playground.hfg-gmuend.de/api/controlnet";
+
+  // --- Copilot State ---
+  let isStyleCopilotOpen = false; // State for modal visibility
 
   // --- Functions ---
   // Funktionen zum Verarbeiten des Bild-Uploads
@@ -174,6 +179,18 @@
       console.error("Fehler bei der ControlNet-Verarbeitung:", e);
     } finally {
       loading = false;
+    }
+  }
+
+  // --- Copilot Functions ---
+  function openStyleCopilot() { // Function to open the modal
+    isStyleCopilotOpen = true;
+  }
+
+  function addGeneratedStyle(event: CustomEvent<{ style: string }>) { // Function to handle adding the style
+    const style = event.detail.style;
+    if (style) {
+      prompt = prompt.trim() + (prompt ? ', ' : '') + style;
     }
   }
 
@@ -534,9 +551,19 @@
         generateLoading={loading}
         generateDisabled={loading || !image} 
         on:generate={processWithControlNet}
+        on:copilot={openStyleCopilot} 
         placeholder="Describe how the image should be modified..."
         promptId="main-prompt"
       />
+
+      <!-- Style Copilot Modal -->
+      {#if isStyleCopilotOpen}
+        <StyleCopilot
+          isOpen={isStyleCopilotOpen}
+          on:close={() => isStyleCopilotOpen = false}
+          on:addStyle={addGeneratedStyle}
+        />
+      {/if}
     </div>
   </main>
 </div>
