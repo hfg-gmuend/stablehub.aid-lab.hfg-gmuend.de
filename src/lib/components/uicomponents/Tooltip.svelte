@@ -3,6 +3,7 @@
   export let visible: boolean = false;
   export let maxWidth: number | null = null; // Prop für maximale Breite
   export let minWidth: number | null = null; // Prop für minimale Breite
+  export let id: string | null = null; // ID-Prop hinzugefügt
 
   // Berechne den Style basierend auf den Props
   $: tooltipStyle = [
@@ -12,7 +13,7 @@
 </script>
 
 {#if visible}
-  <div class="simple-tooltip" style={tooltipStyle}>
+  <div class="simple-tooltip" {id} style={tooltipStyle} role="tooltip"> 
     {text}
   </div>
 {/if}

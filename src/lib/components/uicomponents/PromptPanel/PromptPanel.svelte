@@ -50,29 +50,31 @@
   <div class="prompt-input-container">
     <div class="label-container">
       <label for={promptId}>Prompt</label>
-      <!-- Token Counter Wrapper für Tooltip-Positionierung -->
+      <!-- Token Counter Wrapper -->
       <div
         class="tooltip-wrapper"
         on:mouseenter={() => isTokenCounterHovered = true}
         on:mouseleave={() => isTokenCounterHovered = false}
+        role="status"
       >
         <div
           class="token-counter {isOverLimit ? 'warning' : ''}"
-          aria-describedby="token-tooltip"
+          aria-describedby="token-counter-tooltip"
         >
           {tokenCount}/{tokenLimit}
         </div>
-        <!-- Tooltip Komponente -->
-        <Tooltip text={tokenTooltipText} visible={isTokenCounterHovered} minWidth={200} />
-      </div>
+        <Tooltip id="token-counter-tooltip" text={tokenTooltipText} visible={isTokenCounterHovered} minWidth={200} />
+      </div> <!-- Korrektes Schließen des ersten Wrappers -->
+
       <!-- Copilot Button Wrapper -->
       <div
         class="tooltip-wrapper"
         on:mouseenter={() => isCopilotHovered = true}
         on:mouseleave={() => isCopilotHovered = false}
+        role="group"
       >
-        <CopilotButton on:click={handleCopilotClick} />
-        <Tooltip text={copilotTooltipText} visible={isCopilotHovered} maxWidth={450} minWidth={200} />
+        <CopilotButton on:click={handleCopilotClick} ariaDescribedby="copilot-tooltip" />
+        <Tooltip id="copilot-tooltip" text={copilotTooltipText} visible={isCopilotHovered} maxWidth={450} minWidth={200} />
       </div>
     </div>
 
