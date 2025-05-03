@@ -26,122 +26,122 @@
     {
       name: "CFG Scale",
       value: 7.5,
-      description: "Steuert, wie stark der Prompt befolgt wird. Höhere Werte = mehr Prompttreue."
+      description: "Controls how strongly the prompt is followed. Higher values = more prompt adherence."
     },
     {
       name: "Steps",
       value: 30,
-      description: "Anzahl der Diffusionsschritte. Mehr Steps = mehr Details, aber längere Generierung."
+      description: "Number of diffusion steps. More steps = more details, but longer generation time."
     },
     {
       name: "Seed",
       value: 1234567890,
-      description: "Startpunkt für den Zufallsgenerator. Gleicher Seed = reproduzierbare Bilder."
+      description: "Starting point for the random generator. Same seed = reproducible images."
     }
   ];
   
   // Learning objectives
   const learningObjectives: LearningObjective[] = [
-    "Was Stable Diffusion ist und wie es grundlegend funktioniert",
-    "Unterschiede zwischen Online-Diensten und lokaler Installation",
-    "Die Rolle von positiven und negativen Prompts",
-    "Warum Parameter wichtig sind und wie sie das Ergebnis beeinflussen"
+    "What Stable Diffusion is and how it fundamentally works",
+    "Differences between online services and local installation",
+    "The role of positive and negative prompts",
+    "Why parameters are important and how they influence the result"
   ];
   
   // Navigation props
   const navigationProps: NavigationProps = {
     nextPath: "/guided-tutorial/prompt-basics",
-    nextLabel: "Weiter zum nächsten Thema"
+    nextLabel: "Continue to the next topic"
   };
 </script>
 
 
 
 <svelte:head>
-  <title>Was ist Stable Diffusion? | Guided Tutorial | HfG Ai-Hub</title>
+  <title>What is Stable Diffusion? | Guided Tutorial | HfG Ai-Hub</title>
 </svelte:head>
 
 <div class="tutorial-container">
   <div class="tutorial-header">
-    <h1>Was ist Stable Diffusion?</h1>
-    <p class="subtitle">Einführung in die KI-Bildgenerierung</p>
+    <h1>What is Stable Diffusion?</h1>
+    <p class="subtitle">Introduction to AI Image Generation</p>
   </div>
 
   <div class="content-sections">
-    <!-- Einführungsabschnitt -->
+    <!-- Introduction Section -->
     <section class="tutorial-section">
-      <h2>Kurze Modellübersicht</h2>
+      <h2>Brief Model Overview</h2>
       <div class="content-block">
         <div class="text-content">
-          <p>Stable Diffusion ist ein KI-Modell zur Bildgenerierung, das von Stability AI entwickelt wurde. Es gehört zur Familie der <strong>Diffusionsmodelle</strong>, die auf einer schrittweisen Entfernung von Rauschen basieren.</p>
+          <p>Stable Diffusion is an AI model for image generation developed by Stability AI. It belongs to the family of <strong>diffusion models</strong>, which are based on a step-by-step removal of noise.</p>
           
-          <p>Die Kernfunktionen von Stable Diffusion sind:</p>
+          <p>The core functions of Stable Diffusion are:</p>
           <ul>
-            <li>Text-zu-Bild-Generierung (Text-to-Image)</li>
-            <li>Bild-zu-Bild-Transformation (Image-to-Image)</li>
-            <li>Inpainting und Outpainting (Ergänzung bestehender Bilder)</li>
-            <li>Kontrollierte Bildgenerierung (ControlNet)</li>
+            <li>Text-to-Image Generation</li>
+            <li>Image-to-Image Transformation</li>
+            <li>Inpainting and Outpainting (Completing existing images)</li>
+            <li>Controlled Image Generation (ControlNet)</li>
           </ul>
         </div>
         <div class="image-block">
-          <img src="/tutorial/stablediffusion.png" alt="Stable Diffusion Prozess" class="tutorial-image" />
-          <p class="image-caption">Der Diffusionsprozess: Von Rauschen zum Bild</p>
+          <img src="/tutorial/stablediffusion.png" alt="Stable Diffusion Process" class="tutorial-image" />
+          <p class="image-caption">The Diffusion Process: From Noise to Image</p>
         </div>
       </div>
     </section>
 
-    <!-- Zweiter Abschnitt: Online vs. Lokaler Betrieb -->
+    <!-- Second Section: Online vs. Local Operation -->
     <section class="tutorial-section">
-      <h2>Online versus lokaler Betrieb</h2>
+      <h2>Online versus Local Operation</h2>
       <div class="compare-table">
         <div class="compare-column">
-          <h3>Online-Dienste</h3>
+          <h3>Online Services</h3>
           <ul class="feature-list">
-            <li><span class="icon check">✓</span> Keine Installation erforderlich</li>
-            <li><span class="icon check">✓</span> Sofort einsetzbar</li>
-            <li><span class="icon check">✓</span> Keine leistungsstarke Hardware nötig</li>
-            <li><span class="icon x">×</span> Meist kostenpflichtig oder limitiert</li>
-            <li><span class="icon x">×</span> Eingeschränkte Anpassungsmöglichkeiten</li>
-            <li><span class="icon x">×</span> Potenziell weniger Privatsphäre</li>
+            <li><span class="icon check">✓</span> No installation required</li>
+            <li><span class="icon check">✓</span> Immediately usable</li>
+            <li><span class="icon check">✓</span> No powerful hardware needed</li>
+            <li><span class="icon x">×</span> Usually paid or limited</li>
+            <li><span class="icon x">×</span> Limited customization options</li>
+            <li><span class="icon x">×</span> Potentially less privacy</li>
           </ul>
-          <p class="examples">Beispiele: Midjourney, DALL-E, Leonardo.AI</p>
+          <p class="examples">Examples: Midjourney, DALL-E, Leonardo.AI</p>
         </div>
         
         <div class="compare-column">
-          <h3>Lokale Installation</h3>
+          <h3>Local Installation</h3>
           <ul class="feature-list">
-            <li><span class="icon check">✓</span> Vollständige Kontrolle</li>
-            <li><span class="icon check">✓</span> Keine laufenden Kosten</li>
-            <li><span class="icon check">✓</span> Benutzerdefinierte Modelle & Extensions</li>
-            <li><span class="icon x">×</span> Benötigt leistungsstarke GPU</li>
-            <li><span class="icon x">×</span> Technisches Know-how erforderlich</li>
-            <li><span class="icon x">×</span> Aufwändigeres Setup</li>
+            <li><span class="icon check">✓</span> Complete control</li>
+            <li><span class="icon check">✓</span> No running costs</li>
+            <li><span class="icon check">✓</span> Custom models & extensions</li>
+            <li><span class="icon x">×</span> Requires powerful GPU</li>
+            <li><span class="icon x">×</span> Technical know-how required</li>
+            <li><span class="icon x">×</span> More complex setup</li>
           </ul>
-          <p class="examples">Oberflächen: A1111 Webui, ComfyUI, InvokeAI</p>
+          <p class="examples">Interfaces: A1111 Webui, ComfyUI, InvokeAI</p>
         </div>
       </div>
       
       <div class="info-box">
-        <h4>Wusstest Du?</h4>
-        <p>Der HfG Ai-Hub verwendet Stable Diffusion im Backend und bietet dir damit die Vorteile von lokalem Betrieb ohne den Installationsaufwand!</p>
+        <h4>Did you know?</h4>
+        <p>The HfG Ai-Hub uses Stable Diffusion in the backend, offering you the benefits of local operation without the installation effort!</p>
       </div>
     </section>
 
-    <!-- Dritter Abschnitt: Prompts & Parameter -->
+    <!-- Third Section: Prompts & Parameters -->
     <section class="tutorial-section">
-      <h2>Positiver ↔ negativer Prompt & Parameter</h2>
+      <h2>Positive ↔ Negative Prompt & Parameters</h2>
       
       <div class="content-block">
         <div class="text-content">
-          <h3>Positiver Prompt</h3>
-          <p>Der positive Prompt beschreibt, was im Bild erscheinen soll. Je detaillierter und präziser du formulierst, desto gezielter kann das Modell generieren.</p>
+          <h3>Positive Prompt</h3>
+          <p>The positive prompt describes what should appear in the image. The more detailed and precise your wording, the more targeted the model can generate.</p>
           
           <div class="prompt-example">
             <p class="prompt-text">A majestic castle on a mountain, sunset, dramatic lighting, detailed architecture, 8k, cinematic, fog, mystical atmosphere</p>
           </div>
           
-          <h3>Negativer Prompt</h3>
-          <p>Der negative Prompt gibt an, was im Bild vermieden werden soll. Dies hilft, unerwünschte Elemente oder Qualitätsprobleme zu reduzieren.</p>
+          <h3>Negative Prompt</h3>
+          <p>The negative prompt specifies what should be avoided in the image. This helps reduce unwanted elements or quality issues.</p>
           
           <div class="prompt-example negative">
             <p class="prompt-text">blurry, bad anatomy, distorted, deformed, disfigured, poor quality, low resolution, text, watermark</p>
@@ -149,7 +149,7 @@
         </div>
         
         <div class="parameter-sidebar">
-          <h3>Parameter-Steuerung</h3>
+          <h3>Parameter Control</h3>
           {#each parameters as param}
             <div class="parameter-item">
               <div class="param-header">
@@ -163,11 +163,11 @@
       </div>
     </section>
 
-    <!-- Übungsbereich -->
+    <!-- Learning Check Section -->
     <section class="tutorial-section">
-      <h2>Lernziel-Check</h2>
+      <h2>Learning Objective Check</h2>
       <div class="info-box success">
-        <h4>Du solltest jetzt verstehen:</h4>
+        <h4>You should now understand:</h4>
         <ul>
           {#each learningObjectives as objective}
             <li>{objective}</li>
