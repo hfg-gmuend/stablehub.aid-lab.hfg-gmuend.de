@@ -1,16 +1,16 @@
 <script>
-  // Beispiele für negative Prompts
+  // Examples for negative prompts
   const negativePromptExamples = [
-    { 
-      category: "Qualitätsprobleme",
+    {
+      category: "Quality Issues",
       prompt: "blurry, low quality, pixelated, jpeg artifacts, compression artifacts, bad composition, deformed, mutated, signature, watermark"
     },
-    { 
-      category: "Anatomieprobleme", 
+    {
+      category: "Anatomy Issues",
       prompt: "bad anatomy, deformed hands, extra fingers, missing fingers, extra limbs, distorted face, unrealistic proportions, cross-eyed, assymetrical, disfigured"
     },
-    { 
-      category: "Zeichenstil unerwünscht", 
+    {
+      category: "Unwanted Art Style",
       prompt: "cartoon style, anime, 3d render, painting, drawing, sketch, illustration, low detail face"
     }
   ];
@@ -18,22 +18,22 @@
 </script>
 
 <svelte:head>
-  <title>Fortgeschrittenes Prompting | Guided Tutorial | HfG Ai-Hub</title>
+  <title>Advanced Prompting | Guided Tutorial | HfG Ai-Hub</title>
 </svelte:head>
 
 <div class="tutorial-container">
   <div class="tutorial-header">
-    <h1>Fortgeschrittenes Prompting</h1>
-    <p class="subtitle">Erweiterte Techniken für komplexe und hochauflösende Bilder</p>
+    <h1>Advanced Prompting</h1>
+    <p class="subtitle">Advanced techniques for complex and high-resolution images</p>
   </div>
 
   <div class="content-sections">
-    <!-- Negative Prompt Feintuning -->
+    <!-- Negative Prompt Fine-tuning -->
     <section class="tutorial-section">
-      <h2>Negative Prompt feintunen</h2>
-      
-      <p>Ein gut strukturierter negativer Prompt ist entscheidend für qualitativ hochwertige Bilder. Mit gezielten Negativ-Prompts kannst du häufige Probleme vermeiden:</p>
-      
+      <h2>Fine-tuning the Negative Prompt</h2>
+
+      <p>A well-structured negative prompt is crucial for high-quality images. With targeted negative prompts, you can avoid common problems:</p>
+
       <div class="negative-categories">
         {#each negativePromptExamples as category}
           <div class="negative-category">
@@ -44,42 +44,44 @@
           </div>
         {/each}
       </div>
-      
+
       <div class="comparison-grid">
-        <h3>Auswirkung des negativen Prompts</h3>
+        <h3>Impact of the Negative Prompt</h3>
         <div class="comparison-items">
           <div class="comparison-item">
             <div class="comparison-image">
-              <div class="placeholder-image" data-label="Ohne">
-                <span>Ohne negativen Prompt</span>
+
+              <div class="placeholder-image" data-label="Without">
+                <img src="/tutorial/negative1.png" alt="Example generated without a negative prompt" class="comparison-example-image"/>
               </div>
             </div>
             <div class="comparison-prompt">
-              <p class="prompt-caption">Negativer Prompt:</p>
-              <p class="prompt-text empty">Leer</p>
+              <p class="prompt-caption">Negative Prompt:</p>
+              <p class="prompt-text empty">Empty</p>
             </div>
           </div>
           <div class="comparison-item">
             <div class="comparison-image">
-              <div class="placeholder-image" data-label="Mit">
-                <span>Mit detailliertem negativen Prompt</span>
+
+              <div class="placeholder-image" data-label="With">
+                 <img src="/tutorial/negative2.png" alt="Example generated with a detailed negative prompt" class="comparison-example-image"/>
               </div>
             </div>
             <div class="comparison-prompt">
-              <p class="prompt-caption">Negativer Prompt:</p>
+              <p class="prompt-caption">Negative Prompt:</p>
               <p class="prompt-text">bad quality, blurry, bad anatomy, worst quality, low quality, lowres, extra fingers, ...</p>
             </div>
           </div>
         </div>
       </div>
-      
+
       <div class="tips-box">
-        <h4>Tipps für effektive negative Prompts:</h4>
+        <h4>Tips for effective negative prompts:</h4>
         <ul>
-          <li><strong>Projektspezifisch anpassen:</strong> Für Porträts auf Anatomie-Fehler fokussieren, für Landschaften eher auf Qualitätsprobleme</li>
-          <li><strong>Nicht überladen:</strong> Extrem lange negative Prompts können das Modell verwirren</li>
-          <li><strong>Testlauf:</strong> Vergleiche die Ergebnisse mit und ohne negativen Prompt</li>
-          <li><strong>Priorität setzen:</strong> Wichtigste Vermeidungs-Begriffe an den Anfang des negativen Prompts</li>
+          <li><strong>Adapt project-specifically:</strong> Focus on anatomy errors for portraits, quality issues for landscapes</li>
+          <li><strong>Don't overload:</strong> Extremely long negative prompts can confuse the model</li>
+          <li><strong>Test run:</strong> Compare results with and without the negative prompt</li>
+          <li><strong>Prioritize:</strong> Place the most important avoidance terms at the beginning of the negative prompt</li>
         </ul>
       </div>
     </section>
@@ -87,75 +89,75 @@
     <!-- Multi-Prompt / Composable Diffusion -->
     <section class="tutorial-section">
       <h2>Multi-Prompt / Composable Diffusion</h2>
-      
-      <p>Multi-Prompt oder Composable Diffusion ist eine fortgeschrittene Technik, die es ermöglicht, mehrere separate Prompts gleichzeitig zu nutzen, um komplexe Szenen zu generieren.</p>
-      
+
+      <p>Multi-prompt or Composable Diffusion is an advanced technique that allows using multiple separate prompts simultaneously to generate complex scenes.</p>
+
       <div class="technique-explanation">
-        <h3>So funktioniert es:</h3>
+        <h3>How it works:</h3>
         <div class="explanation-grid">
           <div class="explanation-item">
-            <h4>1. Prompt-Zerlegung</h4>
-            <p>Teile deine komplexe Szene in einzelne Elemente auf und erstelle separate Prompts für jedes Element.</p>
+            <h4>1. Prompt Decomposition</h4>
+            <p>Break down your complex scene into individual elements and create separate prompts for each element.</p>
           </div>
           <div class="explanation-item">
-            <h4>2. Gewichtete Kombination</h4>
-            <p>Weise jedem Prompt eine Gewichtung zu, die seine Bedeutung in der Gesamtkomposition angibt.</p>
+            <h4>2. Weighted Combination</h4>
+            <p>Assign a weight to each prompt indicating its importance in the overall composition.</p>
           </div>
           <div class="explanation-item">
-            <h4>3. Verbindung</h4>
-            <p>Verbinde die Prompts mit einer speziellen Syntax, die von der verwendeten UI abhängt.</p>
+            <h4>3. Connection</h4>
+            <p>Connect the prompts using specific syntax depending on the UI used.</p>
           </div>
         </div>
       </div>
-      
+
       <div class="example-box">
-        <h3>Beispiel: Landschaft mit mehreren Elementen</h3>
-        
+        <h3>Example: Landscape with multiple elements</h3>
+
         <div class="multi-prompt-example">
           <div class="component">
-            <div class="component-label">Komponente 1:</div>
+            <div class="component-label">Component 1:</div>
             <div class="component-prompt">
               <p>a majestic castle on top of a hill</p>
             </div>
-            <div class="component-weight">Gewicht: 1.2</div>
+            <div class="component-weight">Weight: 1.2</div>
           </div>
           <div class="plus-sign">+</div>
           <div class="component">
-            <div class="component-label">Komponente 2:</div>
+            <div class="component-label">Component 2:</div>
             <div class="component-prompt">
               <p>a beautiful lake with reflections</p>
             </div>
-            <div class="component-weight">Gewicht: 0.8</div>
+            <div class="component-weight">Weight: 0.8</div>
           </div>
           <div class="plus-sign">+</div>
           <div class="component">
-            <div class="component-label">Gemeinsame Stile:</div>
+            <div class="component-label">Common Styles:</div>
             <div class="component-prompt">
               <p>sunset, cinematic lighting, detailed, 8k</p>
             </div>
-            <div class="component-weight">Für alle Komponenten</div>
+            <div class="component-weight">For all components</div>
           </div>
         </div>
-        
+
         <div class="syntax-examples">
-          <h4>Implementierungssyntax:</h4>
+          <h4>Implementation Syntax:</h4>
           <div class="syntax-box">
             <p class="syntax-label">A1111 WebUI:</p>
             <code>a majestic castle on top of a hill :1.2 AND a beautiful lake with reflections :0.8, sunset, cinematic lighting, detailed, 8k</code>
           </div>
           <div class="syntax-box">
             <p class="syntax-label">ComfyUI:</p>
-            <code>// In separaten Prompt-Nodes mit entsprechenden Gewichten verbunden</code>
+            <code>// Connected in separate prompt nodes with corresponding weights</code>
           </div>
         </div>
       </div>
-      
+
       <div class="tips-box">
-        <p>Diese Technik ist besonders nützlich für:</p>
+        <p>This technique is particularly useful for:</p>
         <ul>
-          <li>Komplexe Szenen mit mehreren Hauptelementen</li>
-          <li>Kombination verschiedener Stilrichtungen</li>
-          <li>Genaue Kontrolle über die Balance von Elementen im Bild</li>
+          <li>Complex scenes with multiple main elements</li>
+          <li>Combining different styles</li>
+          <li>Precise control over the balance of elements in the image</li>
         </ul>
       </div>
     </section>
@@ -163,19 +165,19 @@
     <!-- Hires-Fix & Upscale Loops -->
     <section class="tutorial-section">
       <h2>Hires-Fix & Upscale Loops</h2>
-      
-      <p>Für hochauflösende Bilder mit feinen Details sind spezielle Techniken notwendig, da Diffusionsmodelle oft bei höheren Auflösungen Probleme haben.</p>
-      
+
+      <p>For high-resolution images with fine details, special techniques are necessary, as diffusion models often struggle at higher resolutions.</p>
+
       <div class="technique-box">
         <h3>Hires-Fix</h3>
-        <p>Diese Technik generiert ein Bild zunächst in niedriger Auflösung und verfeinert es dann in einem zweiten Durchlauf:</p>
-        
+        <p>This technique first generates an image at low resolution and then refines it in a second pass:</p>
+
         <div class="process-diagram">
           <div class="process-step">
             <div class="step-number">1</div>
             <div class="step-content">
-              <h4>Initiale Generation</h4>
-              <p>Bild in niedriger Auflösung (z.B. 512x512 px) generieren</p>
+              <h4>Initial Generation</h4>
+              <p>Generate image at low resolution (e.g., 512x512 px)</p>
             </div>
           </div>
           <div class="step-arrow">→</div>
@@ -183,78 +185,78 @@
             <div class="step-number">2</div>
             <div class="step-content">
               <h4>Upscaling</h4>
-              <p>Bild auf Zielgröße vergrößern (z.B. 1024x1024 px)</p>
+              <p>Enlarge image to target size (e.g., 1024x1024 px)</p>
             </div>
           </div>
           <div class="step-arrow">→</div>
           <div class="process-step">
             <div class="step-number">3</div>
             <div class="step-content">
-              <h4>Detail-Verfeinerung</h4>
-              <p>Erneute Diffusion mit weniger Steps zur Detailverbesserung</p>
+              <h4>Detail Refinement</h4>
+              <p>Rediffusion with fewer steps for detail enhancement</p>
             </div>
           </div>
         </div>
-        
+
         <div class="settings-box">
-          <h4>Typische Einstellungen:</h4>
+          <h4>Typical Settings:</h4>
           <div class="settings-grid">
             <div class="setting-item">
               <span class="setting-name">Denoising Strength:</span>
               <span class="setting-value">0.3 - 0.6</span>
-              <p class="setting-desc">Niedrigere Werte = mehr vom Original beibehalten</p>
+              <p class="setting-desc">Lower values = retain more of the original</p>
             </div>
             <div class="setting-item">
               <span class="setting-name">Upscaler:</span>
               <span class="setting-value">ESRGAN, Latent</span>
-              <p class="setting-desc">Verschiedene Upscaler haben unterschiedliche Stilauswirkungen</p>
+              <p class="setting-desc">Different upscalers have different style impacts</p>
             </div>
             <div class="setting-item">
               <span class="setting-name">Second-pass Steps:</span>
               <span class="setting-value">15-25</span>
-              <p class="setting-desc">Weniger als bei der Erstgenerierung</p>
+              <p class="setting-desc">Fewer than in the initial generation</p>
             </div>
           </div>
         </div>
       </div>
-      
+
       <div class="technique-box">
         <h3>Upscale Loops / Progressive Growing</h3>
-        <p>Bei besonders großen Bildern (2K+) kann ein mehrstufiger Prozess besser funktionieren:</p>
-        
+        <p>For particularly large images (2K+), a multi-stage process can work better:</p>
+
         <div class="upscale-loop-diagram">
           <div class="loop-step">
             <p>512×512</p>
             <div class="loop-arrow">↓</div>
-            <p>Erstgenerierung</p>
+            <p>Initial Generation</p>
           </div>
           <div class="loop-arrow">&rarr;</div>
           <div class="loop-step">
             <p>768×768</p>
             <div class="loop-arrow">↓</div>
-            <p>Erste Upscale + Fix<br>(Denoising: 0.5)</p>
+            <p>First Upscale + Fix<br>(Denoising: 0.5)</p>
           </div>
           <div class="loop-arrow">&rarr;</div>
           <div class="loop-step">
             <p>1024×1024</p>
             <div class="loop-arrow">↓</div>
-            <p>Zweite Upscale + Fix<br>(Denoising: 0.4)</p>
+            <p>Second Upscale + Fix<br>(Denoising: 0.4)</p>
           </div>
           <div class="loop-arrow">&rarr;</div>
           <div class="loop-step">
             <p>1536×1536+</p>
             <div class="loop-arrow">↓</div>
-            <p>Finale Upscale + Fix<br>(Denoising: 0.3)</p>
+            <p>Final Upscale + Fix<br>(Denoising: 0.3)</p>
           </div>
         </div>
-        
+
         <div class="info-box">
-          <h4>Vorteile dieser Methode:</h4>
+          <h4>Advantages of this method:</h4>
           <ul>
-            <li>Behält die Gesamtkomposition und wichtige Elemente bei</li>
-            <li>Fügt bei jedem Schritt feinere Details hinzu</li>
-            <li>Vermeidet Artefakte und Inkonsistenzen bei sehr hohen Auflösungen</li>
-            <li>Ermöglicht mehr Kontrolle über den Detailgrad in jedem Schritt</li>
+            <li>Retains overall composition and important elements</li>
+            <li>Adds finer details at each step</li>
+            <li>Avoids artifacts and inconsistencies at very high resolutions</li>
+            <li>Allows more control over the level of detail in each step</li>
           </ul>
         </div>
       </div>
@@ -262,131 +264,132 @@
 
     <!-- ControlNet & LoRAs -->
     <section class="tutorial-section">
-      <h2>ControlNet & LoRAs: Funktionsprinzip</h2>
-      
+      <h2>ControlNet & LoRAs: How they work</h2>
+
       <div class="technologies-grid">
         <div class="technology-card">
           <h3>ControlNet</h3>
           <div class="tech-image">
             <div class="placeholder-image tech">
-              <span>ControlNet-Beispiel</span>
+              <img src="/tutorial/controlnet.png" alt="Example showing ControlNet input (pose) and generated output" class="tech-example-image"/>
             </div>
           </div>
-          <p class="tech-description">ControlNet erlaubt dir, den Generierungsprozess durch ein Eingabebild zu steuern. Statt nur mit Text zu arbeiten, kann das Modell Konturen, Posen, Tiefenkarten oder andere strukturelle Informationen berücksichtigen.</p>
-          
+          <p class="tech-description">ControlNet allows you to guide the generation process using an input image. Instead of just working with text, the model can consider outlines, poses, depth maps, or other structural information.</p>
+
           <div class="tech-features">
-            <h4>Hauptanwendungen:</h4>
+            <h4>Main Applications:</h4>
             <ul>
-              <li><strong>Canny/Scribble:</strong> Konturen und Skizzen in fertige Bilder umwandeln</li>
-              <li><strong>Pose:</strong> Körperhaltungen und Gesten steuern</li>
-              <li><strong>Depth/Normal:</strong> 3D-Informationen und Raumstruktur beibehalten</li>
+              <li><strong>Canny/Scribble:</strong> Convert outlines and sketches into finished images</li>
+              <li><strong>Pose:</strong> Control body postures and gestures</li>
+              <li><strong>Depth/Normal:</strong> Maintain 3D information and spatial structure</li>
             </ul>
           </div>
         </div>
-        
+
         <div class="technology-card">
           <h3>LoRAs (Low-Rank Adaptations)</h3>
           <div class="tech-image">
             <div class="placeholder-image tech">
-              <span>LoRA-Beispiel</span>
+              <!-- Replace span with img -->
+              <img src="/tutorial/lora.png" alt="Example showing LoRA application" class="tech-example-image"/>
             </div>
           </div>
-          <p class="tech-description">LoRAs sind kleine, trainierte Modell-Ergänzungen, die einem Basis-Modell neue Stile, Charaktere oder Konzepte beibringen, ohne das gesamte Modell neu trainieren zu müssen.</p>
-          
+          <p class="tech-description">LoRAs are small, trained model add-ons that teach a base model new styles, characters, or concepts without needing to retrain the entire model.</p>
+
           <div class="tech-features">
-            <h4>Hauptanwendungen:</h4>
+            <h4>Main Applications:</h4>
             <ul>
-              <li><strong>Stile:</strong> Spezifische Kunststile oder visuelle Ästhetiken</li>
-              <li><strong>Charaktere:</strong> Konsistente Generierung bestimmter Personen oder Figuren</li>
-              <li><strong>Konzepte:</strong> Besondere Objekte oder visuelle Elemente</li>
+              <li><strong>Styles:</strong> Specific art styles or visual aesthetics</li>
+              <li><strong>Characters:</strong> Consistent generation of specific people or figures</li>
+              <li><strong>Concepts:</strong> Special objects or visual elements</li>
             </ul>
           </div>
         </div>
       </div>
-      
+
       <div class="integration-box">
-        <h3>Integration in den Workflow</h3>
-        <p>Beide Technologien können mit den bisher gelernten Prompting-Techniken kombiniert werden:</p>
-        
+        <h3>Integration into the Workflow</h3>
+        <p>Both technologies can be combined with the prompting techniques learned so far:</p>
+
         <div class="workflow-steps">
           <div class="workflow-step">
             <div class="step-icon">🎨</div>
             <div class="step-content">
-              <h4>1. Grundprompt erstellen</h4>
-              <p>Definiere das Hauptmotiv und den Stil wie gewohnt</p>
+              <h4>1. Create Base Prompt</h4>
+              <p>Define the main subject and style as usual</p>
             </div>
           </div>
           <div class="workflow-step">
             <div class="step-icon">🔧</div>
             <div class="step-content">
-              <h4>2. ControlNet / LoRAs hinzufügen</h4>
-              <p>Wähle passende Kontroll-Inputs und Modell-Erweiterungen</p>
+              <h4>2. Add ControlNet / LoRAs</h4>
+              <p>Select appropriate control inputs and model extensions</p>
             </div>
           </div>
           <div class="workflow-step">
             <div class="step-icon">⚖️</div>
             <div class="step-content">
-              <h4>3. Gewichtungen anpassen</h4>
-              <p>Balance zwischen Text-Prompt und anderen Eingaben finden</p>
+              <h4>3. Adjust Weights</h4>
+              <p>Find the balance between text prompt and other inputs</p>
             </div>
           </div>
           <div class="workflow-step">
             <div class="step-icon">🔄</div>
             <div class="step-content">
-              <h4>4. Iterativ verfeinern</h4>
-              <p>Durch Tests die optimalen Einstellungen finden</p>
+              <h4>4. Refine Iteratively</h4>
+              <p>Find the optimal settings through testing</p>
             </div>
           </div>
         </div>
       </div>
-      
+
       <div class="info-box tutorial-links">
-        <h4>Weiterführende Tutorials:</h4>
-        <p>Diese Themen sind komplex und werden in separaten, spezialisierten Tutorials behandelt:</p>
+        <h4>Further Tutorials:</h4>
+        <p>These topics are complex and are covered in separate, specialized tutorials:</p>
         <div class="link-buttons">
-          <a href="#" class="tutorial-link">ControlNet Tutorial</a>
-          <a href="#" class="tutorial-link">LoRAs verstehen & anwenden</a>
-          <a href="#" class="tutorial-link">Eigene Stile trainieren</a>
+          <!-- Add target="_blank" to YouTube links -->
+          <a href="https://www.youtube.com/watch?v=KEv-F5UkhxU" class="tutorial-link" target="_blank">Understanding & Applying LoRAs</a>
+          <a href="https://www.youtube.com/watch?v=fhIGt7QGg4w" class="tutorial-link" target="_blank">Understanding ControlNet</a>
         </div>
       </div>
     </section>
 
-    <!-- Abschluss -->
+    <!-- Conclusion -->
     <section class="tutorial-section">
-      <h2>Zusammenfassung</h2>
-      
-      <p>Du hast nun einen umfassenden Überblick über fortgeschrittene Prompting-Techniken erhalten:</p>
-      
+      <h2>Summary</h2>
+
+      <p>You now have a comprehensive overview of advanced prompting techniques:</p>
+
       <div class="summary-points">
         <ul>
-          <li><strong>Negative Prompts</strong> gezielt einsetzen und auf den Anwendungsfall abstimmen</li>
-          <li>Mit <strong>Multi-Prompt-Techniken</strong> komplexe Szenen mit mehreren Elementen erstellen</li>
-          <li><strong>Hires-Fix und Upscale-Loops</strong> für hochauflösende, detailreiche Bilder nutzen</li>
-          <li>Grundlegende Konzepte von <strong>ControlNet und LoRAs</strong> verstehen und in den Workflow integrieren</li>
+          <li>Use <strong>Negative Prompts</strong> specifically and tailor them to the use case</li>
+          <li>Create complex scenes with multiple elements using <strong>Multi-Prompt Techniques</strong></li>
+          <li>Utilize <strong>Hires-Fix and Upscale Loops</strong> for high-resolution, detailed images</li>
+          <li>Understand the basic concepts of <strong>ControlNet and LoRAs</strong> and integrate them into the workflow</li>
         </ul>
       </div>
-      
+
       <div class="next-steps">
-        <h3>Nächste Schritte</h3>
-        <p>Um deine Fähigkeiten weiter zu vertiefen, empfehlen wir:</p>
+        <h3>Next Steps</h3>
+        <p>To further deepen your skills, we recommend:</p>
         <ul>
-          <li>Experimentiere mit den gelernten Techniken und dokumentiere deine Ergebnisse</li>
-          <li>Erstelle deine eigene Bibliothek von negativen Prompts für verschiedene Anwendungsfälle</li>
-          <li>Lerne spezifische Tools wie ControlNet oder Image-to-Image genauer kennen</li>
-          <li>Teil deine Ergebnisse und Erfahrungen mit der Community</li>
+          <li>Experiment with the learned techniques and document your results</li>
+          <li>Create your own library of negative prompts for different use cases</li>
+          <li>Learn specific tools like ControlNet or Image-to-Image in more detail</li>
+          <li>Share your results and experiences with the community</li>
         </ul>
       </div>
-      
+
       <div class="info-box success">
-        <h4>Kursabschluss:</h4>
-        <p>Herzlichen Glückwunsch! Du hast alle Tutorial-Module abgeschlossen und verfügst nun über ein solides Fundament an Wissen zu Stable Diffusion und fortgeschrittenen Prompting-Techniken.</p>
+        <h4>Course Completion:</h4>
+        <p>Congratulations! You have completed all tutorial modules and now have a solid foundation of knowledge about Stable Diffusion and advanced prompting techniques.</p>
       </div>
-      
+
       <!-- Navigation buttons -->
-      <TutorialNavigation 
+      <TutorialNavigation
         previousPath="/guided-tutorial/prompt-weighting"
         nextPath="/guided-tutorial/advanced/ai-models"
-        nextLabel="Weiter zum Zusatzbereich"
+        nextLabel="Continue to Additional Resources"
       />
     </section>
   </div>
@@ -515,9 +518,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem;
+    /* padding: 1rem; */ /* Padding entfernt */
     position: relative;
     border: 1px solid #333;
+    overflow: hidden; /* Beibehalten, um sicherzustellen, dass nichts überläuft */
+  }
+
+  /* Add max-width specifically for comparison images */
+  .comparison-item .placeholder-image {
+    max-width: 350px; /* Limit width */
+    margin-left: auto;  /* Center the container */
+    margin-right: auto; /* Center the container */
   }
   
   .placeholder-image span {
@@ -777,11 +788,14 @@
     background-color: #4da6ff;
     color: #000;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; /* Use flexbox for centering */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
     font-weight: bold;
     margin-right: 1rem;
+    flex-shrink: 0; /* Prevent shrinking */
+    font-size: 0.9rem; /* Optional: Adjust font size if needed */
+    line-height: 1; /* Ensure text stays centered */
   }
   
   .step-content h4 {
@@ -1110,5 +1124,21 @@
     background-color: rgba(76, 175, 80, 0.1);
     border-left: 4px solid #4CAF50;
     margin-top: 2.5rem;
+  }
+
+  .tech-example-image { /* Neue Klasse für das Bild */
+    display: block; /* Verhindert zusätzlichen Leerraum unter dem Bild */
+    width: 100%;
+    height: 100%; /* Lässt das Bild die Höhe des Containers füllen */
+    object-fit: cover; /* Stellt sicher, dass das ganze Bild sichtbar ist, skaliert es passend */
+    /* object-fit: cover; */ /* Alternative: Füllt den Container, schneidet ggf. Teile ab */
+  }
+
+  /* Use contain for comparison examples */
+  .comparison-example-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Changed to contain for comparison images */
   }
 </style>

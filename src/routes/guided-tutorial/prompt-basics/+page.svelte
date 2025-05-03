@@ -630,35 +630,4 @@
   .info-box p {
     margin-bottom: 0;
   }
-  
-  /* Navigation */
-  .next-section {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    margin-top: 2rem;
-  }
-  
-  .next-button {
-    display: inline-flex;
-    align-items: center;
-    background-color: #FCEA2B;
-    color: #000;
-    padding: 0.8rem 1.2rem;
-    border-radius: 6px;
-    text-decoration: none;
-    font-family: 'IBM Plex Mono', monospace;
-    font-weight: 500;
-    margin-top: 1rem;
-    transition: all 0.2s;
-  }
-  
-  .next-button:hover {
-    background-color: #ffed5c;
-    transform: translateX(3px);
-  }
-  
-  .arrow {
-    margin-left: 10px;
-  }
 </style>

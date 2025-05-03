@@ -453,7 +453,7 @@
         bind:promptValue={prompt}
         generateLabel="Generate"
         generateLoadingLabel="Generating..."
-        generateIconSrc="/icon/combineIcon.svg"
+        generateIconSrc="/icon/rightIcon.svg"
         generateFallbackIconSrc="/icon/rightIcon.svg"
         generateLoading={loading}
         generateDisabled={loading || !image1 || !image2} 

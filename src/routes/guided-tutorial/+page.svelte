@@ -1,69 +1,69 @@
 <script>
-  // Tutorial-Daten in Kategorien
+  // Tutorial data in categories
   const tutorialCategories = [
     {
-      title: "Grundlagen der KI-Bildgenerierung",
-      level: "Grundlagen",
+      title: "Basics of AI Image Generation",
+      level: "Basics",
       topics: [
-        { 
-          name: "Was ist Stable Diffusion?", 
+        {
+          name: "What is Stable Diffusion?",
           path: "/guided-tutorial/stable-diffusion-intro",
-          description: "Einführung in Stable Diffusion: Modellübersicht, Betrieb & Promptgestaltung"
+          description: "Introduction to Stable Diffusion: Model overview, operation & prompt design"
         },
-        { 
-          name: "Prompt-Grundlagen", 
+        {
+          name: "Prompt Basics",
           path: "/guided-tutorial/prompt-basics",
-          description: "Aufbau erfolgreicher Prompts: Struktur, Reihenfolge und Stilelemente"
+          description: "Building successful prompts: Structure, order, and style elements"
         }
       ]
     },
     {
-      title: "Fortgeschrittene Techniken",
-      level: "Fortgeschritten",
+      title: "Advanced Techniques",
+      level: "Advanced",
       topics: [
-        { 
-          name: "Kernparameter", 
+        {
+          name: "Core Parameters",
           path: "/guided-tutorial/core-parameters",
-          description: "CFG-Scale, Sampling-Steps und Seed: Die wichtigsten Parameter verstehen und steuern"
+          description: "CFG Scale, Sampling Steps, and Seed: Understand and control the key parameters"
         },
-        { 
-          name: "Stile verwalten", 
+        {
+          name: "Manage Styles",
           path: "/guided-tutorial/manage-styles",
-          description: "Eigene Stil-Bibliotheken anlegen, verwenden und mit einem Klick wechseln"
+          description: "Create and use your own style libraries, switch with one click"
         }
       ]
     },
     {
-      title: "Profi-Techniken",
-      level: "Profi",
+      title: "Pro Techniques",
+      level: "Pro",
       topics: [
-        { 
-          name: "Prompt-Priorisierung", 
+        {
+          name: "Prompt Prioritization",
           path: "/guided-tutorial/prompt-weighting",
-          description: "Wortposition und Gewichtungssyntax für ausbalancierte und präzise Bilder"
+          description: "Word position and weighting syntax for balanced and precise images"
         },
-        { 
-          name: "Fortgeschrittenes Prompting", 
+        {
+          name: "Advanced Prompting",
           path: "/guided-tutorial/advanced-prompting",
-          description: "Multi-Prompt, Upscaling und weiterführende Techniken für komplexe Szenen"
+          description: "Multi-prompt, upscaling, and advanced techniques for complex scenes"
         }
       ]
     }
   ];
 
-  // Zusatzbereich
+  // Additional resources section
   const additionalResources = {
-    title: "Zusatzbereich",
+    title: "Additional Resources",
     topics: [
-      { 
-        name: "KI-Modelle verstehen", 
+      {
+        name: "Understanding AI Models",
         path: "/guided-tutorial/advanced/ai-models",
-        description: "Ein tieferer Einblick in verschiedene Bildgenerierungsmodelle und ihre Anwendungsbereiche"
+        description: "A deeper dive into different image generation models and their applications"
       },
-      { 
-        name: "Ressourcen & Deep-Dive", 
+      {
+        name: "Resources & Deep Dive",
         path: "/guided-tutorial/advanced/workflow-optimization",
-        description: "Weiterführende Materialien, Cheatsheets und Links für das selbstständige Lernen"
+        description: "Further materials, cheatsheets, and links for self-study"
       }
     ]
   };
@@ -76,10 +76,10 @@
 <div class="tutorial-container">
   <div class="tutorial-header">
     <h1>Guided Tutorials</h1>
-    <p>Lerne Schritt für Schritt die wichtigsten Aspekte der KI-Bildgenerierung</p>
+    <p>Learn the most important aspects of AI image generation step by step</p>
   </div>
 
-  <!-- Tutorial-Kategorien -->
+  <!-- Tutorial Categories -->
   <div class="tutorial-content">
     {#each tutorialCategories as category}
       <div class="tutorial-section">
@@ -93,7 +93,7 @@
               <h3>{topic.name}</h3>
               <p>{topic.description}</p>
               <div class="card-footer">
-                <span class="start-button">Starten</span>
+                <span class="start-button">Start</span>
                 <span class="arrow-icon">→</span>
               </div>
             </a>
@@ -102,11 +102,11 @@
       </div>
     {/each}
 
-    <!-- Zusatzbereich -->
+    <!-- Additional Resources Section -->
     <div class="tutorial-section additional-section">
       <div class="section-header">
         <h2>{additionalResources.title}</h2>
-        <span class="level-badge level-zusatz">Erweitert</span>
+        <span class="level-badge level-extended">Extended</span>
       </div>
       <div class="topic-cards">
         {#each additionalResources.topics as topic}
@@ -114,7 +114,7 @@
             <h3>{topic.name}</h3>
             <p>{topic.description}</p>
             <div class="card-footer">
-              <span class="start-button">Erkunden</span>
+              <span class="start-button">Explore</span>
               <span class="arrow-icon">→</span>
             </div>
           </a>
@@ -142,6 +142,7 @@
     margin-bottom: 0.5rem;
     background: linear-gradient(90deg, #f0f0f0, #FCEA2B);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
   }
   
@@ -182,22 +183,22 @@
     margin-left: 1rem;
   }
   
-  .level-grundlagen {
+  .level-basics {
     background-color: #4da6ff;
     color: #000;
   }
   
-  .level-fortgeschritten {
+  .level-advanced {
     background-color: #FFC107;
     color: #000;
   }
   
-  .level-profi {
+  .level-pro {
     background-color: #F44336;
     color: #fff;
   }
   
-  .level-zusatz {
+  .level-extended {
     background-color: #9C27B0;
     color: #fff;
   }
