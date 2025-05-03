@@ -1,43 +1,44 @@
 <script>
-  // Beispiel-Bilder für CFG Vergleich
+  // Example images for CFG comparison
   const cfgExamples = [
-    { level: "Niedrig (CFG 3)", image: "/tutorials/cfg-low.png", description: "Kreativ, aber oft weit vom Prompt entfernt" },
-    { level: "Mittel (CFG 7)", image: "/tutorials/cfg-medium.png", description: "Gute Balance zwischen Kreativität und Prompt-Treue" },
-    { level: "Hoch (CFG 15)", image: "/tutorials/cfg-high.png", description: "Strenge Prompt-Befolgung, kann übertrieben wirken" }
+    // Remove /static from image paths
+    { level: "Low (CFG 3)", image: "/tutorial/cfglow.png", description: "Creative, but often far from the prompt" },
+    { level: "Medium (CFG 7)", image: "/tutorial/cfgmedium.png", description: "Good balance between creativity and prompt adherence" },
+    { level: "High (CFG 15)", image: "/tutorial/cfghigh.png", description: "Strict prompt adherence, can seem exaggerated" }
   ];
-  
-  // Sampler-Beispiele
+
+  // Sampler examples
   const samplers = [
-    { name: "Euler a", description: "Schnell mit guten Details, etwas kreativ", startwert: "20-25 Steps" },
-    { name: "DPM++ 2M Karras", description: "Hoch detailliert, gut für fotorealistische Bilder", startwert: "25-30 Steps" },
-    { name: "DDIM", description: "Sehr stabil, gut für Inpainting", startwert: "30-40 Steps" }
+    { name: "Euler a", description: "Fast with good details, somewhat creative", startwert: "20-25 Steps" }, // 'startwert' kept as variable name, value translated
+    { name: "DPM++ 2M Karras", description: "Highly detailed, good for photorealistic images", startwert: "25-30 Steps" },
+    { name: "DDIM", description: "Very stable, good for inpainting", startwert: "30-40 Steps" }
   ];
   import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
 </script>
 
 <svelte:head>
-  <title>Kernparameter | Guided Tutorial | HfG Ai-Hub</title>
+  <title>Core Parameters | Guided Tutorial | HfG Ai-Hub</title>
 </svelte:head>
 
 <div class="tutorial-container">
   <div class="tutorial-header">
-    <h1>Kernparameter</h1>
-    <p class="subtitle">Die wichtigsten Einstellungen für optimale Ergebnisse</p>
+    <h1>Core Parameters</h1>
+    <p class="subtitle">The most important settings for optimal results</p>
   </div>
 
   <div class="content-sections">
-    <!-- CFG-Scale Abschnitt -->
+    <!-- CFG-Scale Section -->
     <section class="tutorial-section">
-      <h2>2.1 CFG-Scale: Kreativität vs. Prompt-Bindung</h2>
-      
-      <p>Die <strong>Classifier Free Guidance Scale</strong> (CFG-Scale) bestimmt, wie genau das Modell deinem Prompt folgen soll.</p>
-      
+      <h2>2.1 CFG Scale: Creativity vs. Prompt Adherence</h2>
+
+      <p>The <strong>Classifier Free Guidance Scale</strong> (CFG Scale) determines how closely the model should follow your prompt.</p>
+
       <div class="slider-visualization">
         <div class="slider-container">
           <div class="slider-labels">
-            <span>Kreativität</span>
+            <span>Creativity</span>
             <span>Balance</span>
-            <span>Prompt-Treue</span>
+            <span>Prompt Adherence</span>
           </div>
           <div class="slider-track">
             <div class="slider-thumb" style="left: 50%;">7.5</div>
@@ -52,40 +53,40 @@
 
       <div class="info-grid">
         <div class="info-card">
-          <h4>Niedriger CFG-Wert (1-5)</h4>
+          <h4>Low CFG Value (1-5)</h4>
           <ul>
-            <li>Mehr Kreativität, Interpretation</li>
-            <li>Weniger Bindung an den Prompt</li>
-            <li>Vielfältigere, aber unvorhersehbare Ergebnisse</li>
+            <li>More creativity, interpretation</li>
+            <li>Less adherence to the prompt</li>
+            <li>More diverse, but unpredictable results</li>
           </ul>
         </div>
-        
+
         <div class="info-card highlight">
-          <h4>Mittlerer CFG-Wert (6-10)</h4>
+          <h4>Medium CFG Value (6-10)</h4>
           <ul>
-            <li>Ausgewogenes Verhältnis</li>
-            <li>Für die meisten Anwendungen ideal</li>
-            <li>Standard: 7.5</li>
+            <li>Balanced ratio</li>
+            <li>Ideal for most applications</li>
+            <li>Default: 7.5</li>
           </ul>
         </div>
-        
+
         <div class="info-card">
-          <h4>Hoher CFG-Wert (11-20+)</h4>
+          <h4>High CFG Value (11-20+)</h4>
           <ul>
-            <li>Strikte Prompt-Befolgung</li>
-            <li>Weniger kreative Freiheit</li>
-            <li>Kann zu übertriebenen Bildern führen</li>
+            <li>Strict prompt adherence</li>
+            <li>Less creative freedom</li>
+            <li>Can lead to exaggerated images</li>
           </ul>
         </div>
       </div>
-      
+
       <div class="example-images">
-        <h3>CFG-Beispiele mit demselben Prompt</h3>
+        <h3>CFG Examples with the same prompt</h3>
         <div class="image-comparison">
           {#each cfgExamples as example}
             <div class="comparison-item">
               <div class="comparison-image">
-                <img src={example.image} alt={`Beispiel für ${example.level} CFG`} />
+                <img src={example.image} alt={`Example for ${example.level} CFG`} />
               </div>
               <h4>{example.level}</h4>
               <p>{example.description}</p>
@@ -95,15 +96,15 @@
       </div>
     </section>
 
-    <!-- Sampling-Steps & Sampler Abschnitt -->
+    <!-- Sampling Steps & Sampler Section -->
     <section class="tutorial-section">
-      <h2>2.2 Sampling-Steps & Sampler</h2>
-      
+      <h2>2.2 Sampling Steps & Sampler</h2>
+
       <div class="content-block">
         <div class="text-content">
-          <h3>Sampling-Steps</h3>
-          <p>Die Anzahl der Schritte (Steps), die das Modell durchläuft, um das Bild zu erstellen. Mehr Steps bedeuten mehr Details, aber auch längere Generierungszeit.</p>
-          
+          <h3>Sampling Steps</h3>
+          <p>The number of steps the model goes through to create the image. More steps mean more details, but also longer generation time.</p>
+
           <div class="steps-comparison">
             <div class="steps-range">
               <span class="steps-low">10 Steps</span>
@@ -113,27 +114,27 @@
               <span class="steps-high">50+ Steps</span>
             </div>
             <div class="steps-labels">
-              <span>Schnell, weniger Details</span>
-              <span>Ausgewogen</span>
-              <span>Langsam, mehr Details</span>
+              <span>Fast, fewer details</span>
+              <span>Balanced</span>
+              <span>Slow, more details</span>
             </div>
           </div>
-          
+
           <div class="info-box">
-            <h4>Richtlinie:</h4>
-            <p>Für die meisten Bilder reichen <strong>20-30 Steps</strong> aus. Ab 40-50 Steps sind Verbesserungen oft kaum noch wahrnehmbar.</p>
+            <h4>Guideline:</h4>
+            <p>For most images, <strong>20-30 steps</strong> are sufficient. Above 40-50 steps, improvements are often barely noticeable.</p>
           </div>
         </div>
-        
+
         <div class="sampler-content">
-          <h3>Sampler-Algorithmen</h3>
-          <p>Der Sampler bestimmt, wie das Modell den Diffusionsprozess durchführt. Jeder hat seine eigenen Stärken:</p>
-          
+          <h3>Sampler Algorithms</h3>
+          <p>The sampler determines how the model performs the diffusion process. Each has its own strengths:</p>
+
           <div class="sampler-table">
             <div class="table-header">
               <span>Sampler</span>
-              <span>Eigenschaften</span>
-              <span>Empfohlene Steps</span>
+              <span>Properties</span>
+              <span>Recommended Steps</span>
             </div>
             {#each samplers as sampler}
               <div class="table-row">
@@ -147,87 +148,87 @@
       </div>
     </section>
 
-    <!-- Seed Abschnitt -->
+    <!-- Seed Section -->
     <section class="tutorial-section">
-      <h2>2.3 Seed: Zufall & Reproduzierbarkeit</h2>
-      
-      <p>Der Seed ist der Startwert für den Zufallsgenerator. Er bestimmt den Ausgangspunkt der Bild-Generierung.</p>
-      
+      <h2>2.3 Seed: Randomness & Reproducibility</h2>
+
+      <p>The seed is the starting value for the random generator. It determines the starting point of the image generation.</p>
+
       <div class="seed-visualization">
         <div class="seed-box">
-          <h4>Was macht der Seed?</h4>
+          <h4>What does the seed do?</h4>
           <div class="seed-diagram">
-            <div class="seed-input">Prompt: "ein Schloss"</div>
+            <div class="seed-input">Prompt: "a castle"</div>
             <div class="seed-branches">
               <div class="seed-branch">
                 <div class="seed-value">Seed: 1234</div>
                 <div class="seed-arrow">↓</div>
-                <div class="seed-result">Bild A</div>
+                <div class="seed-result">Image A</div>
               </div>
               <div class="seed-branch">
                 <div class="seed-value">Seed: 5678</div>
                 <div class="seed-arrow">↓</div>
-                <div class="seed-result">Bild B</div>
+                <div class="seed-result">Image B</div>
               </div>
               <div class="seed-branch">
                 <div class="seed-value">Seed: 9012</div>
                 <div class="seed-arrow">↓</div>
-                <div class="seed-result">Bild C</div>
+                <div class="seed-result">Image C</div>
               </div>
             </div>
           </div>
         </div>
-        
+
         <div class="seed-strategies">
-          <h4>Seed-Strategien:</h4>
+          <h4>Seed Strategies:</h4>
           <div class="strategy-cards">
             <div class="strategy-card">
               <span class="strategy-icon">🎲</span>
-              <h5>Zufälliger Seed</h5>
-              <p>Für Exploration und vielfältige Ergebnisse. Jedes generierte Bild ist einzigartig.</p>
+              <h5>Random Seed</h5>
+              <p>For exploration and diverse results. Each generated image is unique.</p>
               <div class="code-snippet">Seed: -1</div>
             </div>
             <div class="strategy-card">
               <span class="strategy-icon">🔁</span>
-              <h5>Fester Seed</h5>
-              <p>Zum Reproduzieren von Bildern oder für systematische Tests.</p>
+              <h5>Fixed Seed</h5>
+              <p>To reproduce images or for systematic testing.</p>
               <div class="code-snippet">Seed: 1234567890</div>
             </div>
           </div>
         </div>
       </div>
-      
+
       <div class="info-box tip">
-        <h4>Profi-Tipp:</h4>
-        <p>Wenn du ein Bild erzeugt hast, das dir gefällt, notiere den Seed! Mit demselben Prompt und denselben Parametern kannst du das Bild später exakt reproduzieren.</p>
+        <h4>Pro Tip:</h4>
+        <p>If you've generated an image you like, note down the seed! With the same prompt and parameters, you can reproduce the image exactly later.</p>
       </div>
     </section>
 
-    <!-- Praktische Anwendung -->
+    <!-- Practical Application -->
     <section class="tutorial-section">
-      <h2>Empfohlene Startwerte</h2>
-      
+      <h2>Recommended Starting Values</h2>
+
       <div class="parameter-recommendations">
         <div class="recommendation-card">
-          <h3>Fotorealismus</h3>
+          <h3>Photorealism</h3>
           <ul class="param-list">
             <li><strong>CFG:</strong> 7-9</li>
             <li><strong>Sampler:</strong> DPM++ 2M Karras</li>
             <li><strong>Steps:</strong> 25-30</li>
           </ul>
         </div>
-        
+
         <div class="recommendation-card">
-          <h3>Kreative Kunst</h3>
+          <h3>Creative Art</h3>
           <ul class="param-list">
             <li><strong>CFG:</strong> 4-7</li>
             <li><strong>Sampler:</strong> Euler a</li>
             <li><strong>Steps:</strong> 20-25</li>
           </ul>
         </div>
-        
+
         <div class="recommendation-card">
-          <h3>Präzise Illustration</h3>
+          <h3>Precise Illustration</h3>
           <ul class="param-list">
             <li><strong>CFG:</strong> 9-12</li>
             <li><strong>Sampler:</strong> DDIM</li>
@@ -235,14 +236,14 @@
           </ul>
         </div>
       </div>
-      
+
       <div class="info-box success">
-        <h4>Lernziel erreicht:</h4>
-        <p>Du verstehst jetzt, wie CFG, Steps und Seed das Ergebnis beeinflussen und kannst bewusste Entscheidungen für deine Generierungen treffen.</p>
+        <h4>Learning objective achieved:</h4>
+        <p>You now understand how CFG, Steps, and Seed influence the result and can make informed decisions for your generations.</p>
       </div>
-      
+
       <!-- Navigation buttons -->
-      <TutorialNavigation 
+      <TutorialNavigation
         previousPath="/guided-tutorial/prompt-basics"
         nextPath="/guided-tutorial/manage-styles"
       />

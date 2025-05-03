@@ -12,11 +12,6 @@
   <div class="panel-content">
     <slot />
   </div>
-  
-  <div class="panel-navigation">
-    <button class="nav-button prev">← Vorheriges Thema</button>
-    <button class="nav-button next">Nächstes Thema →</button>
-  </div>
 </div>
 
 <style>
@@ -54,42 +49,5 @@
     padding: 2rem;
     flex-grow: 1;
     overflow-y: auto;
-  }
-  
-  .panel-navigation {
-    display: flex;
-    justify-content: space-between;
-    padding: 1rem 2rem;
-    border-top: 1px solid #333;
-  }
-  
-  .nav-button {
-    background-color: #262626;
-    border: none;
-    border-radius: 6px;
-    color: #e0e0e0;
-    padding: 0.75rem 1.25rem;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  
-  .nav-button.next {
-    background-color: #2a2a2a;
-    color: #FCEA2B;
-  }
-  
-  .nav-button:hover {
-    background-color: #333;
-  }
-  
-  .nav-button.next:hover {
-    background-color: #3a3a3a;
-    transform: translateX(3px);
-  }
-  
-  .nav-button.prev:hover {
-    transform: translateX(-3px);
   }
 </style>

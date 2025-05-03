@@ -1,38 +1,46 @@
 <script>
   import { page } from '$app/stores';
-  
-  // Aktuelle Route für Hervorhebung
+
+  // Current route for highlighting
   $: currentPath = $page.url.pathname;
-  
-  // Tutorial-Themen in Kategorien
+
+  // Tutorial topics in categories
   const tutorialCategories = [
     {
-      title: "Grundlagen",
+      title: "Basics", // Translated from "Grundlagen"
       topics: [
-        { name: 'Was ist Stable Diffusion?', path: '/guided-tutorial/stable-diffusion-intro' },
-        { name: 'Prompt-Grundlagen', path: '/guided-tutorial/prompt-basics' }
+        // Assuming target page title is "What is Stable Diffusion?"
+        { name: 'What is Stable Diffusion?', path: '/guided-tutorial/stable-diffusion-intro' },
+        // Assuming target page title is "Prompt Basics"
+        { name: 'Prompt Basics', path: '/guided-tutorial/prompt-basics' }
       ]
     },
     {
-      title: "Fortgeschritten",
+      title: "Intermediate", // Translated from "Fortgeschritten"
       topics: [
-        { name: 'Kernparameter', path: '/guided-tutorial/core-parameters' },
-        { name: 'Stile verwalten', path: '/guided-tutorial/manage-styles' }
+        // Assuming target page title is "Core Parameters"
+        { name: 'Core Parameters', path: '/guided-tutorial/core-parameters' },
+        // Matching the translated page title
+        { name: 'Manage Styles', path: '/guided-tutorial/manage-styles' }
       ]
     },
     {
-      title: "Profi",
+      title: "Advanced", // Translated from "Profi"
       topics: [
-        { name: 'Prompt-Priorisierung', path: '/guided-tutorial/prompt-weighting' },
-        { name: 'Fortgeschrittenes Prompting', path: '/guided-tutorial/advanced-prompting' }
+        // Matching the translated page title
+        { name: 'Prompt Prioritization & Weighting', path: '/guided-tutorial/prompt-weighting' },
+        // Assuming target page title is "Advanced Prompting"
+        { name: 'Advanced Prompting', path: '/guided-tutorial/advanced-prompting' }
       ]
     }
   ];
-  
-  // Zusatzbereich-Themen
+
+  // Extra topics
   const advancedTopics = [
-    { name: 'KI-Modelle verstehen', path: '/guided-tutorial/advanced/ai-models' },
-    { name: 'Ressourcen & Deep-Dive', path: '/guided-tutorial/advanced/workflow-optimization' }
+    // Matching the translated page title
+    { name: 'Understanding AI Models', path: '/guided-tutorial/advanced/ai-models' },
+    // Matching the translated page title
+    { name: 'Resources & Deep-Dive', path: '/guided-tutorial/advanced/workflow-optimization' }
   ];
 </script>
 
@@ -42,7 +50,7 @@
   </div>
   
   <div class="sidebar-content">
-    <!-- Tutorial-Kategorien -->
+    <!-- Tutorial Categories -->
     {#each tutorialCategories as category}
       <div class="tutorial-navigation">
         <h3>{category.title}</h3>
@@ -60,9 +68,9 @@
       </div>
     {/each}
     
-    <!-- Zusatzbereich -->
+    <!-- Extra Section -->
     <div class="tutorial-navigation">
-      <h3>Zusatzbereich</h3>
+      <h3>Extras</h3> <!-- Translated from "Zusatzbereich" -->
       <div class="topic-buttons">
         {#each advancedTopics as topic}
           <a 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
 
-  // TypeScript Interfaces definieren
+  // Define TypeScript Interfaces
   interface StyleParameter {
     cfgScale: number;
     steps: number;
@@ -15,34 +15,34 @@
     parameters: StyleParameter;
   }
 
-  // Beispiel Stil-Presets mit TypeScript Typisierung
+  // Example Style Presets with TypeScript typing
   const stylePresets: StylePreset[] = [
-    { 
-      name: "Fotorealistisch", 
-      prompt: "photorealistic, detailed, 8k, high quality, sharp focus", 
+    {
+      name: "Photorealistic",
+      prompt: "photorealistic, detailed, 8k, high quality, sharp focus",
       negative: "cartoon, painting, illustration, drawing, anime, blur",
       parameters: { cfgScale: 7.5, steps: 30, sampler: "DPM++ 2M Karras" }
     },
-    { 
-      name: "Anime", 
-      prompt: "anime style, vibrant colors, cel shading, high quality digital art", 
+    {
+      name: "Anime",
+      prompt: "anime style, vibrant colors, cel shading, high quality digital art",
       negative: "photorealistic, 3d render, photograph",
       parameters: { cfgScale: 9, steps: 25, sampler: "Euler a" }
     },
-    { 
-      name: "Ölgemälde", 
-      prompt: "oil painting, masterpiece, intricate brushwork, artistic, highly detailed", 
+    {
+      name: "Oil Painting",
+      prompt: "oil painting, masterpiece, intricate brushwork, artistic, highly detailed",
       negative: "digital art, 3d render, photograph, sketch",
       parameters: { cfgScale: 8, steps: 30, sampler: "DPM++ SDE Karras" }
     }
   ];
 
-  // Hilfsfunktion zum Formatieren von JSON für die Beispiel-Anzeige
+  // Helper function to format JSON for example display
   function formatJsonExample(obj: any): string {
     return JSON.stringify(obj, null, 2);
   }
 
-  // Typisierte Parameter für Template-Beispiele
+  // Typed parameters for template examples
   interface TemplateParams {
     cfgValue: number;
     stepsValue: number;
@@ -57,59 +57,59 @@
 </script>
 
 <svelte:head>
-  <title>Stile verwalten | Guided Tutorial | HfG Ai-Hub</title>
+  <title>Manage Styles | Guided Tutorial | HfG Ai-Hub</title>
 </svelte:head>
 
 <div class="tutorial-container">
   <div class="tutorial-header">
-    <h1>Stile verwalten</h1>
-    <p class="subtitle">Arbeite effizienter mit wiederverwendbaren Stil-Bibliotheken</p>
+    <h1>Manage Styles</h1>
+    <p class="subtitle">Work more efficiently with reusable style libraries</p>
   </div>
 
   <div class="content-sections">
-    <!-- Style Presets Abschnitt -->
+    <!-- Style Presets Section -->
     <section class="tutorial-section">
-      <h2>„Style-Presets" anlegen</h2>
-      
-      <p>Style-Presets sind vordefinierte Prompt-Teile und Parameter, die du mit einem Klick in deine Generierung einfügen kannst. Sie sparen Zeit und sorgen für Konsistenz in deinen Projekten.</p>
-      
+      <h2>Create "Style Presets"</h2>
+
+      <p>Style presets are predefined prompt parts and parameters that you can insert into your generation with one click. They save time and ensure consistency in your projects.</p>
+
       <div class="platforms-block">
         <div class="platform-card">
-          <h3>A1111 Prompt-Schnipsel</h3>
+          <h3>A1111 Prompt Snippets</h3>
           <div class="platform-image">
-            <img src="/tutorials/a1111-styles.png" alt="A1111 Webui Styles Panel" />
+            <img src="/tutorial/a111.png" alt="A1111 Webui Styles Panel" />
           </div>
           <div class="steps-list">
-            <h4>Wie du Stile anlegst:</h4>
+            <h4>How to create styles:</h4>
             <ol>
-              <li>Öffne das Styles-Menü im Prompt-Bereich</li>
-              <li>Klicke auf "Create Style"</li>
-              <li>Gib Namen, positiven und negativen Text ein</li>
-              <li>Speichere deinen Stil</li>
+              <li>Open the Styles menu in the prompt area</li>
+              <li>Click on "Create Style"</li>
+              <li>Enter name, positive and negative text</li>
+              <li>Save your style</li>
             </ol>
           </div>
           <div class="code-example">
-            <p class="example-title">Stil-Datei Beispiel <code>styles.csv</code>:</p>
+            <p class="example-title">Style file example <code>styles.csv</code>:</p>
             <div class="code-block">
               <code>name,prompt,negative<br>
-              Fotorealismus,"photorealistic, detailed, 8k","cartoon, drawing"<br>
+              Photorealism,"photorealistic, detailed, 8k","cartoon, drawing"<br>
               Anime,"anime style, vibrant colors","photograph, realistic"</code>
             </div>
           </div>
         </div>
-        
+
         <div class="platform-card">
           <h3>ComfyUI Nodes</h3>
           <div class="platform-image">
-            <img src="/tutorials/comfyui-nodes.png" alt="ComfyUI Style Nodes" />
+            <img src="/tutorial/comfy.png" alt="ComfyUI Style Nodes" />
           </div>
           <div class="steps-list">
-            <h4>Workflow mit Stil-Nodes:</h4>
+            <h4>Workflow with Style Nodes:</h4>
             <ol>
-              <li>Erstelle einen "Primitive" Node vom Typ "String"</li>
-              <li>Füge deinen Stil-Prompt in den Inhalt ein</li>
-              <li>Verbinde diesen Node mit dem positiven Prompt-Input</li>
-              <li>Speichere den Workflow als Template</li>
+              <li>Create a "Primitive" node of type "String"</li>
+              <li>Insert your style prompt into the content</li>
+              <li>Connect this node to the positive prompt input</li>
+              <li>Save the workflow as a template</li>
             </ol>
           </div>
           <div class="code-example">
@@ -126,63 +126,63 @@
           </div>
         </div>
       </div>
-      
+
       <div class="platform-card standalone">
-        <h3>Textdateien & Clipboard</h3>
-        <p>Die einfachste Methode: Speichere verschiedene Stile in einer Textdatei und kopiere sie bei Bedarf in deine Prompts.</p>
+        <h3>Text Files & Clipboard</h3>
+        <p>The simplest method: Save different styles in a text file and copy them into your prompts as needed.</p>
         <div class="file-template">
-          <h4>Beispiel-Struktur:</h4>
+          <h4>Example Structure:</h4>
           <div class="file-content">
-            <code>## Fotorealistisch ##<br>
-            positiv: photorealistic, detailed, 8k, high quality photography<br>
-            negativ: cartoon, painting, drawing, illustration<br>
+            <code>## Photorealistic ##<br>
+            positive: photorealistic, detailed, 8k, high quality photography<br>
+            negative: cartoon, painting, drawing, illustration<br>
             cfg: 7.5 | steps: 30 | sampler: DPM++ 2M Karras<br>
             <br>
             ## Anime ##<br>
-            positiv: anime style, vibrant colors, high quality<br>
-            negativ: realistic, photograph, 3d render<br>
+            positive: anime style, vibrant colors, high quality<br>
+            negative: realistic, photograph, 3d render<br>
             cfg: 9 | steps: 25 | sampler: Euler a</code>
           </div>
         </div>
         <div class="tip-box">
-          <h4>Tipp:</h4>
-          <p>Erstelle einen Ordner für deine Stil-Bibliotheken und organisiere sie nach Kategorien (z.B. Kunststile, Epochen, Materialien).</p>
+          <h4>Tip:</h4>
+          <p>Create a folder for your style libraries and organize them by category (e.g., art styles, eras, materials).</p>
         </div>
       </div>
     </section>
 
-    <!-- Button-Makros & Parameter-Sets -->
+    <!-- Button Macros & Parameter Sets -->
     <section class="tutorial-section">
-      <h2>Button-Makros & Parameter-Sets</h2>
-      
+      <h2>Button Macros & Parameter Sets</h2>
+
       <div class="content-block">
         <div class="text-content">
-          <p>Mit Makro-Buttons kannst du häufig verwendete Stile und Parameter mit einem Klick anwenden. In vielen Oberflächen kannst du Parameter-Presets zusammen mit deinen Stilen speichern.</p>
-          
+          <p>With macro buttons, you can apply frequently used styles and parameters with a single click. In many interfaces, you can save parameter presets along with your styles.</p>
+
           <div class="benefits-list">
-            <h3>Vorteile von Parameter-Sets:</h3>
+            <h3>Advantages of Parameter Sets:</h3>
             <ul>
-              <li>Zeitersparnis beim Wechseln zwischen verschiedenen Stilen</li>
-              <li>Konsistente Ergebnisse durch getestete Parametereinstellungen</li>
-              <li>Einfaches Experimentieren durch schnelles Umschalten</li>
-              <li>Bessere Organisation deiner Workflows</li>
+              <li>Time savings when switching between different styles</li>
+              <li>Consistent results through tested parameter settings</li>
+              <li>Easy experimentation through quick switching</li>
+              <li>Better organization of your workflows</li>
             </ul>
           </div>
         </div>
-        
+
         <div class="example-container">
-          <h3>Stil-Button Beispiele</h3>
+          <h3>Style Button Examples</h3>
           <div class="style-buttons-example">
-            <button class="style-button photo">Fotorealistisch</button>
+            <button class="style-button photo">Photorealistic</button>
             <button class="style-button anime">Anime</button>
-            <button class="style-button oil">Ölgemälde</button>
+            <button class="style-button oil">Oil Painting</button>
             <button class="style-button pixel">Pixel Art</button>
             <button class="style-button vintage">Vintage Film</button>
-            <button class="style-button add">+ Neuer Stil</button>
+            <button class="style-button add">+ New Style</button>
           </div>
-          
+
           <div class="style-detail">
-            <h4>Fotorealistisch</h4>
+            <h4>Photorealistic</h4>
             <div class="style-params">
               <div class="param-badge">CFG: 7.5</div>
               <div class="param-badge">Steps: 30</div>
@@ -190,23 +190,23 @@
             </div>
             <div class="prompt-preview">
               <div class="preview-section">
-                <span class="section-label">Positiv:</span>
+                <span class="section-label">Positive:</span>
                 <p>photorealistic, detailed, 8k, high quality, sharp focus</p>
               </div>
               <div class="preview-section negative">
-                <span class="section-label">Negativ:</span>
+                <span class="section-label">Negative:</span>
                 <p>cartoon, painting, illustration, drawing, anime, blur</p>
               </div>
             </div>
           </div>
         </div>
       </div>
-      
+
       <div class="code-example wide">
-        <p class="example-title">Parameter-Set JSON Beispiel:</p>
+        <p class="example-title">Parameter Set JSON Example:</p>
         <div class="code-block">
           <code>{formatJsonExample({
-  "fotorealistisch": {
+  "photorealistic": {
     "prompt_prefix": "photorealistic, detailed, 8k",
     "negative_prefix": "cartoon, painting, drawing",
     "parameters": {
@@ -222,18 +222,18 @@
       </div>
     </section>
 
-    <!-- Positiv-/Negativ-Sammlungen -->
+    <!-- Positive/Negative Collections -->
     <section class="tutorial-section">
-      <h2>Positiv-/Negativ-Sammlungen</h2>
-      
-      <p>Neben vollständigen Stilen ist es hilfreich, separate Sammlungen für positive und negative Prompt-Elemente anzulegen.</p>
-      
+      <h2>Positive/Negative Collections</h2>
+
+      <p>Besides complete styles, it's helpful to create separate collections for positive and negative prompt elements.</p>
+
       <div class="collections-grid">
         <div class="collection-card">
-          <h3>Positive Sammlungen</h3>
+          <h3>Positive Collections</h3>
           <div class="collection-examples">
             <div class="collection-type">
-              <h4>Qualitäts-Booster</h4>
+              <h4>Quality Boosters</h4>
               <div class="tag-cloud">
                 <span class="tag">highly detailed</span>
                 <span class="tag">8k</span>
@@ -243,7 +243,7 @@
               </div>
             </div>
             <div class="collection-type">
-              <h4>Beleuchtung</h4>
+              <h4>Lighting</h4>
               <div class="tag-cloud">
                 <span class="tag">golden hour</span>
                 <span class="tag">cinematic lighting</span>
@@ -252,7 +252,7 @@
               </div>
             </div>
             <div class="collection-type">
-              <h4>Kamera-Einstellungen</h4>
+              <h4>Camera Settings</h4>
               <div class="tag-cloud">
                 <span class="tag">85mm lens</span>
                 <span class="tag">bokeh</span>
@@ -262,12 +262,12 @@
             </div>
           </div>
         </div>
-        
+
         <div class="collection-card">
-          <h3>Negative Sammlungen</h3>
+          <h3>Negative Collections</h3>
           <div class="collection-examples">
             <div class="collection-type">
-              <h4>Qualitäts-Probleme</h4>
+              <h4>Quality Issues</h4>
               <div class="tag-cloud">
                 <span class="tag">blurry</span>
                 <span class="tag">low quality</span>
@@ -277,7 +277,7 @@
               </div>
             </div>
             <div class="collection-type">
-              <h4>Anatomie-Fehler</h4>
+              <h4>Anatomy Errors</h4>
               <div class="tag-cloud">
                 <span class="tag">bad anatomy</span>
                 <span class="tag">deformed</span>
@@ -286,7 +286,7 @@
               </div>
             </div>
             <div class="collection-type">
-              <h4>Unerwünschtes</h4>
+              <h4>Unwanted Elements</h4>
               <div class="tag-cloud">
                 <span class="tag">text</span>
                 <span class="tag">watermark</span>
@@ -297,46 +297,46 @@
           </div>
         </div>
       </div>
-      
+
       <div class="info-box">
-        <h4>Organisation deiner Sammlungen:</h4>
+        <h4>Organizing your collections:</h4>
         <ul>
-          <li><strong>Thematisch gruppieren:</strong> Beleuchtung, Kamera, Stile, etc.</li>
-          <li><strong>Kombinierbar gestalten:</strong> Einzelne Elemente sollten sich gut mischen lassen</li>
-          <li><strong>Testen und dokumentieren:</strong> Notiere, welche Kombinationen besonders gut funktionieren</li>
-          <li><strong>Regelmäßig aktualisieren:</strong> Füge neue Erkenntnisse deiner Sammlung hinzu</li>
+          <li><strong>Group thematically:</strong> Lighting, camera, styles, etc.</li>
+          <li><strong>Design for combinability:</strong> Individual elements should mix well</li>
+          <li><strong>Test and document:</strong> Note which combinations work particularly well</li>
+          <li><strong>Update regularly:</strong> Add new findings to your collection</li>
         </ul>
       </div>
     </section>
 
-    <!-- Praktische Übung -->
+    <!-- Practical Exercise -->
     <section class="tutorial-section">
-      <h2>Deine eigene Stil-Bibliothek</h2>
-      
+      <h2>Your Own Style Library</h2>
+
       <div class="exercise-box">
-        <h3>Übung: Erstellen deiner ersten Stil-Bibliothek</h3>
+        <h3>Exercise: Create your first style library</h3>
         <ol>
-          <li>Wähle einen Stil, den du häufig verwendest (z.B. Fotorealismus, Anime, etc.)</li>
-          <li>Sammle positiv- und negativ-Prompt-Elemente, die diesen Stil definieren</li>
-          <li>Notiere die Parameter, die am besten funktionieren (CFG, Steps, Sampler)</li>
-          <li>Speichere alles in einer Textdatei oder deinem bevorzugten Tool</li>
-          <li>Teste den Stil mit verschiedenen Subjekten und verfeinere ihn</li>
+          <li>Choose a style you use frequently (e.g., Photorealism, Anime, etc.)</li>
+          <li>Collect positive and negative prompt elements that define this style</li>
+          <li>Note the parameters that work best (CFG, Steps, Sampler)</li>
+          <li>Save everything in a text file or your preferred tool</li>
+          <li>Test the style with different subjects and refine it</li>
         </ol>
-        
+
         <div class="template-box">
-          <h4>Stil-Template zum Ausfüllen:</h4>
+          <h4>Style Template to fill out:</h4>
           <div class="template-form">
             <div class="form-group">
-              <span class="form-label">Stil-Name:</span>
-              <div class="template-input">Mein erster Stil</div>
+              <span class="form-label">Style Name:</span>
+              <div class="template-input">My First Style</div>
             </div>
             <div class="form-group">
-              <span class="form-label">Positiver Prompt:</span>
-              <div class="template-input">[Stileigenschaften], [Qualitätsverbesserungen]</div>
+              <span class="form-label">Positive Prompt:</span>
+              <div class="template-input">[Style properties], [Quality improvements]</div>
             </div>
             <div class="form-group">
-              <span class="form-label">Negativer Prompt:</span>
-              <div class="template-input">[Unerwünschte Eigenschaften]</div>
+              <span class="form-label">Negative Prompt:</span>
+              <div class="template-input">[Unwanted properties]</div>
             </div>
             <div class="form-group params">
               <div class="param-group">
@@ -355,14 +355,14 @@
           </div>
         </div>
       </div>
-      
+
       <div class="info-box success">
-        <h4>Lernziel erreicht:</h4>
-        <p>Du weißt nun, wie du deine eigenen Stil-Bibliotheken anlegen, organisieren und effizient nutzen kannst. Dies beschleunigt deinen Workflow und sorgt für konsistentere Ergebnisse.</p>
+        <h4>Learning objective achieved:</h4>
+        <p>You now know how to create, organize, and efficiently use your own style libraries. This speeds up your workflow and ensures more consistent results.</p>
       </div>
-      
+
       <!-- Navigation buttons -->
-      <TutorialNavigation 
+      <TutorialNavigation
         previousPath="/guided-tutorial/core-parameters"
         nextPath="/guided-tutorial/prompt-weighting"
       />
@@ -474,9 +474,9 @@
   }
   
   .platform-image img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   
   .steps-list h4 {

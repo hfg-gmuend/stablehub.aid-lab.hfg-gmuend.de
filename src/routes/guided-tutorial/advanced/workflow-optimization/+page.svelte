@@ -1,190 +1,190 @@
 <script lang="ts">
   import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
 
-  // Typdefinitionen
+  // Type definitions
   interface SamplerInfo {
     name: string;
-    geschwindigkeit: string;
-    detailgrad: string;
-    eignung: string[];
+    speed: string; // Renamed from geschwindigkeit
+    detailLevel: string; // Renamed from detailgrad
+    suitability: string[]; // Renamed from eignung
     steps: string;
-    kommentar: string;
+    comment: string; // Renamed from kommentar
   }
-  
+
   interface StyleKeyword {
     word: string;
     description: string;
   }
-  
+
   interface StyleCategory {
     category: string;
     keywords: StyleKeyword[];
   }
-  
+
   interface Resource {
     name: string;
     url: string;
     description: string;
   }
 
-  // Sampler-Vergleichsdaten
+  // Sampler comparison data
   const samplerComparison: SamplerInfo[] = [
-    { 
-      name: "Euler a", 
-      geschwindigkeit: "Schnell", 
-      detailgrad: "Mittel", 
-      eignung: ["Allgemeine Bilder", "Schnelle Tests", "Kreative Erkundungen"],
+    {
+      name: "Euler a",
+      speed: "Fast",
+      detailLevel: "Medium",
+      suitability: ["General images", "Quick tests", "Creative explorations"],
       steps: "20-25",
-      kommentar: "Guter Allrounder, oft Standard"
+      comment: "Good all-rounder, often default"
     },
-    { 
-      name: "DPM++ 2M Karras", 
-      geschwindigkeit: "Mittel", 
-      detailgrad: "Hoch", 
-      eignung: ["Photorealismus", "Porträts", "Detailreiche Szenen"],
+    {
+      name: "DPM++ 2M Karras",
+      speed: "Medium",
+      detailLevel: "High",
+      suitability: ["Photorealism", "Portraits", "Detailed scenes"],
       steps: "25-30",
-      kommentar: "Exzellente Balance aus Qualität und Geschwindigkeit"
+      comment: "Excellent balance of quality and speed"
     },
-    { 
-      name: "DDIM", 
-      geschwindigkeit: "Schnell", 
-      detailgrad: "Mittel", 
-      eignung: ["Inpainting", "Img2Img", "Konsistente Ergebnisse"],
+    {
+      name: "DDIM",
+      speed: "Fast",
+      detailLevel: "Medium",
+      suitability: ["Inpainting", "Img2Img", "Consistent results"],
       steps: "30-50",
-      kommentar: "Stabil, gut für Iteration auf bestehenden Bildern"
+      comment: "Stable, good for iterating on existing images"
     },
-    { 
-      name: "LMS", 
-      geschwindigkeit: "Mittel", 
-      detailgrad: "Mittel-Hoch", 
-      eignung: ["Abstrakte Kunst", "Stilisierte Bilder"],
+    {
+      name: "LMS",
+      speed: "Medium",
+      detailLevel: "Medium-High",
+      suitability: ["Abstract art", "Stylized images"],
       steps: "30-40",
-      kommentar: "Interessante kreative Ergebnisse" 
+      comment: "Interesting creative results"
     }
   ];
 
-  // Stil-Keywords nach Kategorien
+  // Style keywords by category
   const styleKeywords: StyleCategory[] = [
     {
-      category: "Fotografischer Realismus",
+      category: "Photographic Realism",
       keywords: [
-        { word: "photorealistic", description: "Fotorealistische Darstellung" },
-        { word: "hyperrealistic", description: "Übersteigerte, aber realistisch wirkende Details" },
-        { word: "8k", description: "Hochauflösende Bildqualität" },
-        { word: "cinematic", description: "Filmartige Belichtung und Komposition" },
-        { word: "professional photography", description: "Professionelle Fotoqualität" }
+        { word: "photorealistic", description: "Photorealistic representation" },
+        { word: "hyperrealistic", description: "Exaggerated but realistic-looking details" },
+        { word: "8k", description: "High-resolution image quality" },
+        { word: "cinematic", description: "Film-like lighting and composition" },
+        { word: "professional photography", description: "Professional photo quality" }
       ]
     },
     {
-      category: "Künstlerische Stile",
+      category: "Artistic Styles",
       keywords: [
-        { word: "oil painting", description: "Ölgemälde-Textur und -Farben" },
-        { word: "watercolor", description: "Leichte, transparente Aquarell-Optik" },
-        { word: "digital art", description: "Zeitgenössischer digitaler Kunststil" },
-        { word: "concept art", description: "Professionelle, detailreiche Konzeptkunst" },
-        { word: "anime style", description: "Japanischer Anime-Stil" }
+        { word: "oil painting", description: "Oil painting texture and colors" },
+        { word: "watercolor", description: "Light, transparent watercolor look" },
+        { word: "digital art", description: "Contemporary digital art style" },
+        { word: "concept art", description: "Professional, detailed concept art" },
+        { word: "anime style", description: "Japanese anime style" }
       ]
     },
     {
-      category: "Beleuchtung",
+      category: "Lighting",
       keywords: [
-        { word: "golden hour", description: "Warmes, goldenes Licht wie bei Sonnenauf-/untergang" },
-        { word: "volumetric lighting", description: "Sichtbare Lichtstrahlen und atmosphärische Beleuchtung" },
-        { word: "studio lighting", description: "Professionelle, saubere Studiobeleuchtung" },
-        { word: "dramatic lighting", description: "Starke Kontraste zwischen hell und dunkel" },
-        { word: "rim light", description: "Kante/Umriss eines Objekts ist beleuchtet" }
+        { word: "golden hour", description: "Warm, golden light like sunrise/sunset" },
+        { word: "volumetric lighting", description: "Visible light rays and atmospheric lighting" },
+        { word: "studio lighting", description: "Professional, clean studio lighting" },
+        { word: "dramatic lighting", description: "Strong contrasts between light and dark" },
+        { word: "rim light", description: "Edge/outline of an object is illuminated" }
       ]
     }
   ];
 
-  // Community-Ressourcen
+  // Community resources
   const communityResources: Resource[] = [
-    { name: "Civitai", url: "https://civitai.com", description: "Community-Hub für Models, LoRAs und Prompts" },
-    { name: "Lexica", url: "https://lexica.art", description: "Suchmaschine für AI-generierte Bilder mit Prompts" },
-    { name: "PromptHero", url: "https://prompthero.com", description: "Kuratierte Prompts und Tutorials" },
-    { name: "r/StableDiffusion", url: "https://reddit.com/r/StableDiffusion", description: "Reddit-Community für Stable Diffusion" }
+    { name: "Civitai", url: "https://civitai.com", description: "Community hub for models, LoRAs, and prompts" },
+    { name: "Lexica", url: "https://lexica.art", description: "Search engine for AI-generated images with prompts" },
+    { name: "PromptHero", url: "https://prompthero.com", description: "Curated prompts and tutorials" },
+    { name: "r/StableDiffusion", url: "https://reddit.com/r/StableDiffusion", description: "Reddit community for Stable Diffusion" }
   ];
 
-  // Technische Ressourcen
+  // Technical resources
   const technicalResources: Resource[] = [
-    { name: "Stable Diffusion Web UI Wiki", url: "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki", description: "Offizielle Dokumentation für A1111 UI" },
-    { name: "Hugging Face", url: "https://huggingface.co/models", description: "Offizielle Model-Repository" },
-    { name: "Papers With Code", url: "https://paperswithcode.com/task/text-to-image-generation", description: "Wissenschaftliche Paper zu Text-to-Image" },
-    { name: "ComfyUI Documentation", url: "https://github.com/comfyanonymous/ComfyUI", description: "Node-basierte UI für Stable Diffusion" }
+    { name: "Stable Diffusion Web UI Wiki", url: "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki", description: "Official documentation for A1111 UI" },
+    { name: "Hugging Face", url: "https://huggingface.co/models", description: "Official model repository" },
+    { name: "Papers With Code", url: "https://paperswithcode.com/task/text-to-image-generation", description: "Scientific papers on Text-to-Image" },
+    { name: "ComfyUI Documentation", url: "https://github.com/comfyanonymous/ComfyUI", description: "Node-based UI for Stable Diffusion" }
   ];
-  
+
   // Navigation paths
   const previousPath: string = "/guided-tutorial/advanced/ai-models";
   const nextPath: string = "/guided-tutorial";
-  const nextLabel: string = "Zurück zur Tutorial-Übersicht";
+  const nextLabel: string = "Back to Tutorial Overview"; // Translated from "Zurück zur Tutorial-Übersicht"
 </script>
 
 <svelte:head>
-  <title>Ressourcen & Deep-Dive | Guided Tutorial | HfG Ai-Hub</title>
+  <title>Resources & Deep-Dive | Guided Tutorial | HfG Ai-Hub</title>
 </svelte:head>
 
 <div class="tutorial-container">
   <div class="tutorial-header">
-    <h1>Ressourcen & Deep-Dive</h1>
-    <p class="subtitle">Weiterführende Materialien, Vergleichstabellen und Community-Links</p>
+    <h1>Resources & Deep-Dive</h1>
+    <p class="subtitle">Further materials, comparison tables, and community links</p>
   </div>
 
   <div class="content-sections">
-    <!-- Sampler-Vergleichstabelle -->
+    <!-- Sampler Comparison Table -->
     <section class="tutorial-section">
-      <h2>Empfohlene Sampler im Vergleich</h2>
-      
-      <p>Die Wahl des Samplers hat großen Einfluss auf die Bildqualität, Geschwindigkeit und den Stil. Hier findest du eine vergleichende Übersicht der wichtigsten Sampler.</p>
-      
+      <h2>Recommended Samplers Compared</h2>
+
+      <p>The choice of sampler greatly influences image quality, speed, and style. Here is a comparative overview of the most important samplers.</p>
+
       <div class="table-container">
         <table class="comparison-table">
           <thead>
             <tr>
               <th>Sampler</th>
-              <th>Geschwindigkeit</th>
-              <th>Detailgrad</th>
-              <th>Optimale Steps</th>
-              <th>Empfohlen für</th>
-              <th>Hinweise</th>
+              <th>Speed</th>
+              <th>Detail Level</th>
+              <th>Optimal Steps</th>
+              <th>Recommended for</th>
+              <th>Notes</th>
             </tr>
           </thead>
           <tbody>
             {#each samplerComparison as sampler}
               <tr>
                 <td class="sampler-name">{sampler.name}</td>
-                <td class="sampler-speed">{sampler.geschwindigkeit}</td>
-                <td>{sampler.detailgrad}</td>
+                <td class="sampler-speed">{sampler.speed}</td>
+                <td>{sampler.detailLevel}</td>
                 <td class="sampler-steps">{sampler.steps}</td>
                 <td>
                   <ul class="compact-list">
-                    {#each sampler.eignung as use}
+                    {#each sampler.suitability as use}
                       <li>{use}</li>
                     {/each}
                   </ul>
                 </td>
-                <td class="sampler-comment">{sampler.kommentar}</td>
+                <td class="sampler-comment">{sampler.comment}</td>
               </tr>
             {/each}
           </tbody>
         </table>
       </div>
-      
+
       <div class="info-box">
-        <h4>Tipp zur Sampler-Wahl:</h4>
-        <p>Beginne deine Experimente mit <strong>Euler a</strong> für schnelle Tests und wechsle zu <strong>DPM++ 2M Karras</strong> für die finale Bildgenerierung. Passe die Steps entsprechend an: mehr Steps für komplexere Bilder, weniger für einfachere Motive.</p>
+        <h4>Tip for Sampler Choice:</h4>
+        <p>Start your experiments with <strong>Euler a</strong> for quick tests and switch to <strong>DPM++ 2M Karras</strong> for final image generation. Adjust the steps accordingly: more steps for complex images, fewer for simpler subjects.</p>
       </div>
     </section>
 
-    <!-- Cheatsheets für Keywords und Gewichte -->
+    <!-- Cheatsheets for Keywords and Weights -->
     <section class="tutorial-section">
-      <h2>Cheatsheets: Stil-Keywords und Gewichtungen</h2>
-      
-      <p>Diese Sammlungen von häufig verwendeten Keywords helfen dir, schnell passende Stilbegriffe für deine Prompts zu finden.</p>
-      
-      <!-- Stil-Keywords Cheatsheet -->
+      <h2>Cheatsheets: Style Keywords and Weights</h2>
+
+      <p>These collections of commonly used keywords help you quickly find suitable style terms for your prompts.</p>
+
+      <!-- Style Keywords Cheatsheet -->
       <div class="keyword-section">
-        <h3>Stil-Keywords nach Kategorien</h3>
-        
+        <h3>Style Keywords by Category</h3>
+
         <div class="accordion">
           {#each styleKeywords as category}
             <div class="accordion-item">
@@ -197,7 +197,7 @@
                   <thead>
                     <tr>
                       <th>Keyword</th>
-                      <th>Effekt/Beschreibung</th>
+                      <th>Effect/Description</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -214,14 +214,14 @@
           {/each}
         </div>
       </div>
-      
-      <!-- Gewichtungs-Cheatsheet -->
+
+      <!-- Weighting Cheatsheet -->
       <div class="weight-section">
-        <h3>Gewichtungs-Cheatsheet</h3>
-        
+        <h3>Weighting Cheatsheet</h3>
+
         <div class="weight-grid">
           <div class="weight-card">
-            <h4>Für Hauptmotive</h4>
+            <h4>For Main Subjects</h4>
             <div class="weight-examples">
               <div class="weight-example">
                 <span class="weight-syntax">(subject)</span>
@@ -237,9 +237,9 @@
               </div>
             </div>
           </div>
-          
+
           <div class="weight-card">
-            <h4>Für Hintergründe</h4>
+            <h4>For Backgrounds</h4>
             <div class="weight-examples">
               <div class="weight-example">
                 <span class="weight-syntax">[background]</span>
@@ -251,9 +251,9 @@
               </div>
             </div>
           </div>
-          
+
           <div class="weight-card">
-            <h4>Für Stile</h4>
+            <h4>For Styles</h4>
             <div class="weight-examples">
               <div class="weight-example">
                 <span class="weight-syntax">style:1.1</span>
@@ -266,136 +266,136 @@
             </div>
           </div>
         </div>
-        
+
         <div class="weight-formula">
-          <h4>Gewichts-Formel:</h4>
+          <h4>Weighting Formula:</h4>
           <ul>
-            <li>Klammern erhöhen den Einfluss: <code>(wort)</code> = 1.1×, <code>((wort))</code> = 1.21×</li>
-            <li>Eckige Klammern verringern: <code>[wort]</code> = 0.9×, <code>[[wort]]</code> = 0.81×</li>
-            <li>Genaue Werte mit Doppelpunkt: <code>wort:1.2</code> = 1.2×</li>
+            <li>Parentheses increase influence: <code>(word)</code> = 1.1×, <code>((word))</code> = 1.21×</li>
+            <li>Square brackets decrease: <code>[word]</code> = 0.9×, <code>[[word]]</code> = 0.81×</li>
+            <li>Exact values with colon: <code>word:1.2</code> = 1.2×</li>
           </ul>
         </div>
       </div>
     </section>
 
-    <!-- Links zu Community-Ressourcen -->
+    <!-- Links to Community Resources -->
     <section class="tutorial-section">
-      <h2>Community & Weiterführende Ressourcen</h2>
-      
-      <p>Die KI-Bildgenerierungs-Community ist sehr aktiv und teilt ständig neue Erkenntnisse, Modelle und Prompts. Hier findest du wichtige Anlaufstellen für deine weitere Reise.</p>
-      
-      <!-- Community-Links -->
+      <h2>Community & Further Resources</h2>
+
+      <p>The AI image generation community is very active and constantly shares new insights, models, and prompts. Here are important starting points for your further journey.</p>
+
+      <!-- Community Links -->
       <div class="resources-container">
         <div class="resource-category">
-          <h3>Community & Prompt-Inspiration</h3>
+          <h3>Community & Prompt Inspiration</h3>
           <div class="resources-grid">
             {#each communityResources as resource}
               <div class="resource-card">
                 <h4>{resource.name}</h4>
                 <p>{resource.description}</p>
-                <a href={resource.url} target="_blank" rel="noopener noreferrer" class="resource-link">Besuchen ↗</a>
+                <a href={resource.url} target="_blank" rel="noopener noreferrer" class="resource-link">Visit ↗</a>
               </div>
             {/each}
           </div>
         </div>
-        
-        <!-- Technische Ressourcen -->
+
+        <!-- Technical Resources -->
         <div class="resource-category">
-          <h3>Technische Dokumentation & Papers</h3>
+          <h3>Technical Documentation & Papers</h3>
           <div class="resources-grid">
             {#each technicalResources as resource}
               <div class="resource-card">
                 <h4>{resource.name}</h4>
                 <p>{resource.description}</p>
-                <a href={resource.url} target="_blank" rel="noopener noreferrer" class="resource-link">Besuchen ↗</a>
+                <a href={resource.url} target="_blank" rel="noopener noreferrer" class="resource-link">Visit ↗</a>
               </div>
             {/each}
           </div>
         </div>
       </div>
-      
+
       <div class="downloadable-resources">
-        <h3>Downloadbare Ressourcen</h3>
+        <h3>Downloadable Resources</h3>
         <div class="downloads-list">
           <a href="#" class="download-item">
             <span class="download-icon">📄</span>
             <div class="download-info">
-              <h4>Vollständige Sampler-Vergleichstabelle</h4>
-              <p>PDF mit detaillierten Vergleichsdaten zu allen verfügbaren Samplern</p>
+              <h4>Complete Sampler Comparison Table</h4>
+              <p>PDF with detailed comparison data for all available samplers</p>
             </div>
           </a>
           <a href="#" class="download-item">
             <span class="download-icon">📄</span>
             <div class="download-info">
-              <h4>Stil-Keywords Cheatsheet</h4>
-              <p>Über 200 kategorisierte Stil-Keywords für verschiedene Anwendungsfälle</p>
+              <h4>Style Keywords Cheatsheet</h4>
+              <p>Over 200 categorized style keywords for various use cases</p>
             </div>
           </a>
           <a href="#" class="download-item">
             <span class="download-icon">📄</span>
             <div class="download-info">
-              <h4>Prompt-Engineering Handbuch</h4>
-              <p>Umfassendes Handbuch für fortgeschrittenes Prompt-Engineering</p>
+              <h4>Prompt Engineering Handbook</h4>
+              <p>Comprehensive handbook for advanced prompt engineering</p>
             </div>
           </a>
         </div>
       </div>
     </section>
 
-    <!-- Lesezeichen und Terminologie -->
+    <!-- Bookmarks and Terminology -->
     <section class="tutorial-section">
-      <h2>Lesezeichen & Terminologie</h2>
-      
+      <h2>Bookmarks & Terminology</h2>
+
       <div class="bookmarks-section">
-        <h3>Empfohlene Lesezeichen für den Einstieg</h3>
+        <h3>Recommended Bookmarks for Getting Started</h3>
         <ul class="bookmark-list">
           <li>
-            <h4>"LoRA Training Simplified" von Aitrepreneur</h4>
-            <p>Ein ausführlicher Leitfaden zum Training eigener LoRAs, verständlich erklärt.</p>
+            <h4>"LoRA Training Simplified" by Aitrepreneur</h4>
+            <p>A detailed guide to training your own LoRAs, explained clearly.</p>
             <a href="#" class="bookmark-link">YouTube ↗</a>
           </li>
           <li>
-            <h4>"The Stable Diffusion Parameters Guide" von HuggingFace</h4>
-            <p>Detaillierte Erläuterung aller SD-Parameter und ihrer Auswirkungen.</p>
+            <h4>"The Stable Diffusion Parameters Guide" by HuggingFace</h4>
+            <p>Detailed explanation of all SD parameters and their effects.</p>
             <a href="#" class="bookmark-link">HuggingFace Blog ↗</a>
           </li>
           <li>
-            <h4>"Prompt Engineering Guide" von Learn Prompting</h4>
-            <p>Systematischer Guide zum Erstellen effektiver Prompts für Text-to-Image Modelle.</p>
+            <h4>"Prompt Engineering Guide" by Learn Prompting</h4>
+            <p>Systematic guide to creating effective prompts for text-to-image models.</p>
             <a href="#" class="bookmark-link">Website ↗</a>
           </li>
         </ul>
       </div>
-      
+
       <div class="terminology-section">
-        <h3>Wichtige Begriffe und Terminologie</h3>
+        <h3>Important Terms and Terminology</h3>
         <div class="terminology-grid">
           <div class="term-card">
             <h4>VAE</h4>
-            <p>Variational Autoencoder - Teil des Modells, der die endgültige Bildqualität und Farbwiedergabe beeinflusst.</p>
+            <p>Variational Autoencoder - Part of the model that influences final image quality and color reproduction.</p>
           </div>
           <div class="term-card">
             <h4>Embedding</h4>
-            <p>Trainierte Text-Konzepte, die komplexe Ideen oder Stile in einen Begriff packen.</p>
+            <p>Trained text concepts that package complex ideas or styles into a single term.</p>
           </div>
           <div class="term-card">
             <h4>Inpainting</h4>
-            <p>Technik zum gezielten Ersetzen/Verändern von Teilbereichen eines bereits generierten Bildes.</p>
+            <p>Technique for selectively replacing/modifying parts of an already generated image.</p>
           </div>
           <div class="term-card">
             <h4>CLIP</h4>
-            <p>Contrastive Language-Image Pre-Training - Verbindungsschicht zwischen Text und Bild in SD.</p>
+            <p>Contrastive Language-Image Pre-Training - Connection layer between text and image in SD.</p>
           </div>
         </div>
       </div>
-      
+
       <div class="info-box success">
-        <h4>Herzlichen Glückwunsch!</h4>
-        <p>Du hast alle Zusatzbereiche des Tutorials absolviert und verfügst nun über umfassende Ressourcen für dein fortgeschrittenes Lernen im Bereich der KI-Bildgenerierung.</p>
+        <h4>Congratulations!</h4>
+        <p>You have completed all additional sections of the tutorial and now have comprehensive resources for your advanced learning in AI image generation.</p>
       </div>
-      
+
       <!-- Navigation buttons -->
-      <TutorialNavigation 
+      <TutorialNavigation
         previousPath={previousPath}
         nextPath={nextPath}
         nextLabel={nextLabel}

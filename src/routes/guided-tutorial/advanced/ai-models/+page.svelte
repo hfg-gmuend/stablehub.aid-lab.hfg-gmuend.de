@@ -1,64 +1,64 @@
 <script lang="ts">
   import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
-  
+
   // Types for model data
   interface ModelComparison {
     name: string;
-    stärken: string[];
-    schwächen: string[];
+    strengths: string[]; // Renamed from stärken
+    weaknesses: string[]; // Renamed from schwächen
   }
-  
+
   interface Checkpoint {
     name: string;
     focus: string;
     description: string;
   }
 
-  // Modell-Daten für die Vergleichstabelle
+  // Model data for the comparison table
   const modelComparisons: ModelComparison[] = [
-    { 
-      name: "Stable Diffusion 1.5", 
-      stärken: ["Ausgereift und stabil", "Viele Trainingsressourcen", "Gute Alltagsfotos"],
-      schwächen: ["Älteres Modell", "Anatomie manchmal problematisch", "Begrenzte Kreativität"]
+    {
+      name: "Stable Diffusion 1.5",
+      strengths: ["Mature and stable", "Many training resources", "Good everyday photos"],
+      weaknesses: ["Older model", "Anatomy sometimes problematic", "Limited creativity"]
     },
-    { 
-      name: "Stable Diffusion XL", 
-      stärken: ["Bessere Detailtreue", "Verbesserte Prompt-Befolgung", "Stärkere Komposition"],
-      schwächen: ["Höhere Systemanforderungen", "Längere Generierungszeit", "Weniger Extensions"] 
+    {
+      name: "Stable Diffusion XL",
+      strengths: ["Better detail fidelity", "Improved prompt adherence", "Stronger composition"],
+      weaknesses: ["Higher system requirements", "Longer generation time", "Fewer extensions"]
     },
-    { 
-      name: "Midjourney", 
-      stärken: ["Sehr ästhetische Ergebnisse", "Einfache Bedienung", "Konsistente Qualität"],
-      schwächen: ["Nur Cloud-basiert", "Weniger Kontrolle", "Keine lokale Installation"]
+    {
+      name: "Midjourney",
+      strengths: ["Very aesthetic results", "Easy to use", "Consistent quality"],
+      weaknesses: ["Cloud-based only", "Less control", "No local installation"]
     }
   ];
-  
-  // Beispiel-Checkpoints
+
+  // Example checkpoints
   const checkpoints: Checkpoint[] = [
-    { name: "Realistic Vision", focus: "Fotorealismus", description: "Optimiert für realistische Porträts und Szenen" },
-    { name: "Deliberate", focus: "Balance", description: "Ausgewogen zwischen Realismus und künstlerischem Stil" },
-    { name: "Dreamshaper", focus: "Kreativität", description: "Fantasievolle, kunstvolle Bildkreationen" },
-    { name: "AbsoluteReality", focus: "Hyperrealismus", description: "Extrem detaillierte fotorealistische Bilder" }
+    { name: "Realistic Vision", focus: "Photorealism", description: "Optimized for realistic portraits and scenes" },
+    { name: "Deliberate", focus: "Balance", description: "Balanced between realism and artistic style" },
+    { name: "Dreamshaper", focus: "Creativity", description: "Imaginative, artistic image creations" },
+    { name: "AbsoluteReality", focus: "Hyperrealism", description: "Extremely detailed photorealistic images" }
   ];
 </script>
 
 <svelte:head>
-  <title>KI-Modelle verstehen | Guided Tutorial | HfG Ai-Hub</title>
+  <title>Understanding AI Models | Guided Tutorial | HfG Ai-Hub</title>
 </svelte:head>
 
 <div class="tutorial-container">
   <div class="tutorial-header">
-    <h1>KI-Modelle verstehen</h1>
-    <p class="subtitle">Ein tieferer Einblick in die Bildgenerierungsmodelle</p>
+    <h1>Understanding AI Models</h1>
+    <p class="subtitle">A deeper look into image generation models</p>
   </div>
 
   <div class="content-sections">
-    <!-- Einführung -->
+    <!-- Introduction -->
     <section class="tutorial-section">
-      <h2>Modelllandschaft im Überblick</h2>
-      
-      <p>Die Welt der generativen KI-Modelle entwickelt sich rasant. Verschiedene Modelle haben unterschiedliche Stärken und eignen sich für verschiedene Anwendungsfälle.</p>
-      
+      <h2>Model Landscape Overview</h2>
+
+      <p>The world of generative AI models is evolving rapidly. Different models have different strengths and are suitable for various use cases.</p>
+
       <div class="models-overview">
         <div class="models-grid">
           <div class="model-card">
@@ -67,49 +67,49 @@
               <span class="model-badge open">Open Source</span>
             </div>
             <div class="model-desc">
-              <p>Open-Source-Modell, lokal oder in der Cloud betreibbar. Viele Varianten (1.5, 2.0, XL) und Community-Erweiterungen.</p>
+              <p>Open-source model, can be run locally or in the cloud. Many variants (1.5, 2.0, XL) and community extensions.</p>
             </div>
           </div>
-          
+
           <div class="model-card">
             <div class="model-header">
               <h3>Midjourney</h3>
-              <span class="model-badge commercial">Kommerziell</span>
+              <span class="model-badge commercial">Commercial</span>
             </div>
             <div class="model-desc">
-              <p>Discord-basierter Dienst mit sehr ästhetischen, künstlerischen Ergebnissen. Proprietär, aber einfach zu bedienen.</p>
+              <p>Discord-based service with very aesthetic, artistic results. Proprietary, but easy to use.</p>
             </div>
           </div>
-          
+
           <div class="model-card">
             <div class="model-header">
               <h3>DALL-E</h3>
-              <span class="model-badge commercial">Kommerziell</span>
+              <span class="model-badge commercial">Commercial</span>
             </div>
             <div class="model-desc">
-              <p>OpenAIs Bildgenerator, bekannt für gute Prompt-Interpretation und sichere Inhalte. API verfügbar.</p>
+              <p>OpenAI's image generator, known for good prompt interpretation and safe content. API available.</p>
             </div>
           </div>
         </div>
       </div>
-      
+
       <div class="info-box">
-        <h4>Wichtig zu wissen:</h4>
-        <p>Alle Modelle haben ihre eigenen Stärken und "Ästhetiken". Es ist oft eine Frage des persönlichen Geschmacks und des spezifischen Projekts, welches Modell am besten geeignet ist.</p>
+        <h4>Important to know:</h4>
+        <p>All models have their own strengths and "aesthetics". It's often a matter of personal taste and the specific project which model is best suited.</p>
       </div>
     </section>
 
-    <!-- Modellvergleich -->
+    <!-- Model Comparison -->
     <section class="tutorial-section">
-      <h2>Modellvergleich: Stärken und Schwächen</h2>
-      
+      <h2>Model Comparison: Strengths and Weaknesses</h2>
+
       <div class="comparison-table">
         <table>
           <thead>
             <tr>
-              <th>Modell</th>
-              <th>Stärken</th>
-              <th>Schwächen</th>
+              <th>Model</th>
+              <th>Strengths</th>
+              <th>Weaknesses</th>
             </tr>
           </thead>
           <tbody>
@@ -118,15 +118,15 @@
                 <td class="model-name">{model.name}</td>
                 <td>
                   <ul class="feature-list">
-                    {#each model.stärken as stärke}
-                      <li><span class="feature-plus">+</span> {stärke}</li>
+                    {#each model.strengths as strength}
+                      <li><span class="feature-plus">+</span> {strength}</li>
                     {/each}
                   </ul>
                 </td>
                 <td>
                   <ul class="feature-list">
-                    {#each model.schwächen as schwäche}
-                      <li><span class="feature-minus">-</span> {schwäche}</li>
+                    {#each model.weaknesses as weakness}
+                      <li><span class="feature-minus">-</span> {weakness}</li>
                     {/each}
                   </ul>
                 </td>
@@ -135,14 +135,14 @@
           </tbody>
         </table>
       </div>
-      
+
       <div class="comparison-images">
-        <h3>Stilistische Unterschiede</h3>
+        <h3>Stylistic Differences</h3>
         <div class="image-comparison">
           <div class="comparison-item">
             <div class="comparison-image">
               <div class="placeholder-image" data-label="SD 1.5">
-                <span>Beispielbild SD 1.5</span>
+                <span>Example Image SD 1.5</span>
               </div>
             </div>
             <p>Stable Diffusion 1.5</p>
@@ -150,7 +150,7 @@
           <div class="comparison-item">
             <div class="comparison-image">
               <div class="placeholder-image" data-label="SD XL">
-                <span>Beispielbild SD XL</span>
+                <span>Example Image SD XL</span>
               </div>
             </div>
             <p>Stable Diffusion XL</p>
@@ -158,7 +158,7 @@
           <div class="comparison-item">
             <div class="comparison-image">
               <div class="placeholder-image" data-label="Midjourney">
-                <span>Beispielbild Midjourney</span>
+                <span>Example Image Midjourney</span>
               </div>
             </div>
             <p>Midjourney v5</p>
@@ -167,122 +167,122 @@
       </div>
     </section>
 
-    <!-- Checkpoints und Custom Models -->
+    <!-- Checkpoints and Custom Models -->
     <section class="tutorial-section">
-      <h2>Checkpoints und Custom Models</h2>
-      
-      <p>Im Stable Diffusion-Ökosystem gibt es verschiedene "Checkpoints" - spezialisierte Modellvarianten, die für bestimmte Arten von Bildern oder Stilen optimiert sind.</p>
-      
+      <h2>Checkpoints and Custom Models</h2>
+
+      <p>In the Stable Diffusion ecosystem, there are various "checkpoints" - specialized model variants optimized for specific types of images or styles.</p>
+
       <div class="checkpoint-grid">
         {#each checkpoints as checkpoint}
           <div class="checkpoint-card">
             <h3>{checkpoint.name}</h3>
             <div class="checkpoint-focus">
-              <span class="focus-label">Fokus:</span>
+              <span class="focus-label">Focus:</span>
               <span class="focus-value">{checkpoint.focus}</span>
             </div>
             <p>{checkpoint.description}</p>
           </div>
         {/each}
       </div>
-      
+
       <div class="workflow-tip">
-        <h3>Tipps zur Modellauswahl</h3>
+        <h3>Tips for Model Selection</h3>
         <div class="tip-container">
           <div class="tip-item">
-            <h4>Für Anfänger</h4>
-            <p>Stable Diffusion 1.5 mit einem ausgewogenen Checkpoint wie "Deliberate" oder "Dreamshaper". Einfach zu betreiben und gute Allrounder.</p>
+            <h4>For Beginners</h4>
+            <p>Stable Diffusion 1.5 with a balanced checkpoint like "Deliberate" or "Dreamshaper". Easy to run and good all-rounders.</p>
           </div>
           <div class="tip-item">
-            <h4>Für Profis</h4>
-            <p>Eigene Checkpoints mit spezifischen Mix-Modellen und LoRAs kombinieren. Fortgeschrittenere Setups mit Custom-VAEs für bessere Farbwiedergabe.</p>
+            <h4>For Professionals</h4>
+            <p>Combine custom checkpoints with specific mix models and LoRAs. More advanced setups with custom VAEs for better color reproduction.</p>
           </div>
           <div class="tip-item">
-            <h4>Für Experimente</h4>
-            <p>Verschiedene Modelle testen und Ergebnisse vergleichen. Manchmal funktioniert ein älteres Modell für bestimmte Anwendungsfälle besser als neuere.</p>
+            <h4>For Experiments</h4>
+            <p>Test different models and compare results. Sometimes an older model works better for specific use cases than newer ones.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Modellversionen und Entwicklung -->
+    <!-- Model Versions and Development -->
     <section class="tutorial-section">
-      <h2>Modellversionen und Entwicklung</h2>
-      
+      <h2>Model Versions and Development</h2>
+
       <div class="timeline">
         <div class="timeline-item">
           <div class="timeline-date">Aug 2022</div>
           <div class="timeline-content">
             <h3>Stable Diffusion 1.4</h3>
-            <p>Erste öffentliche Version, revolutionierte die KI-Bildgenerierung durch Open-Source-Ansatz</p>
+            <p>First public version, revolutionized AI image generation with its open-source approach</p>
           </div>
         </div>
         <div class="timeline-item">
-          <div class="timeline-date">Okt 2022</div>
+          <div class="timeline-date">Oct 2022</div>
           <div class="timeline-content">
             <h3>Stable Diffusion 1.5</h3>
-            <p>Verbesserte Bildqualität, heute noch weit verbreitet und Basis vieler Community-Modelle</p>
+            <p>Improved image quality, still widely used today and the basis for many community models</p>
           </div>
         </div>
         <div class="timeline-item">
           <div class="timeline-date">Nov 2022</div>
           <div class="timeline-content">
             <h3>Stable Diffusion 2.0/2.1</h3>
-            <p>Neue Architektur mit 768x768 Auflösung, höhere Detailgenauigkeit</p>
+            <p>New architecture with 768x768 resolution, higher detail accuracy</p>
           </div>
         </div>
         <div class="timeline-item">
           <div class="timeline-date">Jul 2023</div>
           <div class="timeline-content">
             <h3>Stable Diffusion XL</h3>
-            <p>Grundlegend überarbeitetes Modell mit deutlich verbesserter Bildqualität und Prompt-Befolgung</p>
+            <p>Fundamentally revised model with significantly improved image quality and prompt adherence</p>
           </div>
         </div>
         <div class="timeline-item">
-          <div class="timeline-date">Zukunft</div>
+          <div class="timeline-date">Future</div>
           <div class="timeline-content">
-            <h3>Multimodale Modelle</h3>
-            <p>Integration von Text, Bild, Animation und 3D in einheitliche KI-Systeme</p>
+            <h3>Multimodal Models</h3>
+            <p>Integration of text, image, animation, and 3D into unified AI systems</p>
           </div>
         </div>
       </div>
-      
+
       <div class="info-box">
-        <h4>Aktiv bleiben:</h4>
-        <p>Die KI-Entwicklung schreitet rasant voran. Um auf dem Laufenden zu bleiben, empfehlen wir, Communities wie reddit.com/r/StableDiffusion, Discord-Server und KI-Blogs zu verfolgen.</p>
+        <h4>Stay Active:</h4>
+        <p>AI development is progressing rapidly. To stay up-to-date, we recommend following communities like reddit.com/r/StableDiffusion, Discord servers, and AI blogs.</p>
       </div>
     </section>
 
-    <!-- Übungsbereich -->
+    <!-- Exercise Area -->
     <section class="tutorial-section">
-      <h2>Praktischer Vergleich</h2>
-      
+      <h2>Practical Comparison</h2>
+
       <div class="exercise-box">
-        <h3>Übung: Modellvergleich mit identischem Prompt</h3>
-        <p>Führe einen Vergleichstest durch, um ein Gefühl für die Unterschiede zwischen Modellen zu bekommen:</p>
-        
+        <h3>Exercise: Model Comparison with Identical Prompt</h3>
+        <p>Perform a comparison test to get a feel for the differences between models:</p>
+
         <ol>
-          <li>Wähle einen Prompt, der für dich relevant ist, z.B. "Ein futuristisches Stadtbild bei Sonnenuntergang"</li>
-          <li>Generiere Bilder mit identischen Parametern (Seed, CFG, Steps) in verschiedenen Modellen</li>
-          <li>Vergleiche die Ergebnisse und notiere die Unterschiede in Stil, Qualität und Prompt-Treue</li>
-          <li>Bestimme, welches Modell für deine spezifischen Projekte am besten geeignet ist</li>
+          <li>Choose a prompt relevant to you, e.g., "A futuristic cityscape at sunset"</li>
+          <li>Generate images with identical parameters (Seed, CFG, Steps) in different models</li>
+          <li>Compare the results and note the differences in style, quality, and prompt fidelity</li>
+          <li>Determine which model is best suited for your specific projects</li>
         </ol>
-        
+
         <div class="prompt-template">
-          <h4>Test-Prompt:</h4>
+          <h4>Test Prompt:</h4>
           <div class="template-box">
-            <p>Ein futuristisches Stadtbild bei Sonnenuntergang, detailliert, cinematisch, atmosphärisch</p>
+            <p>A futuristic cityscape at sunset, detailed, cinematic, atmospheric</p>
           </div>
         </div>
       </div>
-      
+
       <div class="info-box success">
-        <h4>Lernziel erreicht:</h4>
-        <p>Du verstehst nun die Unterschiede zwischen verschiedenen KI-Bildgenerierungsmodellen und kannst fundierte Entscheidungen treffen, welches Modell für deine Projekte am besten geeignet ist.</p>
+        <h4>Learning objective achieved:</h4>
+        <p>You now understand the differences between various AI image generation models and can make informed decisions about which model is best suited for your projects.</p>
       </div>
-      
+
       <!-- Navigation buttons -->
-      <TutorialNavigation 
+      <TutorialNavigation
         previousPath="/guided-tutorial/advanced-prompting"
         nextPath="/guided-tutorial/advanced/workflow-optimization"
       />
