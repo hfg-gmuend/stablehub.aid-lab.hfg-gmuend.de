@@ -84,7 +84,7 @@
           </ul>
         </div>
         <div class="image-block">
-          <img src="/tutorials/stable-diffusion-illustration.png" alt="Stable Diffusion Prozess" class="tutorial-image" />
+          <img src="/tutorial/stablediffusion.png" alt="Stable Diffusion Prozess" class="tutorial-image" />
           <p class="image-caption">Der Diffusionsprozess: Von Rauschen zum Bild</p>
         </div>
       </div>
