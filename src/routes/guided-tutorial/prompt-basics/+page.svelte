@@ -1,7 +1,7 @@
 <script lang="ts">
   import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
   
-  // Interfaces und Types
+  // Interfaces and Types
   interface ExamplePrompts {
     basic: string;
     improved: string;
@@ -14,76 +14,76 @@
     keywords: string[];
   }
   
-  // Beispiel-Prompts für die Demonstration
+  // Example prompts for demonstration
   const examplePrompts: ExamplePrompts = {
-    basic: "ein Schloss",
-    improved: "ein mittelalterliches Schloss auf einem Hügel",
-    detailed: "ein mittelalterliches Schloss auf einem Hügel, umgeben von einem nebligen Wald, bei Sonnenuntergang, fotorealistische Darstellung, detaillierte Architektur",
-    structured: "Mittelalterliches Schloss | auf einem Hügel | umgeben von nebligem Wald | Sonnenuntergang | fotorealistisch | detaillierte Architektur | cinematic lighting | 8k"
+    basic: "a castle",
+    improved: "a medieval castle on a hill",
+    detailed: "a medieval castle on a hill, surrounded by a foggy forest, at sunset, photorealistic representation, detailed architecture",
+    structured: "Medieval castle | on a hill | surrounded by foggy forest | sunset | photorealistic | detailed architecture | cinematic lighting | 8k"
   };
 
-  // Stil-Keywords für die Demonstration
+  // Style keywords for demonstration
   const styleKeywords: StyleCategory[] = [
-    { category: "Fotorealismus", 
+    { category: "Photorealism", 
       keywords: ["photorealistic", "hyperrealistic", "8k", "detailed", "cinematic", "professional photography"] },
-    { category: "Kunst & Illustration", 
+    { category: "Art & Illustration", 
       keywords: ["oil painting", "watercolor", "concept art", "digital art", "anime style", "cartoon style"] },
-    { category: "Grafik & Design", 
+    { category: "Graphics & Design", 
       keywords: ["vector art", "flat design", "minimalist", "isometric", "3D render", "pixel art"] }
   ];
   
-  // Navigations-Props (explizit als Strings typisiert)
+  // Navigation props (explicitly typed as strings)
   const navigationPrevPath: string = "/guided-tutorial/stable-diffusion-intro";
   const navigationNextPath: string = "/guided-tutorial/core-parameters";
 </script>
 
 <svelte:head>
-  <title>Prompt-Grundlagen | Guided Tutorial | HfG Ai-Hub</title>
+  <title>Prompt Basics | Guided Tutorial | HfG Ai-Hub</title>
 </svelte:head>
 
 <div class="tutorial-container">
   <div class="tutorial-header">
-    <h1>Prompt-Grundlagen</h1>
-    <p class="subtitle">Die Kunst des effektiven Prompt-Schreibens</p>
+    <h1>Prompt Basics</h1>
+    <p class="subtitle">The Art of Effective Prompt Writing</p>
   </div>
 
   <div class="content-sections">
-    <!-- Anatomie eines Prompts -->
+    <!-- Anatomy of a Prompt -->
     <section class="tutorial-section">
-      <h2>Anatomie eines Prompts</h2>
-      <p>Ein erfolgreicher Prompt besteht typischerweise aus vier Hauptelementen:</p>
+      <h2>Anatomy of a Prompt</h2>
+      <p>A successful prompt typically consists of four main elements:</p>
       
       <div class="anatomy-grid">
         <div class="anatomy-item">
           <div class="anatomy-header">
             <span class="badge">1</span>
-            <h3>Subjekt</h3>
+            <h3>Subject</h3>
           </div>
-          <p>Das Hauptobjekt oder die Person im Bild — <em>Was</em> soll dargestellt werden?</p>
+          <p>The main object or person in the image — <em>What</em> should be depicted?</p>
           <div class="anatomy-example">
-            <span class="highlight">Ein mittelalterliches Schloss</span>
+            <span class="highlight">A medieval castle</span>
           </div>
         </div>
         
         <div class="anatomy-item">
           <div class="anatomy-header">
             <span class="badge">2</span>
-            <h3>Stil</h3>
+            <h3>Style</h3>
           </div>
-          <p>Die künstlerische Darstellungsart — <em>Wie</em> soll es aussehen?</p>
+          <p>The artistic representation — <em>How</em> should it look?</p>
           <div class="anatomy-example">
-            <span class="highlight">fotorealistisch, cinematic lighting</span>
+            <span class="highlight">photorealistic, cinematic lighting</span>
           </div>
         </div>
         
         <div class="anatomy-item">
           <div class="anatomy-header">
             <span class="badge">3</span>
-            <h3>Kontext</h3>
+            <h3>Context</h3>
           </div>
-          <p>Die Umgebung oder Situation — <em>Wo</em> und <em>wann</em> findet es statt?</p>
+          <p>The environment or situation — <em>Where</em> and <em>when</em> does it take place?</p>
           <div class="anatomy-example">
-            <span class="highlight">auf einem Hügel, bei Sonnenuntergang</span>
+            <span class="highlight">on a hill, at sunset</span>
           </div>
         </div>
         
@@ -92,108 +92,107 @@
             <span class="badge">4</span>
             <h3>Details</h3>
           </div>
-          <p>Zusätzliche Beschreibungen, die das Bild bereichern.</p>
+          <p>Additional descriptions that enrich the image.</p>
           <div class="anatomy-example">
-            <span class="highlight">detaillierte Architektur, umgeben von nebligem Wald</span>
+            <span class="highlight">detailed architecture, surrounded by foggy forest</span>
           </div>
         </div>
       </div>
       
       <div class="info-box">
-        <h4>Wichtig zu wissen:</h4>
-        <p>Nicht jeder Prompt muss alle vier Elemente enthalten, aber je spezifischer dein Prompt ist, desto gezielter wird das generierte Bild.</p>
+        <h4>Important to know:</h4>
+        <p>Not every prompt needs to contain all four elements, but the more specific your prompt is, the more targeted the generated image will be.</p>
       </div>
     </section>
 
-    <!-- Reihenfolge & Verständlichkeit -->
+    <!-- Order & Clarity -->
     <section class="tutorial-section">
-      <h2>Reihenfolge & Verständlichkeit</h2>
+      <h2>Order & Clarity</h2>
       
-      <p>Die Reihenfolge der Elemente in deinem Prompt hat Einfluss auf das Ergebnis. Eine empfohlene Struktur ist:</p>
+      <p>The order of elements in your prompt influences the result. A recommended structure is:</p>
       
       <div class="order-flow">
         <div class="flow-item">
           <div class="flow-number">1</div>
           <div class="flow-content">
-            <h4>Subjekt</h4>
-            <p>Was ist das Hauptmotiv?</p>
+            <h4>Subject</h4>
+            <p>What is the main motif?</p>
           </div>
         </div>
         <div class="flow-arrow">→</div>
         <div class="flow-item">
           <div class="flow-number">2</div>
           <div class="flow-content">
-            <h4>Eigenschaften</h4>
-            <p>Wie sieht es aus?</p>
+            <h4>Properties</h4>
+            <p>What does it look like?</p>
           </div>
         </div>
         <div class="flow-arrow">→</div>
         <div class="flow-item">
           <div class="flow-number">3</div>
           <div class="flow-content">
-            <h4>Umgebung</h4>
-            <p>Wo befindet es sich?</p>
+            <h4>Environment</h4>
+            <p>Where is it located?</p>
           </div>
         </div>
         <div class="flow-arrow">→</div>
         <div class="flow-item">
           <div class="flow-content">
-            <h4>Stil & Details</h4>
-            <p>Künstlerische Elemente</p>
+            <h4>Style & Details</h4>
+            <p>Artistic elements</p>
           </div>
         </div>
       </div>
       
       <div class="prompt-evolution">
-        <h3>Vom einfachen zum detaillierten Prompt</h3>
+        <h3>From Simple to Detailed Prompt</h3>
         
         <div class="prompt-level">
-          <div class="level-label">Einfach</div>
+          <div class="level-label">Simple</div>
           <div class="prompt-box">
             <p>{examplePrompts.basic}</p>
           </div>
           <div class="prompt-effect">
-            <p>→ Sehr allgemein, viele Interpretationsmöglichkeiten</p>
+            <p>→ Very general, many interpretations possible</p>
           </div>
         </div>
         
         <div class="prompt-level">
-          <div class="level-label">Besser</div>
+          <div class="level-label">Better</div>
           <div class="prompt-box">
             <p>{examplePrompts.improved}</p>
           </div>
           <div class="prompt-effect">
-            <p>→ Grundlegende Details, aber immer noch offen für viele Stile</p>
+            <p>→ Basic details, but still open to many styles</p>
           </div>
         </div>
         
         <div class="prompt-level">
-          <div class="level-label">Detailliert</div>
           <div class="prompt-box detailed">
             <p>{examplePrompts.detailed}</p>
           </div>
           <div class="prompt-effect">
-            <p>→ Klares Motiv mit Stil, Kontext und Details</p>
+            <p>→ Clear motif with style, context, and details</p>
           </div>
         </div>
         
         <div class="prompt-level">
-          <div class="level-label">Strukturiert</div>
+          <div class="level-label">Structured</div>
           <div class="prompt-box structured">
             <p>{examplePrompts.structured}</p>
           </div>
           <div class="prompt-effect">
-            <p>→ Gut organisiert mit Trennzeichen für bessere Lesbarkeit</p>
+            <p>→ Well-organized with separators for better readability</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Häufige Stil-Keywords -->
+    <!-- Common Style Keywords -->
     <section class="tutorial-section">
-      <h2>Häufige Stil-Keywords</h2>
+      <h2>Common Style Keywords</h2>
       
-      <p>Stil-Keywords sind entscheidend, um den Look deines Bildes zu definieren. Hier sind einige gängige Kategorien:</p>
+      <p>Style keywords are crucial for defining the look of your image. Here are some common categories:</p>
       
       <div class="style-categories">
         {#each styleKeywords as style}
@@ -209,52 +208,52 @@
       </div>
       
       <div class="style-examples">
-        <h3>Beispiel-Anwendungen</h3>
+        <h3>Example Applications</h3>
         
         <div class="style-example">
-          <div class="example-label">Fotorealismus:</div>
+          <div class="example-label">Photorealism:</div>
           <div class="example-prompt">
-            <p>Ein Porträt eines älteren Mannes mit Bart, detaillierte Gesichtszüge, fotorealistisch, Studio-Beleuchtung, 8k, professionelle Fotografie</p>
+            <p>A portrait of an elderly man with a beard, detailed facial features, photorealistic, studio lighting, 8k, professional photography</p>
           </div>
         </div>
         
         <div class="style-example">
-          <div class="example-label">Kunst:</div>
+          <div class="example-label">Art:</div>
           <div class="example-prompt">
-            <p>Eine Landschaft mit Bergen und See, Ölgemälde-Stil, impressionistisch, kräftige Pinselstriche, lebendige Farben</p>
+            <p>A landscape with mountains and a lake, oil painting style, impressionistic, bold brushstrokes, vibrant colors</p>
           </div>
         </div>
         
         <div class="style-example">
           <div class="example-label">Design:</div>
           <div class="example-prompt">
-            <p>Ein futuristisches Auto, isometrische Vektorillustration, klare Linien, flache Farben, minimalistischer Stil</p>
+            <p>A futuristic car, isometric vector illustration, clean lines, flat colors, minimalist style</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Übungsbereich -->
+    <!-- Practical Exercise -->
     <section class="tutorial-section">
-      <h2>Praktische Übung</h2>
+      <h2>Practical Exercise</h2>
       
       <div class="exercise-box">
-        <h3>Erstelle deinen eigenen strukturierten Prompt</h3>
-        <p>Versuche, einen Prompt nach dem folgenden Schema zu entwickeln:</p>
+        <h3>Create your own structured prompt</h3>
+        <p>Try to develop a prompt according to the following scheme:</p>
         
         <div class="prompt-template">
-          <p><span class="template-part">Subjekt</span> | <span class="template-part">Eigenschaften</span> | <span class="template-part">Umgebung</span> | <span class="template-part">Stil</span> | <span class="template-part">Details</span></p>
+          <p><span class="template-part">Subject</span> | <span class="template-part">Properties</span> | <span class="template-part">Environment</span> | <span class="template-part">Style</span> | <span class="template-part">Details</span></p>
         </div>
         
-        <p>Beispiel für eine Naturszene:</p>
+        <p>Example for a nature scene:</p>
         <div class="prompt-example">
-          <p>Ein majestätischer Wasserfall | hoch und mächtig, türkisblaues Wasser | in einem tropischen Regenwald | fotorealistisch | Morgennebel, goldenes Sonnenlicht, detaillierte Vegetation, 8k</p>
+          <p>A majestic waterfall | tall and powerful, turquoise blue water | in a tropical rainforest | photorealistic | morning mist, golden sunlight, detailed vegetation, 8k</p>
         </div>
       </div>
       
       <div class="info-box success">
-        <h4>Lernziel erreicht:</h4>
-        <p>Du solltest jetzt in der Lage sein, einen strukturierten Prompt zu schreiben, der alle wichtigen Elemente enthält und ein erwartbares Ergebnis liefert.</p>
+        <h4>Learning objective achieved:</h4>
+        <p>You should now be able to write a structured prompt that includes all important elements and delivers a predictable result.</p>
       </div>
       
       <!-- Navigation buttons -->
@@ -382,13 +381,32 @@
   /* Flow Diagram */
   .order-flow {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap; /* Prevent wrapping */
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start; /* Align items to the start */
     gap: 0.8rem;
     margin: 2rem 0;
+    overflow-x: auto; /* Allow horizontal scrolling */
+    padding: 1rem 0.5rem; /* Add some padding for scrollbar and spacing */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    scrollbar-width: thin; /* Firefox scrollbar */
   }
-  
+
+  /* Optional: Style scrollbar for Webkit browsers */
+  .order-flow::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .order-flow::-webkit-scrollbar-track {
+    background: #222;
+    border-radius: 4px;
+  }
+
+  .order-flow::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 4px;
+  }
+
   .flow-item {
     display: flex;
     align-items: center;
@@ -396,7 +414,8 @@
     padding: 1rem;
     border-radius: 8px;
     border: 1px solid #333;
-    min-width: 120px;
+    min-width: 150px; /* Ensure items have a minimum width */
+    flex-shrink: 0; /* Prevent items from shrinking */
   }
   
   .flow-number {
@@ -629,36 +648,5 @@
   
   .info-box p {
     margin-bottom: 0;
-  }
-  
-  /* Navigation */
-  .next-section {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    margin-top: 2rem;
-  }
-  
-  .next-button {
-    display: inline-flex;
-    align-items: center;
-    background-color: #FCEA2B;
-    color: #000;
-    padding: 0.8rem 1.2rem;
-    border-radius: 6px;
-    text-decoration: none;
-    font-family: 'IBM Plex Mono', monospace;
-    font-weight: 500;
-    margin-top: 1rem;
-    transition: all 0.2s;
-  }
-  
-  .next-button:hover {
-    background-color: #ffed5c;
-    transform: translateX(3px);
-  }
-  
-  .arrow {
-    margin-left: 10px;
   }
 </style>

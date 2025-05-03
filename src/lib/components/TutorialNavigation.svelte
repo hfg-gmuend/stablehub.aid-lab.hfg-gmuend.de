@@ -2,8 +2,8 @@
   // Props mit korrekten TypeScript-Typen
   export let nextPath: string | undefined | null = undefined;
   export let previousPath: string | undefined | null = undefined;
-  export let nextLabel: string = "Weiter";
-  export let previousLabel: string = "Zurück";
+  export let nextLabel: string = "Next";
+  export let previousLabel: string = "Back";
 </script>
 
 <div class="navigation-controls">

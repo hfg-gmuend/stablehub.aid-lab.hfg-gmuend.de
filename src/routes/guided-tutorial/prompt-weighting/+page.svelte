@@ -1,251 +1,236 @@
 <script>
-  // Beispiele für Gewichtungssyntax
+  // Examples for weighting syntax
   const weightingExamples = [
-    { syntax: "(Begriff)", weight: "1.1×", example: "(porträt einer frau)", description: "Leichte Betonung" },
-    { syntax: "((Begriff))", weight: "1.21× (1.1²)", example: "((porträt einer frau))", description: "Mittlere Betonung" },
-    { syntax: "(((Begriff)))", weight: "1.33× (1.1³)", example: "(((porträt einer frau)))", description: "Starke Betonung" },
-    { syntax: "[Begriff]", weight: "0.9×", example: "[porträt einer frau]", description: "Leichte Abschwächung" },
-    { syntax: "[[Begriff]]", weight: "0.81× (0.9²)", example: "[[porträt einer frau]]", description: "Mittlere Abschwächung" },
-    { syntax: "Begriff:1.5", weight: "1.5×", example: "porträt einer frau:1.5", description: "Exakte Gewichtung" }
+    { syntax: "(Term)", weight: "1.1×", example: "(portrait of a woman)", description: "Slight emphasis" },
+    { syntax: "((Term))", weight: "1.21× (1.1²)", example: "((portrait of a woman))", description: "Medium emphasis" },
+    { syntax: "(((Term)))", weight: "1.33× (1.1³)", example: "(((portrait of a woman)))", description: "Strong emphasis" },
+    { syntax: "[Term]", weight: "0.9×", example: "[portrait of a woman]", description: "Slight de-emphasis" },
+    { syntax: "[[Term]]", weight: "0.81× (0.9²)", example: "[[portrait of a woman]]", description: "Medium de-emphasis" },
+    { syntax: "Term:1.5", weight: "1.5×", example: "portrait of a woman:1.5", description: "Exact weighting" }
   ];
-  
-  // Beispiele für AND/OR Techniken
+
+  // Examples for AND/OR techniques
   const combinationExamples = [
-    { name: "Blend Technique", example: "ein haus UND ein schloss", description: "Erzeugt eine Mischung beider Elemente" },
-    { name: "OR Technique", example: "ein haus | ein schloss", description: "Generiert entweder das eine oder das andere" },
-    { name: "AND mit Gewichtung", example: "ein haus:1.2 UND ein schloss:0.8", description: "Kontrollierte Mischung mit Dominanz" }
+    { name: "Blend Technique", example: "a house AND a castle", description: "Creates a mix of both elements" },
+    { name: "OR Technique", example: "a house | a castle", description: "Generates either one or the other" },
+    { name: "AND with Weighting", example: "a house:1.2 AND a castle:0.8", description: "Controlled mix with dominance" }
   ];
+  // Import TutorialNavigation if it's used (it seems to be missing in the provided script but present in the HTML)
+  import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
 </script>
 
 <svelte:head>
-  <title>Prompt-Priorisierung | Guided Tutorial | HfG Ai-Hub</title>
+  <title>Prompt Prioritization | Guided Tutorial | HfG Ai-Hub</title>
 </svelte:head>
 
 <div class="tutorial-container">
   <div class="tutorial-header">
-    <h1>Prompt-Priorisierung & Gewichtung</h1>
-    <p class="subtitle">Feineinstellung von Prompts für präzisere Kontrolle</p>
+    <h1>Prompt Prioritization & Weighting</h1>
+    <p class="subtitle">Fine-tuning prompts for more precise control</p>
   </div>
 
   <div class="content-sections">
-    <!-- Wortposition und Gewichtung -->
+    <!-- Word Position and Weighting -->
     <section class="tutorial-section">
-      <h2>Wortposition → höheres Gewicht</h2>
-      
-      <p>Die Reihenfolge deiner Prompt-Begriffe hat Auswirkungen auf das generierte Bild. Begriffe am <strong>Anfang des Prompts</strong> erhalten in der Regel mehr Aufmerksamkeit vom KI-Modell.</p>
-      
+      <h2>Word Position → Higher Weight</h2>
+
+      <p>The order of your prompt terms affects the generated image. Terms at the <strong>beginning of the prompt</strong> generally receive more attention from the AI model.</p>
+
       <div class="position-examples">
         <div class="position-card">
-          <h3>Anfang des Prompts</h3>
+          <h3>Beginning of the Prompt</h3>
           <div class="prompt-example">
-            <p class="emphasis">Ein Porträt einer Frau</p> mit einem roten Kleid und einer Kette, ölgemälde, detailliert, kunstvoll
+            <p class="emphasis">A portrait of a woman</p> with a red dress and a necklace, oil painting, detailed, ornate
           </div>
           <div class="result-info">
-            <p>→ Fokus liegt auf der Person (Frau), Kleid und Kette sind sekundär</p>
+            <p>→ Focus is on the person (woman), dress and necklace are secondary</p>
           </div>
         </div>
-        
+
         <div class="position-card">
-          <h3>Ende des Prompts</h3>
+          <h3>End of the Prompt</h3>
           <div class="prompt-example">
-            Ölgemälde, detailliert, kunstvoll, mit einem roten Kleid und einer Kette, <p class="emphasis">ein Porträt einer Frau</p>
+            Oil painting, detailed, ornate, with a red dress and a necklace, <p class="emphasis">a portrait of a woman</p>
           </div>
           <div class="result-info">
-            <p>→ Stilelemente könnten dominanter sein als das Hauptmotiv</p>
+            <p>→ Style elements might be more dominant than the main subject</p>
           </div>
         </div>
       </div>
-      
+
       <div class="info-box">
-        <h4>Grundregel:</h4>
-        <p>Platziere das Hauptmotiv am Anfang des Prompts und stilistische Details eher zum Ende hin.</p>
+        <h4>Basic Rule:</h4>
+        <p>Place the main subject at the beginning of the prompt and stylistic details towards the end.</p>
       </div>
-      
+
       <div class="priority-order">
-        <h3>Empfohlene Priorisierungs-Reihenfolge:</h3>
+        <h3>Recommended Prioritization Order:</h3>
         <ol class="priority-list">
-          <li><strong>Hauptmotiv/Subjekt</strong> — Was soll im Fokus stehen?</li>
-          <li><strong>Komposition/Umgebung</strong> — Wie ist die Szene aufgebaut?</li>
-          <li><strong>Wichtige Attribute</strong> — Spezifische Eigenschaften des Motivs</li>
-          <li><strong>Künstlerischer Stil</strong> — Welche Ästhetik soll das Bild haben?</li>
-          <li><strong>Qualitätsmarker</strong> — Schärfe, Detailgrad, Auflösung etc.</li>
+          <li><strong>Main Subject</strong> — What should be the focus?</li>
+          <li><strong>Composition/Environment</strong> — How is the scene structured?</li>
+          <li><strong>Important Attributes</strong> — Specific properties of the subject</li>
+          <li><strong>Artistic Style</strong> — What aesthetic should the image have?</li>
+          <li><strong>Quality Markers</strong> — Sharpness, detail level, resolution, etc.</li>
         </ol>
       </div>
     </section>
 
-    <!-- Gewichtungssyntax -->
+    <!-- Weighting Syntax -->
     <section class="tutorial-section">
-      <h2>Gewichtungssyntax: ( ), [ ] und :n</h2>
-      
-      <p>Mit spezieller Syntax kannst du bestimmten Begriffen oder Phrasen mehr oder weniger Gewicht verleihen, unabhängig von ihrer Position.</p>
-      
+      <h2>Weighting Syntax: ( ), [ ] and :n</h2>
+
+      <p>Using special syntax, you can give specific terms or phrases more or less weight, regardless of their position.</p>
+
       <div class="syntax-table">
         <div class="table-header">
           <span>Syntax</span>
-          <span>Gewichtung</span>
-          <span>Beispiel</span>
-          <span>Effekt</span>
+          <span>Weighting</span>
+          <span>Example</span>
+          <span>Effect</span>
         </div>
-        
+
         {#each weightingExamples as example}
           <div class="table-row">
-            <span class="syntax-code">{example.syntax}</span>
+            <span class="syntax-code">{example.syntax.replace('Begriff', 'Term')}</span>
             <span class="weight-value">{example.weight}</span>
-            <span class="syntax-example">{example.example}</span>
+            <span class="syntax-example">{example.example.replace('porträt einer frau', 'portrait of a woman')}</span>
             <span class="syntax-description">{example.description}</span>
           </div>
         {/each}
       </div>
-      
+
       <div class="comparison-grid">
-        <h3>Visuelle Auswirkungen der Gewichtung</h3>
+        <h3>Visual Impact of Weighting</h3>
         <div class="comparison-items">
           <div class="comparison-item">
             <div class="comparison-image">
-              <div class="placeholder-image" data-label="Normal">
-                <span>porträt einer frau</span>
-              </div>
+              <img src="/tutorial/Normal.png" alt="Portrait with normal prompt weighting" class="showcase-image small"/>
             </div>
-            <p>Normaler Prompt</p>
+            <p>Normal Prompt</p>
           </div>
           <div class="comparison-item">
             <div class="comparison-image">
-              <div class="placeholder-image" data-label="Betont">
-                <span>((porträt einer frau))</span>
-              </div>
+              <img src="/tutorial/Double.png" alt="Portrait with double emphasis weighting" class="showcase-image small"/>
             </div>
-            <p>Doppelt betont</p>
+            <p>Double Emphasis</p>
           </div>
           <div class="comparison-item">
             <div class="comparison-image">
-              <div class="placeholder-image" data-label="Abgeschwächt">
-                <span>[porträt einer frau]</span>
-              </div>
+              <img src="/tutorial/de.png" alt="Portrait with de-emphasized weighting" class="showcase-image small"/>
             </div>
-            <p>Abgeschwächt</p>
+            <p>De-emphasized</p>
           </div>
         </div>
       </div>
-      
+
       <div class="tips-box">
-        <h4>Praktische Tipps:</h4>
+        <h4>Practical Tips:</h4>
         <ul>
-          <li><strong>Nicht übertreiben:</strong> Zu viele Gewichtungen machen den Prompt unlesbar</li>
-          <li><strong>Experimentieren:</strong> Teste verschiedene Gewichtungen mit demselben Seed</li>
-          <li><strong>Selektiv sein:</strong> Gewichte nur die wirklich wichtigen Elemente</li>
-          <li><strong>Dokumentieren:</strong> Notiere erfolgreiche Gewichtungen für spätere Verwendung</li>
+          <li><strong>Don't overdo it:</strong> Too many weights make the prompt unreadable</li>
+          <li><strong>Experiment:</strong> Test different weights with the same seed</li>
+          <li><strong>Be selective:</strong> Only weight the truly important elements</li>
+          <li><strong>Document:</strong> Note successful weightings for later use</li>
         </ul>
       </div>
     </section>
 
-    <!-- Kombinationstechniken -->
+    <!-- Combination Techniques -->
     <section class="tutorial-section">
-      <h2>Themen ausbalancieren: Blend / AND / OR</h2>
-      
-      <p>Bei komplexen Prompts mit mehreren Motiven oder Stilen kannst du spezielle Techniken verwenden, um sie zu kombinieren oder zu trennen.</p>
-      
+      <h2>Balancing Topics: Blend / AND / OR</h2>
+
+      <p>For complex prompts with multiple subjects or styles, you can use special techniques to combine or separate them.</p>
+
       <div class="technique-grid">
         {#each combinationExamples as technique}
           <div class="technique-card">
             <h3>{technique.name}</h3>
             <div class="technique-example">
-              <code>{technique.example}</code>
+              <code>{technique.example.replace('ein haus', 'a house').replace('ein schloss', 'a castle')}</code>
             </div>
             <p>{technique.description}</p>
           </div>
         {/each}
       </div>
-      
+
       <div class="example-showcase">
-        <h3>Beispielanwendungen</h3>
-        
+        <h3>Example Applications</h3>
+
         <div class="showcase-item">
-          <h4>Architekturstil-Mix</h4>
+          <h4>Architectural Style Mix</h4>
           <div class="showcase-prompt">
-            <p>moderne architektur:1.2 UND gotische kathedrale:0.8, detailliert, atmosphärisch, sonnenlicht</p>
+            <p>modern architecture:1.2 AND gothic cathedral:0.8, detailed, atmospheric, sunlight</p>
           </div>
           <div class="showcase-result">
-            <div class="placeholder-image wide">
-              <span>Modernes Gebäude mit gotischen Elementen</span>
-            </div>
+            <img src="/tutorial/cathedral.png" alt="Architectural mix of modern and gothic styles" class="showcase-image wide"/>
           </div>
         </div>
-        
+
         <div class="showcase-item">
-          <h4>Alternativ-Generierung</h4>
+          <h4>Alternative Generation</h4>
           <div class="showcase-prompt">
-            <p>ein porträt im stile von picasso | ein porträt im stile von van gogh, detailliert, kunstwerk</p>
+            <p>a portrait in the style of picasso | a portrait in the style of van gogh, detailed, artwork</p>
           </div>
           <div class="showcase-variants">
             <div class="variant">
-              <div class="placeholder-image small">
-                <span>Picasso-Stil</span>
-              </div>
-              <p>Variante 1</p>
+              <img src="/tutorial/pic-style.png" alt="Portrait in Picasso style" class="showcase-image small"/>
+              <p>Variant 1</p>
             </div>
             <div class="variant">
-              <div class="placeholder-image small">
-                <span>Van Gogh-Stil</span>
-              </div>
-              <p>Variante 2</p>
+              <img src="/tutorial/van-style.png" alt="Portrait in Van Gogh style" class="showcase-image small"/>
+              <p>Variant 2</p>
             </div>
           </div>
         </div>
       </div>
-      
+
       <div class="info-box warning">
-        <h4>Hinweis zur Kompatibilität:</h4>
-        <p>Die AND/OR Syntax funktioniert nicht in allen UI-Implementierungen gleichermaßen. In A1111 WebUI verwendet man "AND" (Großbuchstaben), während ComfyUI andere Notation nutzen kann.</p>
+        <h4>Compatibility Note:</h4>
+        <p>The AND/OR syntax does not work the same way in all UI implementations. In A1111 WebUI, "AND" (uppercase) is used, while ComfyUI might use different notation.</p>
       </div>
     </section>
 
-    <!-- Übungsbereich -->
+    <!-- Exercise Area -->
     <section class="tutorial-section">
-      <h2>Praktische Übung</h2>
-      
+      <h2>Practical Exercise</h2>
+
       <div class="exercise-box">
-        <h3>Übung: Gewichtung und Balance</h3>
-        <p>Probiere folgende Prompt-Variationen mit demselben Seed und vergleiche die Ergebnisse:</p>
-        
+        <h3>Exercise: Weighting and Balance</h3>
+        <p>Try the following prompt variations with the same seed and compare the results:</p>
+
         <div class="exercise-examples">
           <div class="exercise-prompt">
-            <h4>Grundprompt</h4>
+            <h4>Base Prompt</h4>
             <div class="prompt-box">
-              <p>porträt einer frau mit roter jacke, stadt im hintergrund, sonnenlicht, detailliert</p>
+              <p>portrait of a woman with red jacket, city in background, sunlight, detailed</p>
             </div>
           </div>
-          
+
           <div class="exercise-prompt">
-            <h4>Mit Gewichtung</h4>
+            <h4>With Weighting</h4>
             <div class="prompt-box">
-              <p>((porträt einer frau)) mit roter jacke, [stadt im hintergrund], sonnenlicht, detailliert</p>
+              <p>((portrait of a woman)) with red jacket, [city in background], sunlight, detailed</p>
             </div>
           </div>
-          
+
           <div class="exercise-prompt">
-            <h4>Mit AND-Technik</h4>
+            <h4>With AND Technique</h4>
             <div class="prompt-box">
-              <p>porträt einer frau mit roter jacke UND stadt im hintergrund, sonnenlicht, detailliert</p>
+              <p>portrait of a woman with red jacket AND city in background, sunlight, detailed</p>
             </div>
           </div>
         </div>
       </div>
-      
+
       <div class="info-box success">
-        <h4>Lernziel erreicht:</h4>
-        <p>Du verstehst nun, wie Wortposition und Gewichtungssyntax die Aufmerksamkeit des Modells lenken und wie du mehrere Themen in deinen Prompts ausbalancieren kannst.</p>
+        <h4>Learning objective achieved:</h4>
+        <p>You now understand how word position and weighting syntax direct the model's attention and how you can balance multiple topics in your prompts.</p>
       </div>
-      
-      <div class="navigation-buttons">
-        <a href="/guided-tutorial/manage-styles" class="back-button">
-          <span class="arrow back-arrow">←</span>
-          Zurück zum vorherigen Thema
-        </a>
-        <a href="/guided-tutorial/advanced-prompting" class="next-button">
-          Weiter zum nächsten Thema
-          <span class="arrow">→</span>
-        </a>
-      </div>
+
+      <!-- Use TutorialNavigation component -->
+       <TutorialNavigation
+        previousPath="/guided-tutorial/manage-styles"
+        nextPath="/guided-tutorial/advanced-prompting"
+      />
     </section>
   </div>
 </div>
@@ -476,11 +461,6 @@
     position: relative;
     border: 1px solid #333;
   }
-  
-  .placeholder-image.wide {
-    aspect-ratio: 16 / 9;
-  }
-  
   .placeholder-image.small {
     aspect-ratio: 1 / 1;
   }
@@ -720,64 +700,20 @@
     margin-bottom: 0;
   }
   
-  /* Navigation */
-  .navigation-buttons {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 2rem;
-    flex-wrap: wrap;
-    gap: 1rem;
+  .showcase-image {
+     width: 100%;
+     border-radius: 8px;
+     border: 1px solid #333;
+     display: block; /* Ensure img behaves like a block element */
   }
-  
-  .next-button, .back-button {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.8rem 1.2rem;
-    border-radius: 6px;
-    text-decoration: none;
-    font-family: 'IBM Plex Mono', monospace;
-    font-weight: 500;
-    transition: all 0.2s;
+
+  .showcase-image.wide {
+     aspect-ratio: 16 / 9; /* Maintain aspect ratio if desired */
+     object-fit: cover; /* Ensure image covers the area */
   }
-  
-  .next-button {
-    background-color: #FCEA2B;
-    color: #000;
-  }
-  
-  .back-button {
-    background-color: #333;
-    color: #e0e0e0;
-  }
-  
-  .next-button:hover {
-    background-color: #ffed5c;
-    transform: translateX(3px);
-  }
-  
-  .back-button:hover {
-    background-color: #444;
-    transform: translateX(-3px);
-  }
-  
-  .arrow {
-    margin-left: 10px;
-  }
-  
-  .back-arrow {
-    margin-left: 0;
-    margin-right: 10px;
-  }
-  
-  @media (max-width: 600px) {
-    .navigation-buttons {
-      flex-direction: column;
-      align-items: stretch;
-    }
-    
-    .back-button {
-      order: 2;
-    }
+
+  .showcase-image.small {
+     aspect-ratio: 1 / 1; /* Maintain aspect ratio */
+     object-fit: cover; /* Ensure image covers the area */
   }
 </style>
