@@ -8,8 +8,8 @@
   // Props
   export let isOpen = false;
   
-  // Zugriff auf die Umgebungsvariable für den API-Key
-  // Mit Fallback für den Fall, dass die Umgebungsvariable nicht verfügbar ist
+  // Access the environment variable for the API key
+  // With fallback in case the environment variable is not available
   const apiKey = browser ? import.meta.env.VITE_CHAT_API_KEY || '' : '';
   
   // State
@@ -19,20 +19,20 @@
   let error = null;
   let messages = [];
   
-  // Vorschläge für die schnelle Auswahl
+  // Quick selection suggestions
   const suggestions = [
-    "Futuristischer Neonstadt-Stil mit Cyberpunk-Elementen",
-    "Impressionistischer Malstil wie Claude Monet",
-    "Fotorealistisches Portrait mit Studiofotografie-Look",
-    "Surreale Fantasy-Illustration im Stil von Salvador Dalí"
+    "Futuristic neon city style with cyberpunk elements",
+    "Impressionist painting style like Claude Monet",
+    "Photorealistic portrait with studio photography look",
+    "Surreal fantasy illustration in the style of Salvador Dalí"
   ];
   
-  // Funktion zum Schließen des Modals
+  // Function to close the modal
   function closeModal() {
     dispatch('close');
   }
   
-  // Funktion zum Hinzufügen des generierten Stils zum Prompt
+  // Function to add the generated style to the prompt
   function addStyleToPrompt() {
     if (generatedStyle) {
       dispatch('addStyle', { style: generatedStyle });
@@ -40,20 +40,20 @@
     }
   }
   
-  // Suggestion auswählen
+  // Select a suggestion
   function selectSuggestion(suggestion) {
     userPrompt = suggestion;
   }
   
-  // Generiere einen Stil basierend auf dem Prompt mit KI
+  // Generate a style based on the prompt using AI
   async function generateStyle() {
     if (!userPrompt.trim()) {
-      error = 'Bitte gib eine Beschreibung für den gewünschten Stil ein.';
+      error = 'Please enter a description for the desired style.';
       return;
     }
     
     if (!apiKey) {
-      error = 'API-Schlüssel nicht gefunden. Bitte überprüfe deine Umgebungsvariablen.';
+      error = 'API key not found. Please check your environment variables.';
       return;
     }
     
@@ -62,25 +62,26 @@
     generatedStyle = '';
     
     try {
-      // System Message und User Message erstellen
+      // Create system message and user message
       const systemMessage = {
         role: "system",
-        content: "Du bist ein KI-Assistent, der dabei hilft, hochwertige Prompts für Stable Diffusion zu erstellen. " +
-                 "Generiere kurze, präzise Style-Beschreibungen ohne Erklärungen oder Kommentare. " +
-                 "Achte auf spezifische Stilelemente, Techniken und visuelle Details, die für die Bildgenerierung relevant sind."
+        content: "You are an AI assistant that helps create high-quality prompts for Stable Diffusion. " +
+                 "Generate short, precise style descriptions without explanations or comments. " +
+                 "Focus on specific style elements, techniques, and visual details relevant for image generation. " +
+                 "Limit your response to a maximum of 30 words."
       };
       
       const userMessage = {
         role: "user",
-        content: `Erstelle einen detaillierten Style-Prompt für Stable Diffusion, der folgendem Stil entspricht: ${userPrompt}. ` +
-                 "Beschreibe visuelle Elemente, Farbpaletten und technische Aspekte. Halte die Antwort kurz und kompakt, " +
-                 "nur den Style-Prompt selbst ohne Einleitung oder Erklärung."
+        content: `Create a concise style prompt for Stable Diffusion that corresponds to the following style: ${userPrompt}. ` +
+                 "Describe visual elements, color palettes, and technical aspects in no more than 30 words. " +
+                 "Return only the style prompt without any introduction or explanation."
       };
       
-      // Chat History für die API Anfrage
+      // Chat history for the API request
       messages = [systemMessage, userMessage];
       
-      // API-Anfrage
+      // API request
       const response = await fetch("https://chat1.kitegg.de/api/chat/completions", {
         method: "POST",
         headers: {
@@ -95,22 +96,22 @@
       });
       
       if (!response.ok) {
-        throw new Error(`Fehler bei der API-Anfrage: ${response.status}`);
+        throw new Error(`API request error: ${response.status}`);
       }
       
       const data = await response.json();
       
       if (data && data.choices && data.choices.length > 0) {
         generatedStyle = data.choices[0].message.content.trim();
-        // Füge die Antwort zur Nachrichten-Historie hinzu
+        // Add the response to the message history
         messages.push(data.choices[0].message);
       } else {
-        throw new Error("Ungültiges Antwortformat von der API");
+        throw new Error("Invalid response format from the API");
       }
       
     } catch (err) {
-      console.error("Fehler bei der Style-Generierung:", err);
-      error = err.message || "Fehler bei der Verbindung zum KI-Modell";
+      console.error("Error generating style:", err);
+      error = err.message || "Error connecting to the AI model";
     } finally {
       isProcessing = false;
     }
@@ -121,24 +122,24 @@
   <div class="modal-backdrop" on:click={closeModal} transition:fade={{ duration: 200 }}>
     <div class="modal-content" on:click|stopPropagation transition:scale={{ start: 0.9, duration: 200 }}>
       <div class="modal-header">
-        <h2>Style-Copilot</h2>
+        <h2>Style Copilot</h2>
         <button class="close-button" on:click={closeModal}>×</button>
       </div>
       
       <div class="modal-body">
-        <p class="description">Beschreibe den Stil, den du für dein Bild verwenden möchtest:</p>
+        <p class="description">Describe the style you want for your image:</p>
         
         <div class="input-container">
           <textarea 
             bind:value={userPrompt} 
-            placeholder="z.B. Dystopische Sci-Fi Stadt mit Neonlichtern im Regen"
+            placeholder="e.g., Dystopian sci-fi city with neon lights in the rain"
             rows="3"
           ></textarea>
           <button class="generate-button" on:click={generateStyle} disabled={isProcessing}>
             {#if isProcessing}
               <span class="spinner"></span>
             {:else}
-              Stil generieren
+              Generate Style
             {/if}
           </button>
         </div>
@@ -150,7 +151,7 @@
         {/if}
         
         <div class="suggestions">
-          <h3>Schnellauswahl</h3>
+          <h3>Quick Selection</h3>
           <div class="suggestion-tags">
             {#each suggestions as suggestion}
               <button class="suggestion-tag" on:click={() => selectSuggestion(suggestion)}>
@@ -162,12 +163,12 @@
         
         {#if generatedStyle}
           <div class="result-container">
-            <h3>Generierter Stil:</h3>
+            <h3>Generated Style:</h3>
             <div class="generated-style">
               {generatedStyle}
             </div>
             <button class="add-style-button" on:click={addStyleToPrompt}>
-              <span class="plus-icon">+</span> Zum Prompt hinzufügen
+              <span class="plus-icon">+</span> Add to Prompt
             </button>
           </div>
         {/if}
