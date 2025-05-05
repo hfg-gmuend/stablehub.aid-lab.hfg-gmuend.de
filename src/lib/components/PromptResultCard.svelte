@@ -6,7 +6,6 @@
   export let prompt = "";
   export let imageUrls = [];
   export let onEdit = () => {};
-  // Neue Prop für die Styles
   export let usedStyles = [];
   
   // Funktion zum Herunterladen eines Bildes
@@ -20,24 +19,24 @@
   }
   
   // Initialisierung des Favoriten-Status für jedes Bild
-  let favoriteStatus = imageUrls.map(url => $favorites.some(fav => fav.imageUrl === url));
+  let favoriteStatus = imageUrls.map(() => false);
+  
+  // Aktualisiere den Favoriten-Status basierend auf dem Store
+  $: {
+    favoriteStatus = imageUrls.map(url => 
+      $favorites.some(fav => fav.imageUrl === url)
+    );
+  }
   
   // Funktion zum Umschalten des Favoriten-Status
-  function toggleFavorite(imageUrl, index) {
-    const isFavorite = $favorites.some(fav => fav.imageUrl === imageUrl);
+  async function toggleFavorite(imageUrl, index) {
+    console.log("Favorit umschalten:", imageUrl);
     
-    if (isFavorite) {
-      favorites.remove(imageUrl);
-    } else {
-      favorites.add({
-        imageUrl,
-        prompt,
-        timestamp: new Date().toISOString()
-      });
-    }
-    
-    // Favoriten-Status aktualisieren
-    favoriteStatus[index] = !favoriteStatus[index];
+    // Verwende die toggle-Methode des Stores
+    await favorites.toggle({
+      imageUrl,
+      prompt
+    });
   }
 </script>
 
