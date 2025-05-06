@@ -6,6 +6,7 @@
   import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte';
   import { onMount, onDestroy } from "svelte";
   import { styles } from "$lib/config/styles.js";
+  import { generatedImages } from '$lib/stores/generatedImages.js'; // Import des Stores
   
   // Parameter für die API
   let prompt = "cat with dog";
@@ -86,17 +87,24 @@
         variantImages.push(variantUrl);
       }
       
+      // Neues Ergebnis erstellen
+      const newResult = { 
+        id: Date.now(), 
+        prompt: prompt,
+        imageUrls: variantImages,
+        timestamp: new Date(),
+        styles: [...selectedStyles] // Speichern der verwendeten Stile
+      };
+      
       // Zum Verlauf hinzufügen
-      generatedResults = [
-        { 
-          id: Date.now(), 
-          prompt: prompt,
-          imageUrls: variantImages,
-          timestamp: new Date(),
-          styles: [...selectedStyles] // Speichern der verwendeten Stile
-        },
-        ...generatedResults
-      ];
+      generatedResults = [newResult, ...generatedResults];
+      
+      // Im localStorage speichern
+      await generatedImages.addToHistory({
+        prompt: prompt,
+        imageUrls: variantImages,
+        styles: selectedStyles
+      });
       
     } catch (e) {
       error = e.message;
@@ -116,6 +124,17 @@
   
   // Parameter aus URL auslesen, wenn die Seite geladen wird
   onMount(() => {
+    // Lade gespeicherte Bilder aus dem localStorage
+    if ($generatedImages.length > 0) {
+      generatedResults = $generatedImages.map(entry => ({
+        id: entry.id || Date.now(),
+        prompt: entry.prompt,
+        imageUrls: entry.imageUrls,
+        timestamp: new Date(entry.timestamp || new Date()),
+        styles: entry.styles || []
+      }));
+    }
+    
     const url = new URL(window.location.href);
     
     if (url.searchParams.has("prompt")) {

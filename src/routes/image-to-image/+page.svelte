@@ -4,7 +4,8 @@
   import PromptResultCard from "$lib/components/PromptResultCard.svelte";
   import { onMount, onDestroy } from "svelte";
   import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte';
-  import StyleCopilot from "$lib/components/StyleCopilot.svelte"; // Import StyleCopilot
+  import StyleCopilot from "$lib/components/StyleCopilot.svelte"; 
+  import { generatedImages } from "$lib/stores/generatedImages.js"; // Import des Stores
   
   // Parameter für die API
   let prompt = "combine these images";
@@ -12,7 +13,6 @@
   let cfg = 1.3;
   let steps = 6;
   let seed = 0;
-  // Entferne uid
   
   // Zustand für Bilder
   let image1 = null;
@@ -41,6 +41,12 @@
   
   // Historie der generierten Bilder
   let generatedResults = [];
+  
+  // Abonniere den Store für generierte Bilder
+  const unsubscribe = generatedImages.subscribe(history => {
+    // Filtere nur die Ergebnisse mit sourceImages (nur Image-to-Image hat diese)
+    generatedResults = history.filter(entry => entry.sourceImages);
+  });
   
   // API URL Basis
   const apiBaseUrl = "https://aid-playground.hfg-gmuend.de/api/combine";
@@ -144,17 +150,15 @@
       // Objekt-URL für den Blob erstellen
       const resultUrl = URL.createObjectURL(blob);
       
-      // Zum Verlauf hinzufügen
-      generatedResults = [
-        { 
-          id: Date.now(), 
-          prompt: prompt,
-          imageUrls: [resultUrl],
-          sourceImages: [image1Preview, image2Preview], // Speichern der Quellbilder für die Anzeige
-          timestamp: new Date()
-        },
-        ...generatedResults
-      ];
+      // In den Store speichern statt in die lokale Variable
+      const historyEntry = {
+        prompt: prompt,
+        imageUrls: [resultUrl],
+        sourceImages: [image1Preview, image2Preview], // Speichern der Quellbilder für die Anzeige
+        type: "image-to-image" // Typ für späteres Filtern
+      };
+      
+      generatedImages.addToHistory(historyEntry);
       
     } catch (e) {
       error = e.message;
@@ -171,17 +175,16 @@
   }
   
   // --- Copilot State ---
-  let isStyleCopilotOpen = false; // State for modal visibility
+  let isStyleCopilotOpen = false;
 
   // --- Copilot Functions ---
-  function openStyleCopilot() { // Function to open the modal
+  function openStyleCopilot() {
     isStyleCopilotOpen = true;
   }
 
-  function addGeneratedStyle(event) { // Function to handle adding the style
+  function addGeneratedStyle(event) {
     const style = event.detail.style;
     if (style) {
-      // Füge den Style zum Prompt hinzu (ggf. anpassen, wie es für Image-to-Image sinnvoll ist)
       prompt = prompt.trim() + (prompt ? ', ' : '') + style;
     }
   }
@@ -213,16 +216,8 @@
   
   // Aufräumen bei Komponenten-Zerstörung
   onDestroy(() => {
-    // Objekt-URL freigeben, wenn vorhanden
-    generatedResults.forEach(result => {
-      if (result.imageUrls) {
-        result.imageUrls.forEach(url => {
-          if (url.startsWith('blob:')) {
-            URL.revokeObjectURL(url);
-          }
-        });
-      }
-    });
+    // Store-Subscription beenden
+    unsubscribe();
   });
 </script>
 
