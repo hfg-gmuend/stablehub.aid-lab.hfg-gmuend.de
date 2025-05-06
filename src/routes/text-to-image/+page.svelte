@@ -40,9 +40,12 @@
   // Historie der generierten Bilder
   let generatedResults = [];
   
-  // Abonniere den Store für generierte Bilder und filtere nach text-to-image Typ
+  // Verbesserte Filterung - strikter Check auf Typ
   const unsubscribe = generatedImages.subscribe(history => {
-    generatedResults = history.filter(entry => entry.type === "text-to-image" || !entry.type);
+    // Nur exakt vom Typ "text-to-image" anzeigen
+    generatedResults = history.filter(entry => entry.type === "text-to-image");
+    console.log("[TextToImage] Filtered results:", generatedResults.length, 
+                "von insgesamt", history.length);
   });
   
   // API URL Basis
@@ -66,22 +69,29 @@
       for (let i = 0; i < variants; i++) {
         // URL mit Parametern erstellen
         const url = new URL(apiBaseUrl);
-        url.searchParams.append("prompt", prompt);
+        
+        // Korrekt formatierte Parameter - Verwende encodeURIComponent für Strings
+        url.searchParams.append("prompt", encodeURIComponent(prompt));
         if (negativePrompt) {
-          url.searchParams.append("negative_prompt", negativePrompt);
+          url.searchParams.append("negative_prompt", encodeURIComponent(negativePrompt));
         }
-        url.searchParams.append("cfg", cfg);
-        url.searchParams.append("steps", steps);
+        url.searchParams.append("cfg", cfg.toString());
+        url.searchParams.append("steps", steps.toString());
         
         // Für verschiedene Varianten unterschiedliche Seeds verwenden
         const currentSeed = i === 0 ? seed : seed + i;
-        url.searchParams.append("seed", currentSeed);
+        url.searchParams.append("seed", currentSeed.toString());
         url.searchParams.append("uid", "default"); // Standardwert verwenden
+        
+        console.log("API Request URL:", url.toString()); // Debugging
         
         const response = await fetch(url);
         
+        // Erweiterte Fehlerbehandlung
         if (!response.ok) {
-          throw new Error(`API Fehler: ${response.status}`);
+          const errorText = await response.text().catch(() => "Keine Fehlermeldung verfügbar");
+          console.error("API Fehlerdetails:", errorText);
+          throw new Error(`API Fehler: ${response.status} - ${errorText}`);
         }
         
         // Die Antwort als Blob behandeln (Binärdaten/Bild)
@@ -104,7 +114,7 @@
       // Zum Verlauf hinzufügen
       generatedResults = [newResult, ...generatedResults];
       
-      // Im localStorage speichern
+      // Im localStorage speichern mit klarem Typ
       await generatedImages.addToHistory({
         prompt: prompt,
         imageUrls: variantImages,
@@ -130,6 +140,9 @@
   
   // Parameter aus URL auslesen, wenn die Seite geladen wird
   onMount(() => {
+    // Fix Store-Typen beim Laden
+    generatedImages.fixTypes();
+    
     // Lade gespeicherte Bilder aus dem localStorage
     if ($generatedImages.length > 0) {
       generatedResults = $generatedImages.map(entry => ({

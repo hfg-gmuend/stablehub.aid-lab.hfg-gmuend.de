@@ -9,20 +9,26 @@ const loadGeneratedImagesHistory = () => {
       if (storedHistory) {
         const parsedHistory = JSON.parse(storedHistory);
         
-        // Legacy-Daten mit Typen anreichern, falls sie keinen haben
-        return parsedHistory.map(entry => {
-          if (!entry.type) {
-            // Bestimme den Typ basierend auf vorhandenen Eigenschaften
-            if (entry.controlnetParams) {
-              entry.type = "controlnet";
-            } else if (entry.sourceImages && entry.sourceImages.length) {
-              entry.type = "image-to-image";
-            } else {
-              entry.type = "text-to-image";
-            }
+        // Typen-Bereinigung für alle Einträge
+        const cleanedHistory = parsedHistory.map(entry => {
+          // Bestimme den korrekten Typ anhand der Eigenschaften
+          let correctType;
+          if (entry.controlnetParams) {
+            correctType = "controlnet";
+          } else if (entry.sourceImages && entry.sourceImages.length > 0) {
+            correctType = "image-to-image";
+          } else {
+            correctType = "text-to-image";
           }
-          return entry;
+          
+          // Überschreibe den Typ mit dem korrekten Wert
+          return {
+            ...entry,
+            type: correctType
+          };
         });
+        
+        return cleanedHistory;
       }
       return [];
     } catch (e) {
@@ -34,7 +40,19 @@ const loadGeneratedImagesHistory = () => {
 };
 
 const createGeneratedImagesStore = () => {
-  const { subscribe, update } = writable(loadGeneratedImagesHistory());
+  // Initialisiere den Store mit geladenen Daten
+  const { subscribe, update, set } = writable(loadGeneratedImagesHistory());
+  
+  // Log-Funktion für Debugging
+  const logStoreState = (label, history) => {
+    const types = {};
+    history.forEach(entry => {
+      const type = entry.type || "unknown";
+      types[type] = (types[type] || 0) + 1;
+    });
+    console.log(`[GeneratedImages Store ${label}] Entries by type:`, types);
+    return history;
+  };
 
   return {
     subscribe,
@@ -42,6 +60,17 @@ const createGeneratedImagesStore = () => {
     // Fügt ein neues generiertes Bild zur Historie hinzu
     addToHistory: async (imageData) => {
       try {
+        // Stelle sicher, dass der Typ immer korrekt gesetzt ist
+        if (!imageData.type) {
+          if (imageData.controlnetParams) {
+            imageData.type = "controlnet";
+          } else if (imageData.sourceImages && imageData.sourceImages.length > 0) {
+            imageData.type = "image-to-image";
+          } else {
+            imageData.type = "text-to-image";
+          }
+        }
+        
         // Konvertiere Blob-URLs zu Base64-Strings für die persistente Speicherung
         let persistentImageUrls = [];
         
@@ -118,29 +147,30 @@ const createGeneratedImagesStore = () => {
           );
         }
         
-        // Erstelle den Eintrag für die Historie
+        // Erstelle den Eintrag für die Historie mit garantiertem Typ
         const historyEntry = {
           id: Date.now().toString(),
           prompt: imageData.prompt || "",
-          imageUrls: persistentImageUrls,
-          sourceImages: persistentSourceImages, // Für Image-to-Image
-          sourceImage: persistentSourceImage, // Für ControlNet
-          controlnetParams: imageData.controlnetParams, // Für ControlNet
-          type: imageData.type || "text-to-image", // Typ des Eintrags
+          imageUrls: persistentImageUrls || imageData.imageUrls,
+          sourceImages: persistentSourceImages || imageData.sourceImages,
+          sourceImage: persistentSourceImage || imageData.sourceImage,
+          controlnetParams: imageData.controlnetParams,
+          type: imageData.type, // Garantierter Typ
           styles: imageData.styles || [],
           timestamp: new Date().toISOString()
         };
 
         update(history => {
           // Füge das neue Bild am Anfang der Liste hinzu
-          const updatedHistory = [historyEntry, ...history.slice(0, 9)]; // Begrenze auf 10 Einträge
+          const updatedHistory = [historyEntry, ...history.slice(0, 9)];
+          
+          logStoreState("after add", updatedHistory);
           
           // Speichere im LocalStorage
           if (browser) {
             try {
               localStorage.setItem('generatedImagesHistory', JSON.stringify(updatedHistory));
             } catch (e) {
-              // Bei Überschreitung des Speicherplatzes versuche mit weniger Einträgen
               console.warn("Speicherplatz möglicherweise überschritten, reduziere Historie", e);
               const reducedHistory = [historyEntry, ...history.slice(0, 4)];
               localStorage.setItem('generatedImagesHistory', JSON.stringify(reducedHistory));
@@ -155,14 +185,64 @@ const createGeneratedImagesStore = () => {
       }
     },
     
+    // Methode zum Korrigieren der Typen im Store
+    fixTypes: () => {
+      update(history => {
+        const fixedHistory = history.map(entry => {
+          // Bestimme Typ anhand vorhandener Eigenschaften
+          let correctType;
+          if (entry.controlnetParams) {
+            correctType = "controlnet";
+          } else if (entry.sourceImages && entry.sourceImages.length > 0) {
+            correctType = "image-to-image";
+          } else {
+            correctType = "text-to-image";
+          }
+          
+          return { ...entry, type: correctType };
+        });
+        
+        logStoreState("after fixTypes", fixedHistory);
+        
+        // Speichere die korrigierte Historie
+        if (browser) {
+          try {
+            localStorage.setItem('generatedImagesHistory', JSON.stringify(fixedHistory));
+          } catch (e) {
+            console.warn("Konnte korrigierte Historie nicht speichern:", e);
+          }
+        }
+        
+        return fixedHistory;
+      });
+    },
+    
+    // Methode zum Bereinigen des Stores (optional)
+    resetStore: () => {
+      if (browser) {
+        try {
+          localStorage.removeItem('generatedImagesHistory');
+          set([]);
+          console.log("[GeneratedImages Store] Store zurückgesetzt");
+        } catch (e) {
+          console.error("Fehler beim Zurücksetzen des Stores:", e);
+        }
+      }
+    },
+    
     // Löscht die Historie
     clearHistory: () => {
       if (browser) {
         localStorage.removeItem('generatedImagesHistory');
       }
-      update(() => []);
+      set([]);
     }
   };
 };
 
 export const generatedImages = createGeneratedImagesStore();
+
+// Führe beim Import die Typenkorrektur durch
+if (browser) {
+  generatedImages.fixTypes();
+}

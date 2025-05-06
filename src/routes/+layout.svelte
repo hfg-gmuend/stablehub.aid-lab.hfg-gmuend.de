@@ -1,5 +1,22 @@
 <script>
-  // Layout script kann später erweitert werden
+  import { onMount } from 'svelte';
+  import { generatedImages } from '$lib/stores/generatedImages.js';
+  import { navigating } from '$app/stores';
+  
+  // Fix Typen beim ersten Laden und bei jedem Routing-Wechsel
+  onMount(() => {
+    console.log("[Layout] App geladen, bereite Store vor");
+    generatedImages.fixTypes();
+  });
+  
+  // Bei Navigation zwischen Routen Typen korrigieren
+  $: if ($navigating) {
+    console.log("[Layout] Navigation erkannt:", $navigating.to?.route?.id);
+    // Verzögert ausführen, damit es nach der Navigation passiert
+    setTimeout(() => {
+      generatedImages.fixTypes();
+    }, 50);
+  }
 </script>
 
 <svelte:head>
@@ -7,7 +24,7 @@
   <link rel="icon" type="image/svg+xml" href="/icon/icon.svg">
 </svelte:head>
 
-<slot />
+<slot></slot>
 
 <style>
   :global(body) {

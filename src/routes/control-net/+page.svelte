@@ -69,10 +69,12 @@
   // Historie der generierten Bilder
   let generatedResults: GeneratedResult[] = [];
   
-  // Abonniere den Store für generierte Bilder
+  // Verbesserte Filterung mit Logging
   const unsubscribe = generatedImages.subscribe(history => {
-    // Filtere nur die Ergebnisse mit controlnetParams und explizitem Typ "controlnet"
+    // Nur exakt vom Typ "controlnet" anzeigen
     generatedResults = history.filter(entry => entry.type === "controlnet") as GeneratedResult[];
+    console.log("[ControlNet] Filtered results:", generatedResults.length, 
+                "von insgesamt", history.length);
   });
 
   // API URL Basis
@@ -134,21 +136,26 @@
       url.searchParams.append("controlnet_strength", controlnetStrength.toString());
       url.searchParams.append("start_percent", startPercent.toString());
       url.searchParams.append("end_percent", endPercent.toString());
-      url.searchParams.append("prompt", prompt);
+      url.searchParams.append("prompt", encodeURIComponent(prompt));
       url.searchParams.append("cfg", cfg.toString());
       url.searchParams.append("steps", steps.toString());
       url.searchParams.append("seed", seed.toString());
       url.searchParams.append("uid", "default"); // Standardwert verwenden
-      if (negativePrompt) url.searchParams.append("negative_prompt", negativePrompt);
+      if (negativePrompt) url.searchParams.append("negative_prompt", encodeURIComponent(negativePrompt));
 
+      console.log("API Request URL:", url.toString()); // Debugging
+      
       // POST-Request mit FormData
       const response = await fetch(url, {
         method: "POST",
         body: formData
       });
 
+      // Erweiterte Fehlerbehandlung
       if (!response.ok) {
-        throw new Error(`API Fehler: ${response.status}`);
+        const errorText = await response.text().catch(() => "Keine Fehlermeldung verfügbar");
+        console.error("API Fehlerdetails:", errorText);
+        throw new Error(`API Fehler: ${response.status} - ${errorText}`);
       }
 
       // Die Antwort als Blob behandeln (Binärdaten/Bild)
@@ -194,6 +201,9 @@
 
   // --- Lifecycle ---
   onMount(() => {
+    // Fix Store-Typen beim Laden
+    generatedImages.fixTypes();
+
     const url = new URL(window.location.href);
 
     if (url.searchParams.has("prompt")) {
