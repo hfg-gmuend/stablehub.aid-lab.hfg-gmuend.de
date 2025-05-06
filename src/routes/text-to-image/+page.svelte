@@ -6,6 +6,7 @@
   import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte';
   import { onMount, onDestroy } from "svelte";
   import { styles } from "$lib/config/styles.js";
+  import { generatedImages } from '$lib/stores/generatedImages.js'; // Import des Stores
   
   // Parameter für die API
   let prompt = "cat with dog";
@@ -39,6 +40,14 @@
   // Historie der generierten Bilder
   let generatedResults = [];
   
+  // Verbesserte Filterung - strikter Check auf Typ
+  const unsubscribe = generatedImages.subscribe(history => {
+    // Nur exakt vom Typ "text-to-image" anzeigen
+    generatedResults = history.filter(entry => entry.type === "text-to-image");
+    console.log("[TextToImage] Filtered results:", generatedResults.length, 
+                "von insgesamt", history.length);
+  });
+  
   // API URL Basis
   const apiBaseUrl = "https://aid-playground.hfg-gmuend.de/api/txt2img";
   
@@ -60,22 +69,29 @@
       for (let i = 0; i < variants; i++) {
         // URL mit Parametern erstellen
         const url = new URL(apiBaseUrl);
-        url.searchParams.append("prompt", prompt);
+        
+        // Korrekt formatierte Parameter - Verwende encodeURIComponent für Strings
+        url.searchParams.append("prompt", encodeURIComponent(prompt));
         if (negativePrompt) {
-          url.searchParams.append("negative_prompt", negativePrompt);
+          url.searchParams.append("negative_prompt", encodeURIComponent(negativePrompt));
         }
-        url.searchParams.append("cfg", cfg);
-        url.searchParams.append("steps", steps);
+        url.searchParams.append("cfg", cfg.toString());
+        url.searchParams.append("steps", steps.toString());
         
         // Für verschiedene Varianten unterschiedliche Seeds verwenden
         const currentSeed = i === 0 ? seed : seed + i;
-        url.searchParams.append("seed", currentSeed);
+        url.searchParams.append("seed", currentSeed.toString());
         url.searchParams.append("uid", "default"); // Standardwert verwenden
+        
+        console.log("API Request URL:", url.toString()); // Debugging
         
         const response = await fetch(url);
         
+        // Erweiterte Fehlerbehandlung
         if (!response.ok) {
-          throw new Error(`API Fehler: ${response.status}`);
+          const errorText = await response.text().catch(() => "Keine Fehlermeldung verfügbar");
+          console.error("API Fehlerdetails:", errorText);
+          throw new Error(`API Fehler: ${response.status} - ${errorText}`);
         }
         
         // Die Antwort als Blob behandeln (Binärdaten/Bild)
@@ -86,17 +102,25 @@
         variantImages.push(variantUrl);
       }
       
+      // Neues Ergebnis erstellen
+      const newResult = { 
+        id: Date.now(), 
+        prompt: prompt,
+        imageUrls: variantImages,
+        timestamp: new Date(),
+        styles: [...selectedStyles] // Speichern der verwendeten Stile
+      };
+      
       // Zum Verlauf hinzufügen
-      generatedResults = [
-        { 
-          id: Date.now(), 
-          prompt: prompt,
-          imageUrls: variantImages,
-          timestamp: new Date(),
-          styles: [...selectedStyles] // Speichern der verwendeten Stile
-        },
-        ...generatedResults
-      ];
+      generatedResults = [newResult, ...generatedResults];
+      
+      // Im localStorage speichern mit klarem Typ
+      await generatedImages.addToHistory({
+        prompt: prompt,
+        imageUrls: variantImages,
+        styles: selectedStyles,
+        type: "text-to-image" // Expliziten Typ definieren
+      });
       
     } catch (e) {
       error = e.message;
@@ -116,6 +140,20 @@
   
   // Parameter aus URL auslesen, wenn die Seite geladen wird
   onMount(() => {
+    // Fix Store-Typen beim Laden
+    generatedImages.fixTypes();
+    
+    // Lade gespeicherte Bilder aus dem localStorage
+    if ($generatedImages.length > 0) {
+      generatedResults = $generatedImages.map(entry => ({
+        id: entry.id || Date.now(),
+        prompt: entry.prompt,
+        imageUrls: entry.imageUrls,
+        timestamp: new Date(entry.timestamp || new Date()),
+        styles: entry.styles || []
+      }));
+    }
+    
     const url = new URL(window.location.href);
     
     if (url.searchParams.has("prompt")) {
@@ -160,6 +198,8 @@
         });
       }
     });
+    // Store-Subscription beenden
+    unsubscribe();
   });
   
   // Hilfsfunktion zum Anpassen des Style-Prompts

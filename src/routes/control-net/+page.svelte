@@ -1,11 +1,12 @@
-<script lang="ts"> // Add lang="ts"
+<script lang="ts">
   import MinimalSidebar from "$lib/components/uicomponents/SidePanel/MinimalSidebar.svelte";
   import NavigationBar from "$lib/components/NavigationBar.svelte";
   import PromptResultCard from "$lib/components/PromptResultCard.svelte";
-  import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte'; // Aktualisierter Importpfad
-  import StyleCopilot from "$lib/components/StyleCopilot.svelte"; // Import StyleCopilot
+  import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte';
+  import StyleCopilot from "$lib/components/StyleCopilot.svelte";
   import { onMount, onDestroy } from "svelte";
-  import type { GeneratedResult } from '$lib/types'; // Assuming types are defined
+  import { generatedImages } from "$lib/stores/generatedImages.js"; // Import des Stores
+  import type { GeneratedResult } from '$lib/types';
 
   // --- Type Definitions ---
   interface ControlNetParams {
@@ -58,16 +59,23 @@
     startPercent: "Prozentualer Wert, ab dem die Kontrolle durch die Vorlage beginnen soll (0 bedeutet direkt zu Beginn der Bildgenerierung).",
     endPercent: "Prozentualer Wert, bis zu dem die Kontrolle durch die Vorlage angewendet werden soll (1 bedeutet bis zum Ende der Bildgenerierung).",
     image: "Lade ein Bild hoch, das als Vorlage/Kontrolle für den ControlNet-Prozess dienen soll.",
-    percentRange: "Bestimmt, in welchem Bereich des Generierungsprozesses die Kontrolle angewendet wird." // Added tooltip key
+    percentRange: "Bestimmt, in welchem Bereich des Generierungsprozesses die Kontrolle angewendet wird."
   };
 
   // Zustand der Anwendung
   let loading: boolean = false;
-  // let imageUrl: string | null = null; // Seems unused, consider removing
   let error: string | null = null;
 
   // Historie der generierten Bilder
   let generatedResults: GeneratedResult[] = [];
+  
+  // Verbesserte Filterung mit Logging
+  const unsubscribe = generatedImages.subscribe(history => {
+    // Nur exakt vom Typ "controlnet" anzeigen
+    generatedResults = history.filter(entry => entry.type === "controlnet") as GeneratedResult[];
+    console.log("[ControlNet] Filtered results:", generatedResults.length, 
+                "von insgesamt", history.length);
+  });
 
   // API URL Basis
   const apiBaseUrl: string = "https://aid-playground.hfg-gmuend.de/api/controlnet";
@@ -118,12 +126,6 @@
     loading = true;
     error = null;
 
-    // Alte Bild-URL bereinigen, falls vorhanden
-    // if (imageUrl && imageUrl.startsWith('blob:')) { // Consider removing if imageUrl is unused
-    //   URL.revokeObjectURL(imageUrl);
-    //   imageUrl = null;
-    // }
-
     try {
       // FormData für den POST-Request erstellen
       const formData = new FormData();
@@ -134,21 +136,26 @@
       url.searchParams.append("controlnet_strength", controlnetStrength.toString());
       url.searchParams.append("start_percent", startPercent.toString());
       url.searchParams.append("end_percent", endPercent.toString());
-      url.searchParams.append("prompt", prompt);
+      url.searchParams.append("prompt", encodeURIComponent(prompt));
       url.searchParams.append("cfg", cfg.toString());
       url.searchParams.append("steps", steps.toString());
       url.searchParams.append("seed", seed.toString());
       url.searchParams.append("uid", "default"); // Standardwert verwenden
-      if (negativePrompt) url.searchParams.append("negative_prompt", negativePrompt);
+      if (negativePrompt) url.searchParams.append("negative_prompt", encodeURIComponent(negativePrompt));
 
+      console.log("API Request URL:", url.toString()); // Debugging
+      
       // POST-Request mit FormData
       const response = await fetch(url, {
         method: "POST",
         body: formData
       });
 
+      // Erweiterte Fehlerbehandlung
       if (!response.ok) {
-        throw new Error(`API Fehler: ${response.status}`);
+        const errorText = await response.text().catch(() => "Keine Fehlermeldung verfügbar");
+        console.error("API Fehlerdetails:", errorText);
+        throw new Error(`API Fehler: ${response.status} - ${errorText}`);
       }
 
       // Die Antwort als Blob behandeln (Binärdaten/Bild)
@@ -157,22 +164,20 @@
       // Objekt-URL für den Blob erstellen
       const resultUrl = URL.createObjectURL(blob);
 
-      // Zum Verlauf hinzufügen
-      generatedResults = [
-        {
-          id: Date.now(),
-          prompt: prompt,
-          imageUrls: [resultUrl],
-          sourceImage: imagePreview,
-          controlnetParams: {
-            strength: controlnetStrength,
-            startPercent: startPercent,
-            endPercent: endPercent
-          },
-          timestamp: new Date()
+      // In den Store speichern mit explizitem Typ
+      const historyEntry = {
+        prompt: prompt,
+        imageUrls: [resultUrl],
+        sourceImage: imagePreview,
+        controlnetParams: {
+          strength: controlnetStrength,
+          startPercent: startPercent,
+          endPercent: endPercent
         },
-        ...generatedResults
-      ];
+        type: "controlnet" // Expliziten Typ definieren
+      };
+      
+      generatedImages.addToHistory(historyEntry);
 
     } catch (e) {
       error = e instanceof Error ? e.message : "Unbekannter Fehler";
@@ -196,6 +201,9 @@
 
   // --- Lifecycle ---
   onMount(() => {
+    // Fix Store-Typen beim Laden
+    generatedImages.fixTypes();
+
     const url = new URL(window.location.href);
 
     if (url.searchParams.has("prompt")) {
@@ -248,6 +256,9 @@
         });
       }
     });
+
+    // Store-Subscription beenden
+    unsubscribe();
   });
 
 </script>

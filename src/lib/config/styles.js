@@ -25,3 +25,4 @@ export const styles = [
   }
   // Hier können später weitere Stile hinzugefügt werden
 ];
+//push

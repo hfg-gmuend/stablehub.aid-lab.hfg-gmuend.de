@@ -21,6 +21,16 @@
   function removeFavorite(imageUrl) {
     favorites.remove(imageUrl);
   }
+  
+  // Funktion zum Behandeln von Bildlade-Fehlern
+  function handleImageError(event) {
+    console.error("Fehler beim Laden des Bildes:", event);
+    event.target.onerror = null;
+    event.target.src = '/fallback-image.png'; // Hier Pfad zu einem Platzhalterbild
+  }
+
+  // Logging zur Fehlersuche
+  $: console.log("Favoriten in der Gallery:", $favorites.length);
 </script>
 
 <svelte:head>
@@ -41,11 +51,16 @@
         </div>
       {:else}
         <div class="image-grid">
-          {#each $favorites as favorite (favorite.imageUrl)}
+          {#each $favorites as favorite (favorite.imageData || favorite.imageUrl)}
             <div class="gallery-item"
                  on:mouseenter={() => displayPrompt = favorite.imageUrl}
                  on:mouseleave={() => displayPrompt = null}>
-              <img src={favorite.imageUrl} alt="Favorisiertes Bild" class="gallery-image" />
+              <img 
+                src={favorite.imageData || favorite.imageUrl} 
+                alt="Favorisiertes Bild" 
+                class="gallery-image" 
+                on:error={handleImageError}
+              />
               
               {#if displayPrompt === favorite.imageUrl}
                 <div class="prompt-overlay">
@@ -54,7 +69,7 @@
                     <button class="copy-button" on:click={() => copyPromptToClipboard(favorite.prompt)}>
                       <span class="copy-icon">📋</span> Kopieren
                     </button>
-                    <button class="remove-button" on:click={() => removeFavorite(favorite.imageUrl)}>
+                    <button class="remove-button" on:click={() => removeFavorite(favorite.imageData || favorite.imageUrl)}>
                       <span class="remove-icon">🗑️</span> Entfernen
                     </button>
                   </div>

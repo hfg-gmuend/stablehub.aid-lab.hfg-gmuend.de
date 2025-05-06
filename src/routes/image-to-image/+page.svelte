@@ -4,7 +4,8 @@
   import PromptResultCard from "$lib/components/PromptResultCard.svelte";
   import { onMount, onDestroy } from "svelte";
   import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte';
-  import StyleCopilot from "$lib/components/StyleCopilot.svelte"; // Import StyleCopilot
+  import StyleCopilot from "$lib/components/StyleCopilot.svelte"; 
+  import { generatedImages } from "$lib/stores/generatedImages.js"; // Import des Stores
   
   // Parameter für die API
   let prompt = "combine these images";
@@ -12,7 +13,6 @@
   let cfg = 1.3;
   let steps = 6;
   let seed = 0;
-  // Entferne uid
   
   // Zustand für Bilder
   let image1 = null;
@@ -41,6 +41,14 @@
   
   // Historie der generierten Bilder
   let generatedResults = [];
+  
+  // Verbesserte Filterung mit Logging
+  const unsubscribe = generatedImages.subscribe(history => {
+    // Nur exakt vom Typ "image-to-image" anzeigen
+    generatedResults = history.filter(entry => entry.type === "image-to-image");
+    console.log("[ImageToImage] Filtered results:", generatedResults.length, 
+                "von insgesamt", history.length);
+  });
   
   // API URL Basis
   const apiBaseUrl = "https://aid-playground.hfg-gmuend.de/api/combine";
@@ -121,12 +129,14 @@
       
       // URL mit Parametern erstellen
       const url = new URL(apiBaseUrl);
-      url.searchParams.append("cfg", cfg);
-      url.searchParams.append("steps", steps);
-      url.searchParams.append("seed", seed);
+      url.searchParams.append("cfg", cfg.toString());
+      url.searchParams.append("steps", steps.toString());
+      url.searchParams.append("seed", seed.toString());
       url.searchParams.append("uid", "default"); // Standardwert verwenden
-      if (prompt) url.searchParams.append("prompt", prompt);
-      if (negativePrompt) url.searchParams.append("negative_prompt", negativePrompt);
+      if (prompt) url.searchParams.append("prompt", encodeURIComponent(prompt));
+      if (negativePrompt) url.searchParams.append("negative_prompt", encodeURIComponent(negativePrompt));
+      
+      console.log("API Request URL:", url.toString()); // Debugging
       
       // POST-Request mit FormData
       const response = await fetch(url, {
@@ -134,8 +144,11 @@
         body: formData
       });
       
+      // Erweiterte Fehlerbehandlung
       if (!response.ok) {
-        throw new Error(`API Fehler: ${response.status}`);
+        const errorText = await response.text().catch(() => "Keine Fehlermeldung verfügbar");
+        console.error("API Fehlerdetails:", errorText);
+        throw new Error(`API Fehler: ${response.status} - ${errorText}`);
       }
       
       // Die Antwort als Blob behandeln (Binärdaten/Bild)
@@ -144,17 +157,15 @@
       // Objekt-URL für den Blob erstellen
       const resultUrl = URL.createObjectURL(blob);
       
-      // Zum Verlauf hinzufügen
-      generatedResults = [
-        { 
-          id: Date.now(), 
-          prompt: prompt,
-          imageUrls: [resultUrl],
-          sourceImages: [image1Preview, image2Preview], // Speichern der Quellbilder für die Anzeige
-          timestamp: new Date()
-        },
-        ...generatedResults
-      ];
+      // In den Store speichern mit explizitem Typ
+      const historyEntry = {
+        prompt: prompt,
+        imageUrls: [resultUrl],
+        sourceImages: [image1Preview, image2Preview],
+        type: "image-to-image" // Expliziten Typ definieren
+      };
+      
+      generatedImages.addToHistory(historyEntry);
       
     } catch (e) {
       error = e.message;
@@ -171,23 +182,25 @@
   }
   
   // --- Copilot State ---
-  let isStyleCopilotOpen = false; // State for modal visibility
+  let isStyleCopilotOpen = false;
 
   // --- Copilot Functions ---
-  function openStyleCopilot() { // Function to open the modal
+  function openStyleCopilot() {
     isStyleCopilotOpen = true;
   }
 
-  function addGeneratedStyle(event) { // Function to handle adding the style
+  function addGeneratedStyle(event) {
     const style = event.detail.style;
     if (style) {
-      // Füge den Style zum Prompt hinzu (ggf. anpassen, wie es für Image-to-Image sinnvoll ist)
       prompt = prompt.trim() + (prompt ? ', ' : '') + style;
     }
   }
 
   // Parameter aus URL auslesen, wenn die Seite geladen wird
   onMount(() => {
+    // Fix Store-Typen beim Laden
+    generatedImages.fixTypes();
+    
     const url = new URL(window.location.href);
     
     if (url.searchParams.has("prompt")) {
@@ -213,16 +226,8 @@
   
   // Aufräumen bei Komponenten-Zerstörung
   onDestroy(() => {
-    // Objekt-URL freigeben, wenn vorhanden
-    generatedResults.forEach(result => {
-      if (result.imageUrls) {
-        result.imageUrls.forEach(url => {
-          if (url.startsWith('blob:')) {
-            URL.revokeObjectURL(url);
-          }
-        });
-      }
-    });
+    // Store-Subscription beenden
+    unsubscribe();
   });
 </script>
 
