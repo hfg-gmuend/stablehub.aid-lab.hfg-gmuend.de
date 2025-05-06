@@ -6,7 +6,25 @@ const loadGeneratedImagesHistory = () => {
   if (browser) {
     try {
       const storedHistory = localStorage.getItem('generatedImagesHistory');
-      return storedHistory ? JSON.parse(storedHistory) : [];
+      if (storedHistory) {
+        const parsedHistory = JSON.parse(storedHistory);
+        
+        // Legacy-Daten mit Typen anreichern, falls sie keinen haben
+        return parsedHistory.map(entry => {
+          if (!entry.type) {
+            // Bestimme den Typ basierend auf vorhandenen Eigenschaften
+            if (entry.controlnetParams) {
+              entry.type = "controlnet";
+            } else if (entry.sourceImages && entry.sourceImages.length) {
+              entry.type = "image-to-image";
+            } else {
+              entry.type = "text-to-image";
+            }
+          }
+          return entry;
+        });
+      }
+      return [];
     } catch (e) {
       console.error("Fehler beim Laden der Bilder-Historie:", e);
       return [];
@@ -51,6 +69,27 @@ const createGeneratedImagesStore = () => {
           );
         }
         
+        // Konvertiere sourceImage für ControlNet
+        let persistentSourceImage = imageData.sourceImage;
+        if (imageData.sourceImage) {
+          if (typeof imageData.sourceImage === 'string' && 
+              (imageData.sourceImage.startsWith('blob:') || 
+               !imageData.sourceImage.startsWith('data:'))) {
+            try {
+              const response = await fetch(imageData.sourceImage);
+              if (!response.ok) throw new Error('Fehler beim Abruf der Quellbild-URL');
+              const blob = await response.blob();
+              persistentSourceImage = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(blob);
+              });
+            } catch (error) {
+              console.error("Fehler bei der Konvertierung der Quellbild-URL:", error);
+            }
+          }
+        }
+
         // Konvertiere auch die sourceImages (für Image-to-Image) zu Base64, wenn vorhanden
         let persistentSourceImages = [];
         if (imageData.sourceImages && imageData.sourceImages.length > 0) {
@@ -84,8 +123,10 @@ const createGeneratedImagesStore = () => {
           id: Date.now().toString(),
           prompt: imageData.prompt || "",
           imageUrls: persistentImageUrls,
-          sourceImages: persistentSourceImages, // Füge sourceImages hinzu für Image-to-Image
-          type: imageData.type || "text-to-image", // Typ des Eintrags (text-to-image oder image-to-image)
+          sourceImages: persistentSourceImages, // Für Image-to-Image
+          sourceImage: persistentSourceImage, // Für ControlNet
+          controlnetParams: imageData.controlnetParams, // Für ControlNet
+          type: imageData.type || "text-to-image", // Typ des Eintrags
           styles: imageData.styles || [],
           timestamp: new Date().toISOString()
         };

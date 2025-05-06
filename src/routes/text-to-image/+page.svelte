@@ -40,6 +40,11 @@
   // Historie der generierten Bilder
   let generatedResults = [];
   
+  // Abonniere den Store für generierte Bilder und filtere nach text-to-image Typ
+  const unsubscribe = generatedImages.subscribe(history => {
+    generatedResults = history.filter(entry => entry.type === "text-to-image" || !entry.type);
+  });
+  
   // API URL Basis
   const apiBaseUrl = "https://aid-playground.hfg-gmuend.de/api/txt2img";
   
@@ -103,7 +108,8 @@
       await generatedImages.addToHistory({
         prompt: prompt,
         imageUrls: variantImages,
-        styles: selectedStyles
+        styles: selectedStyles,
+        type: "text-to-image" // Expliziten Typ definieren
       });
       
     } catch (e) {
@@ -179,6 +185,8 @@
         });
       }
     });
+    // Store-Subscription beenden
+    unsubscribe();
   });
   
   // Hilfsfunktion zum Anpassen des Style-Prompts

@@ -42,10 +42,9 @@
   // Historie der generierten Bilder
   let generatedResults = [];
   
-  // Abonniere den Store für generierte Bilder
+  // Abonniere den Store für generierte Bilder und filtere nach image-to-image Typ
   const unsubscribe = generatedImages.subscribe(history => {
-    // Filtere nur die Ergebnisse mit sourceImages (nur Image-to-Image hat diese)
-    generatedResults = history.filter(entry => entry.sourceImages);
+    generatedResults = history.filter(entry => entry.type === "image-to-image");
   });
   
   // API URL Basis
@@ -150,12 +149,12 @@
       // Objekt-URL für den Blob erstellen
       const resultUrl = URL.createObjectURL(blob);
       
-      // In den Store speichern statt in die lokale Variable
+      // In den Store speichern mit explizitem Typ
       const historyEntry = {
         prompt: prompt,
         imageUrls: [resultUrl],
         sourceImages: [image1Preview, image2Preview], // Speichern der Quellbilder für die Anzeige
-        type: "image-to-image" // Typ für späteres Filtern
+        type: "image-to-image" // Expliziten Typ definieren
       };
       
       generatedImages.addToHistory(historyEntry);
