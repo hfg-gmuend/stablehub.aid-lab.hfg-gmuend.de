@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import MinimalSidebar from "$lib/components/uicomponents/SidePanel/MinimalSidebar.svelte";
   import PromptResultCard from "$lib/components/PromptResultCard.svelte";
   import NavigationBar from "$lib/components/NavigationBar.svelte";
@@ -8,51 +8,73 @@
   import { styles } from "$lib/config/styles.js";
   import { generatedImages } from '$lib/stores/generatedImages.js'; // Import des Stores
   
+  // Typedefinitionen
+  interface Style {
+    id: string;
+    name: string;
+    prompt: string;
+    thumbnail: string;
+  }
+
+  interface GeneratedResult {
+    id: number;
+    prompt: string;
+    imageUrls: string[];
+    timestamp: Date;
+    styles?: string[];
+    type?: string;
+  }
+
+  interface TooltipData {
+    [key: string]: string;
+  }
+
   // Parameter für die API
-  let prompt = "cat with dog";
-  let negativePrompt = "";
-  let variants = 1;
-  let cfg = 2;
-  let steps = 6;
-  let seed = 0;
+  let prompt: string = "cat with dog";
+  let negativePrompt: string = "";
+  let variants: number = 1;
+  let cfg: number = 2;
+  let steps: number = 6;
+  let seed: number = 0;
   
   // Ausgewählte Stile
-  let selectedStyles = [];
+  let selectedStyles: string[] = [];
   
   // Tooltip und Style-Operationen
-  let activeTooltip = null;
+  let activeTooltip: string | null = null;
   
   // Tooltip-Texte
-  const tooltips = {
+  const tooltips: TooltipData = {
     prompt: "Beschreibe detailliert, was im Bild erscheinen soll. Je mehr Details (Stil, Umgebung, Farben, etc.), desto besser das Ergebnis.",
     negativePrompt: "Ein negativer Prompt beschreibt, was im Bild nicht erscheinen soll. Dies hilft, unerwünschte Elemente zu vermeiden.",
     steps: "Mehr Steps bedeuten eine längere Renderzeit, aber oft ein detaillierteres Bild. Übliche Werte liegen zwischen 5 und 50.",
     cfg: "Steuert, wie stark sich das Modell an den Prompt halten soll. Höhere Werte bedeuten mehr Prompt-Treue, aber manchmal weniger Kreativität.",
     seed: "Ein bestimmter Seed erzeugt immer das gleiche Bild bei identischen anderen Parametern. Nützlich, um Ergebnisse zu reproduzieren oder leichte Variationen zu erzeugen.",
-    styles: "Wähle vordefinierte Stile, die deinem Prompt als Tags hinzugefügt werden."
+    styles: "Wähle vordefinierte Stile, die deinem Prompt als Tags hinzugefügt werden.",
+    variants: "Generiere mehrere Bildvarianten gleichzeitig. Mehr Varianten bedeuten längere Ladezeit."
   };
   
   // Zustand der Anwendung
-  let loading = false;
-  let imageUrl = null;
-  let error = null;
+  let loading: boolean = false;
+  let imageUrl: string | null = null;
+  let error: string | null = null;
   
   // Historie der generierten Bilder
-  let generatedResults = [];
+  let generatedResults: GeneratedResult[] = [];
   
   // Verbesserte Filterung - strikter Check auf Typ
   const unsubscribe = generatedImages.subscribe(history => {
     // Nur exakt vom Typ "text-to-image" anzeigen
-    generatedResults = history.filter(entry => entry.type === "text-to-image");
+    generatedResults = history.filter(entry => entry.type === "text-to-image") as GeneratedResult[];
     console.log("[TextToImage] Filtered results:", generatedResults.length, 
                 "von insgesamt", history.length);
   });
   
   // API URL Basis
-  const apiBaseUrl = "https://aid-playground.hfg-gmuend.de/api/txt2img";
+  const apiBaseUrl: string = "https://aid-playground.hfg-gmuend.de/api/txt2img";
   
   // Funktion zum Generieren des Bildes
-  async function generateImage() {
+  async function generateImage(): Promise<void> {
     loading = true;
     error = null;
     
@@ -63,7 +85,7 @@
     }
     
     try {
-      const variantImages = []; // Array für mehrere Bilder
+      const variantImages: string[] = []; // Array für mehrere Bilder
       
       // Generiere die gewählte Anzahl an Varianten
       for (let i = 0; i < variants; i++) {
@@ -103,7 +125,7 @@
       }
       
       // Neues Ergebnis erstellen
-      const newResult = { 
+      const newResult: GeneratedResult = { 
         id: Date.now(), 
         prompt: prompt,
         imageUrls: variantImages,
@@ -123,7 +145,7 @@
       });
       
     } catch (e) {
-      error = e.message;
+      error = e instanceof Error ? e.message : "Unbekannter Fehler";
       console.error("Fehler beim Generieren des Bildes:", e);
     } finally {
       loading = false;
@@ -131,11 +153,14 @@
   }
   
   // Funktion zum Bearbeiten eines vorherigen Prompts
-  function editPrompt(oldPrompt) {
+  function editPrompt(oldPrompt: string): void {
     prompt = oldPrompt;
     // Scrolle zum Prompt-Eingabefeld
-    document.querySelector('#main-prompt').scrollIntoView({ behavior: 'smooth' });
-    document.querySelector('#main-prompt').focus();
+    const promptElement = document.querySelector('#main-prompt');
+    if (promptElement) {
+      promptElement.scrollIntoView({ behavior: 'smooth' });
+      (promptElement as HTMLElement).focus();
+    }
   }
   
   // Parameter aus URL auslesen, wenn die Seite geladen wird
@@ -151,33 +176,37 @@
         imageUrls: entry.imageUrls,
         timestamp: new Date(entry.timestamp || new Date()),
         styles: entry.styles || []
-      }));
+      })) as GeneratedResult[];
     }
     
     const url = new URL(window.location.href);
     
     if (url.searchParams.has("prompt")) {
-      prompt = url.searchParams.get("prompt");
+      prompt = url.searchParams.get("prompt") || "cat with dog";
     }
     
     if (url.searchParams.has("negative_prompt")) {
-      negativePrompt = url.searchParams.get("negative_prompt");
+      negativePrompt = url.searchParams.get("negative_prompt") || "";
     }
     
     if (url.searchParams.has("cfg")) {
-      cfg = parseFloat(url.searchParams.get("cfg"));
+      const cfgParam = url.searchParams.get("cfg");
+      if (cfgParam) cfg = parseFloat(cfgParam);
     }
     
     if (url.searchParams.has("steps")) {
-      steps = parseInt(url.searchParams.get("steps"));
+      const stepsParam = url.searchParams.get("steps");
+      if (stepsParam) steps = parseInt(stepsParam);
     }
     
     if (url.searchParams.has("seed")) {
-      seed = parseInt(url.searchParams.get("seed"));
+      const seedParam = url.searchParams.get("seed");
+      if (seedParam) seed = parseInt(seedParam);
     }
     
     if (url.searchParams.has("variants")) {
-      variants = Math.min(3, Math.max(1, parseInt(url.searchParams.get("variants"))));
+      const variantsParam = url.searchParams.get("variants");
+      if (variantsParam) variants = Math.min(3, Math.max(1, parseInt(variantsParam)));
     }
     
     // Automatisch Bild generieren, wenn Parameter in der URL vorhanden sind
@@ -203,7 +232,7 @@
   });
   
   // Hilfsfunktion zum Anpassen des Style-Prompts
-  function addStyle(style) {
+  function addStyle(style: Style): void {
     if (!selectedStyles.includes(style.id)) {
       selectedStyles = [...selectedStyles, style.id];
       
@@ -220,8 +249,8 @@
     }
   }
   
-  function removeStyle(styleId) {
-    const styleToRemove = styles.find(s => s.id === styleId);
+  function removeStyle(styleId: string): void {
+    const styleToRemove = styles.find(s => s.id === styleId) as Style | undefined;
     if (styleToRemove) {
       // Entferne den Style-Prompt aus dem Hauptprompt
       prompt = prompt.replace(`, ${styleToRemove.prompt}`, '');
@@ -232,15 +261,15 @@
   }
   
   // Copilot State
-  let isStyleCopilotOpen = false;
+  let isStyleCopilotOpen: boolean = false;
   
   // Funktion zum Öffnen des Style-Copilots
-  function openStyleCopilot() {
+  function openStyleCopilot(): void {
     isStyleCopilotOpen = true;
   }
   
   // Funktion zum Hinzufügen des generierten Stils zum Prompt
-  function addGeneratedStyle(event) {
+  function addGeneratedStyle(event: CustomEvent<{style: string}>): void {
     const style = event.detail.style;
     if (style) {
       prompt = prompt.trim() + (prompt ? ', ' : '') + style;
@@ -427,7 +456,7 @@
         {#if loading}
           <div class="loading-indicator">
             <div class="spinner"></div>
-            <p>Generiere {variants} Bild{variants > 1 ? 'er' : ''}...</p>
+            <p>Generate {variants} picture{variants > 1 ? 's' : ''}...</p>
           </div>
         {:else if error}
           <div class="error-message">
@@ -698,64 +727,7 @@
     background-color: #ffe566;
   }
   
-  /* Prompt Panel mit 2-Spalten-Layout */
-  .prompt-panel {
-    grid-column: 2;
-    grid-row: 2;
-    background-color: #1e1e1e;
-    border-radius: 8px;
-    padding: 1rem 1.25rem;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 1.25rem;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
-    align-items: center;
-  }
-  
-  .prompt-input-container {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-  }
-  
-  .generate-button-container {
-    display: flex;
-    align-items: center; /* Vertikale Zentrierung */
-    height: 100%;
-  }
-  
-  .prompt-panel button {
-    padding: 0.85rem 1.25rem; /* Etwas schmaleres Padding */
-    background-color: #FCEA2B;
-    color: #121212;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: 'IBM Plex Mono', monospace;
-    font-weight: 500;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    white-space: nowrap; /* Verhindert Umbruch des Textes */
-    box-shadow: 0 2px 5px rgba(252, 234, 43, 0.2);
-  }
-  
-  .prompt-panel button:hover {
-    background-color: #ffe566;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(252, 234, 43, 0.3);
-  }
-  
-  .prompt-panel button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 3px rgba(252, 234, 43, 0.2);
-  }
-  
-  .button-icon-inside {
-    width: 18px;
-    height: 18px;
-    margin-right: 8px;
-  }
+
   
   /* Ausgabebereich */
   .output-area {
@@ -798,7 +770,7 @@
     width: 40px;
     height: 40px;
     border: 4px solid #333333;
-    border-top: 4px solid #3498db;
+    border-top: 4px solid #FCEA2B; /* Geändert von #3498db zu #FCEA2B für das HfG-Gelb */
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 1rem;
