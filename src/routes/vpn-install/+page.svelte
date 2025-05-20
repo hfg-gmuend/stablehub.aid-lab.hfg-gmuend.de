@@ -26,10 +26,10 @@
   
   // Definition der Schritte
   const steps: Step[] = [
-    { id: 0, title: "VPN Client\ninstallieren" },
-    { id: 1, title: "Dateien\nherunterladen" },
-    { id: 2, title: "Profil\nimportieren" },
-    { id: 3, title: "Verbinden" }
+    { id: 0, title: "Install\nVPN Client" },
+    { id: 1, title: "Download\nFiles" },
+    { id: 2, title: "Import\nProfile" },
+    { id: 3, title: "Connect" }
   ];
   
   // Navigation zwischen den Schritten
@@ -82,12 +82,12 @@
   <main class="main-content">
     <div class="vpn-container">
       <div class="vpn-header">
-        <h1>VPN installieren</h1>
+        <h1>Install VPN</h1>
         <p class="subtitle">Virtual Private Network</p>
       </div>
 
       <div class="vpn-content">
-        <p class="instruction-text">So richtest du das HfG-VPN in vier einfachen Schritten ein:</p>
+        <p class="instruction-text">Set up the HfG VPN in four simple steps:</p>
         
         <!-- Stepper -->
         <div class="stepper">
@@ -120,8 +120,8 @@
           <!-- Schritt 1: VPN Client installieren -->
           {#if activeStep === 0}
             <div class="step-panel">
-              <h2>Installiere den VPN-Client</h2>
-              <p>Wähle dein Betriebssystem und lade den entsprechenden VPN-Client herunter:</p>
+              <h2>Install the VPN Client</h2>
+              <p>Choose your operating system and download the appropriate VPN client:</p>
               
               <div class="os-selection">
                 <button class="os-card" on:click={() => downloadClient('mac')} on:keydown={e => e.key === 'Enter' && downloadClient('mac')}>
@@ -141,32 +141,32 @@
                 </button>
               </div>
               
-              <p class="help-text">Folge den Installationsanweisungen des Installers. Nach der Installation kannst du zum nächsten Schritt übergehen.</p>
+              <p class="help-text">Follow the installer instructions. After installation, you can proceed to the next step.</p>
             </div>
           {/if}
           
           <!-- Schritt 2: Dateien herunterladen -->
           {#if activeStep === 1}
             <div class="step-panel">
-              <h2>Dateien herunterladen</h2>
-              <p>Lade die VPN-Konfigurationsdateien für dein Profil herunter. Du benötigst beide Dateien für die vollständige Konfiguration:</p>
+              <h2>Download Files</h2>
+              <p>Download the VPN configuration files for your profile. You need both files for the complete configuration:</p>
               
               <div class="download-section">
                 <div class="config-downloads">
                   <a href={configLinks.client201} class="download-button" target="_blank">
                     <svg viewBox="0 0 24 24" class="download-icon"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                    Client.201.zip herunterladen
+                    Download Client.201.zip
                   </a>
                   
                   <a href={configLinks.client202} class="download-button" target="_blank">
                     <svg viewBox="0 0 24 24" class="download-icon"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                    Client.202.zip herunterladen
+                    Download Client.202.zip
                   </a>
                 </div>
                 
                 <div class="download-info">
-                  <p>Diese ZIP-Dateien enthalten die notwendigen Konfigurationen (.ovpn-Dateien) für den Zugang zum HfG-Netzwerk.</p>
-                  <p>Nachdem du beide Dateien heruntergeladen hast, entpacke sie und bewahre sie für den nächsten Schritt auf.</p>
+                  <p>These ZIP files contain the necessary configurations (.ovpn files) to access the HfG network.</p>
+                  <p>After downloading both files, extract them and keep them for the next step.</p>
                 </div>
               </div>
             </div>
@@ -175,26 +175,26 @@
           <!-- Schritt 3: Profil importieren -->
           {#if activeStep === 2}
             <div class="step-panel">
-              <h2>Profile importieren</h2>
-              <p>Importiere die heruntergeladenen und entpackten .ovpn-Dateien in deinen VPN-Client:</p>
+              <h2>Import Profiles</h2>
+              <p>Import the downloaded and extracted .ovpn files into your VPN client:</p>
               
               <div class="import-instructions">
                 <div class="instruction-card">
-                  <h3>Für macOS (Tunnelblick):</h3>
+                  <h3>For macOS (Tunnelblick):</h3>
                   <ol>
-                    <li>Doppelklicke auf die heruntergeladene .ovpn-Datei</li>
-                    <li>Tunnelblick wird automatisch geöffnet</li>
-                    <li>Bestätige den Import, indem du auf "Installieren" klickst</li>
-                    <li>Gib dein Systempasswort ein, wenn du dazu aufgefordert wirst</li>
+                    <li>Double-click on the downloaded .ovpn file</li>
+                    <li>Tunnelblick will open automatically</li>
+                    <li>Confirm the import by clicking "Install"</li>
+                    <li>Enter your system password when prompted</li>
                   </ol>
                 </div>
                 
                 <div class="instruction-card">
-                  <h3>Für Windows (OpenVPN):</h3>
+                  <h3>For Windows (OpenVPN):</h3>
                   <ol>
-                    <li>Öffne OpenVPN GUI mit Administratorrechten</li>
-                    <li>Kopiere die .ovpn-Datei in den Ordner "config" im OpenVPN-Installationsverzeichnis</li>
-                    <li>Starte OpenVPN neu, um das neue Profil zu laden</li>
+                    <li>Open OpenVPN GUI with administrator privileges</li>
+                    <li>Copy the .ovpn file into the "config" folder in the OpenVPN installation directory</li>
+                    <li>Restart OpenVPN to load the new profile</li>
                   </ol>
                 </div>
               </div>
@@ -204,55 +204,55 @@
           <!-- Schritt 4: Verbinden -->
           {#if activeStep === 3}
             <div class="step-panel">
-              <h2>Mit dem VPN verbinden</h2>
-              <p>Jetzt kannst du dich mit dem HfG-Netzwerk verbinden:</p>
+              <h2>Connect to the VPN</h2>
+              <p>Now you can connect to the HfG network:</p>
               
               <div class="connect-instructions">
                 <div class="instruction-card">
-                  <h3>Für macOS (Tunnelblick):</h3>
+                  <h3>For macOS (Tunnelblick):</h3>
                   <ol>
-                    <li>Klicke auf das Tunnelblick-Symbol in der Menüleiste</li>
-                    <li>Wähle "HfG VPN" aus der Liste</li>
-                    <li>Klicke auf "Verbinden"</li>
-                    <li>Gib deine HfG-Zugangsdaten ein, wenn du dazu aufgefordert wirst</li>
-                    <li>Bestätige die 2-Faktor-Authentifizierung (siehe unten)</li>
+                    <li>Click on the Tunnelblick icon in the menu bar</li>
+                    <li>Select "HfG VPN" from the list</li>
+                    <li>Click "Connect"</li>
+                    <li>Enter your HfG credentials when prompted</li>
+                    <li>Confirm the 2-factor authentication (see below)</li>
                   </ol>
                 </div>
                 
                 <div class="instruction-card">
-                  <h3>Für Windows (OpenVPN):</h3>
+                  <h3>For Windows (OpenVPN):</h3>
                   <ol>
-                    <li>Rechtsklicke auf das OpenVPN-Symbol im Systemtray</li>
-                    <li>Wähle "HfG VPN" und klicke auf "Verbinden"</li>
-                    <li>Gib deine HfG-Zugangsdaten ein, wenn du dazu aufgefordert wirst</li>
-                    <li>Bestätige die 2-Faktor-Authentifizierung (siehe unten)</li>
+                    <li>Right-click on the OpenVPN icon in the system tray</li>
+                    <li>Select "HfG VPN" and click "Connect"</li>
+                    <li>Enter your HfG credentials when prompted</li>
+                    <li>Confirm the 2-factor authentication (see below)</li>
                   </ol>
                 </div>
                 
                 <div class="instruction-card auth-info">
-                  <h3>2-Faktor-Authentifizierung</h3>
-                  <p>Für die sichere Verbindung zum HfG-Netzwerk ist eine Zwei-Faktor-Authentifizierung notwendig:</p>
+                  <h3>2-Factor Authentication</h3>
+                  <p>For secure connection to the HfG network, two-factor authentication is required:</p>
                   <ol>
-                    <li>Nach Eingabe deiner Zugangsdaten wird eine Anfrage an die Microsoft Authenticator App auf deinem Smartphone gesendet</li>
-                    <li>Öffne die App und bestätige die Anfrage mit dem angezeigten Code</li>
-                    <li>Es erscheint ein Popup-Fenster, das dich auffordert, zwei Zahlen einzugeben</li>
-                    <li>Gib die angeforderten Zahlen ein, um die Verbindung herzustellen</li>
+                    <li>After entering your credentials, a request will be sent to the Microsoft Authenticator app on your smartphone</li>
+                    <li>Open the app and confirm the request with the displayed code</li>
+                    <li>A popup window will appear asking you to enter two numbers</li>
+                    <li>Enter the requested numbers to establish the connection</li>
                   </ol>
                   
                   <div class="auth-note">
-                    <h4>Hinweis zur 2-Faktor-Authentifizierung:</h4>
-                    <p>Falls du eine andere 2-Faktor-Methode wie SMS oder Anruf eingerichtet hast, kann es zu Problemen kommen. In diesem Fall:</p>
+                    <h4>Note on 2-Factor Authentication:</h4>
+                    <p>If you have set up another 2-factor method like SMS or call, you may encounter issues. In this case:</p>
                     <ol>
-                      <li>Besuche <a href="https://mysignins.microsoft.com/security-info" target="_blank">mysignins.microsoft.com/security-info</a></li>
-                      <li>Melde dich mit deinem HfG-Konto an</li>
-                      <li>Passe deine Sicherheitseinstellungen an und aktiviere die Authentifizierung per App (Kennwort)</li>
+                      <li>Visit <a href="https://mysignins.microsoft.com/security-info" target="_blank">mysignins.microsoft.com/security-info</a></li>
+                      <li>Sign in with your HfG account</li>
+                      <li>Adjust your security settings and enable authentication via app (password)</li>
                     </ol>
                   </div>
                 </div>
                 
                 <div class="success-message">
-                  <h3>Erfolg!</h3>
-                  <p>Nach erfolgreicher Authentifizierung bist du mit dem HfG-Netzwerk verbunden und kannst auf alle internen Ressourcen zugreifen.</p>
+                  <h3>Success!</h3>
+                  <p>After successful authentication, you are connected to the HfG network and can access all internal resources.</p>
                 </div>
               </div>
             </div>
@@ -262,11 +262,11 @@
           <div class="step-navigation">
             <button class="nav-button back" on:click={prevStep} disabled={activeStep === 0}>
               <svg viewBox="0 0 24 24" class="nav-icon"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12l4.58-4.59z"/></svg>
-              Zurück
+              Back
             </button>
-            <div class="step-indicator">{activeStep + 1} von {steps.length}</div>
+            <div class="step-indicator">{activeStep + 1} of {steps.length}</div>
             <button class="nav-button next" on:click={nextStep} disabled={activeStep === steps.length - 1}>
-              Weiter
+              Next
               <svg viewBox="0 0 24 24" class="nav-icon"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12l-4.58 4.59z"/></svg>
             </button>
           </div>
