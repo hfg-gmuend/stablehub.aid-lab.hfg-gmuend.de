@@ -104,19 +104,19 @@
         <div class="comparison-items">
           <div class="comparison-item">
             <div class="comparison-image">
-              <img src="/tutorial/Normal.png" alt="Portrait with normal prompt weighting" class="showcase-image small"/>
+              <img src="/tutorial/Normal.jpg" alt="Portrait with normal prompt weighting" class="showcase-image small"/>
             </div>
             <p>Normal Prompt</p>
           </div>
           <div class="comparison-item">
             <div class="comparison-image">
-              <img src="/tutorial/Double.png" alt="Portrait with double emphasis weighting" class="showcase-image small"/>
+              <img src="/tutorial/Double.jpg" alt="Portrait with double emphasis weighting" class="showcase-image small"/>
             </div>
             <p>Double Emphasis</p>
           </div>
           <div class="comparison-item">
             <div class="comparison-image">
-              <img src="/tutorial/de.png" alt="Portrait with de-emphasized weighting" class="showcase-image small"/>
+              <img src="/tutorial/de.jpg" alt="Portrait with de-emphasized weighting" class="showcase-image small"/>
             </div>
             <p>De-emphasized</p>
           </div>
@@ -161,7 +161,7 @@
             <p>modern architecture:1.2 AND gothic cathedral:0.8, detailed, atmospheric, sunlight</p>
           </div>
           <div class="showcase-result">
-            <img src="/tutorial/cathedral.png" alt="Architectural mix of modern and gothic styles" class="showcase-image wide"/>
+            <img src="/tutorial/cathedral.jpg" alt="Architectural mix of modern and gothic styles" class="showcase-image wide"/>
           </div>
         </div>
 
@@ -172,11 +172,11 @@
           </div>
           <div class="showcase-variants">
             <div class="variant">
-              <img src="/tutorial/pic-style.png" alt="Portrait in Picasso style" class="showcase-image small"/>
+              <img src="/tutorial/pic-style.jpg" alt="Portrait in Picasso style" class="showcase-image small"/>
               <p>Variant 1</p>
             </div>
             <div class="variant">
-              <img src="/tutorial/van-style.png" alt="Portrait in Van Gogh style" class="showcase-image small"/>
+              <img src="/tutorial/van-style.jpg" alt="Portrait in Van Gogh style" class="showcase-image small"/>
               <p>Variant 2</p>
             </div>
           </div>

@@ -2,9 +2,9 @@
   // Example images for CFG comparison
   const cfgExamples = [
     // Remove /static from image paths
-    { level: "Low (CFG 3)", image: "/tutorial/cfglow.png", description: "Creative, but often far from the prompt" },
-    { level: "Medium (CFG 7)", image: "/tutorial/cfgmedium.png", description: "Good balance between creativity and prompt adherence" },
-    { level: "High (CFG 15)", image: "/tutorial/cfghigh.png", description: "Strict prompt adherence, can seem exaggerated" }
+    { level: "Low (CFG 3)", image: "/tutorial/cfglow.jpg", description: "Creative, but often far from the prompt" },
+    { level: "Medium (CFG 7)", image: "/tutorial/cfgmedium.jpg", description: "Good balance between creativity and prompt adherence" },
+    { level: "High (CFG 15)", image: "/tutorial/cfghigh.jpg", description: "Strict prompt adherence, can seem exaggerated" }
   ];
 
   // Sampler examples

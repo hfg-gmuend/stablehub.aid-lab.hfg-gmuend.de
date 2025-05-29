@@ -21,19 +21,19 @@
         title="Text To Image" 
         description="Schreibe ein Prompt, erhalte in Sekunden ein maßgeschneidertes Bild."
         href="{base}/text-to-image" 
-        imageUrl="{assets}/cards/card1.png" 
+        imageUrl="{assets}/cards/card1.jpg" 
       />
       <ImageCard 
         title="Image To Image" 
         description="Lade ein Bild hoch und sieh zu, wie es in neue Stile oder Varianten verwandelt wird."
         href="{base}/image-to-image" 
-        imageUrl="{assets}/cards/card2.png" 
+        imageUrl="{assets}/cards/card2.jpg" 
       />
       <ImageCard 
         title="ControlNet" 
         description="Nutze Skizzen oder Posen als Leitfaden, um präzise Bilder mit voller kreativer Kontrolle zu erzeugen."
         href="{base}/control-net" 
-        imageUrl="{assets}/cards/card3.png" 
+        imageUrl="{assets}/cards/card3.jpg" 
       />
     </div>
     

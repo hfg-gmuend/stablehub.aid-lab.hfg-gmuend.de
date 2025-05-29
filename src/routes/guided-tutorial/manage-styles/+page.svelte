@@ -78,7 +78,7 @@
         <div class="platform-card">
           <h3>A1111 Prompt Snippets</h3>
           <div class="platform-image">
-            <img src="{assets}/tutorial/a111.png" alt="A1111 Webui Styles Panel" />
+            <img src="{assets}/tutorial/a111.jpg" alt="A1111 Webui Styles Panel" />
           </div>
           <div class="steps-list">
             <h4>How to create styles:</h4>
@@ -102,7 +102,7 @@
         <div class="platform-card">
           <h3>ComfyUI Nodes</h3>
           <div class="platform-image">
-            <img src="/tutorial/comfy.png" alt="ComfyUI Style Nodes" />
+            <img src="/tutorial/comfy.jpg" alt="ComfyUI Style Nodes" />
           </div>
           <div class="steps-list">
             <h4>Workflow with Style Nodes:</h4>

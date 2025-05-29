@@ -52,7 +52,7 @@
             <div class="comparison-image">
 
               <div class="placeholder-image" data-label="Without">
-                <img src="/tutorial/negative1.png" alt="Example generated without a negative prompt" class="comparison-example-image"/>
+                <img src="/tutorial/negative1.jpg" alt="Example generated without a negative prompt" class="comparison-example-image"/>
               </div>
             </div>
             <div class="comparison-prompt">
@@ -64,7 +64,7 @@
             <div class="comparison-image">
 
               <div class="placeholder-image" data-label="With">
-                 <img src="/tutorial/negative2.png" alt="Example generated with a detailed negative prompt" class="comparison-example-image"/>
+                 <img src="/tutorial/negative2.jpg" alt="Example generated with a detailed negative prompt" class="comparison-example-image"/>
               </div>
             </div>
             <div class="comparison-prompt">
@@ -271,7 +271,7 @@
           <h3>ControlNet</h3>
           <div class="tech-image">
             <div class="placeholder-image tech">
-              <img src="/tutorial/controlnet.png" alt="Example showing ControlNet input (pose) and generated output" class="tech-example-image"/>
+              <img src="/tutorial/controlnet.jpg" alt="Example showing ControlNet input (pose) and generated output" class="tech-example-image"/>
             </div>
           </div>
           <p class="tech-description">ControlNet allows you to guide the generation process using an input image. Instead of just working with text, the model can consider outlines, poses, depth maps, or other structural information.</p>
@@ -291,7 +291,7 @@
           <div class="tech-image">
             <div class="placeholder-image tech">
               <!-- Replace span with img -->
-              <img src="/tutorial/lora.png" alt="Example showing LoRA application" class="tech-example-image"/>
+              <img src="/tutorial/lora.jpg" alt="Example showing LoRA application" class="tech-example-image"/>
             </div>
           </div>
           <p class="tech-description">LoRAs are small, trained model add-ons that teach a base model new styles, characters, or concepts without needing to retrain the entire model.</p>
