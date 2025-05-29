@@ -2,6 +2,7 @@
   import MinimalSidebar from "$lib/components/uicomponents/SidePanel/MinimalSidebar.svelte";
   import ImageCard from "$lib/components/ImageCard.svelte";
   import TutorialHighlightCard from "$lib/components/uicomponents/TutorialHighlightCard.svelte";
+  import { base, assets } from '$app/paths';
 </script>
 
 <svelte:head>
@@ -19,20 +20,20 @@
       <ImageCard 
         title="Text To Image" 
         description="Schreibe ein Prompt, erhalte in Sekunden ein maßgeschneidertes Bild."
-        href="/text-to-image" 
-        imageUrl="/cards/card1.png" 
+        href="{base}/text-to-image" 
+        imageUrl="{assets}/cards/card1.png" 
       />
       <ImageCard 
         title="Image To Image" 
         description="Lade ein Bild hoch und sieh zu, wie es in neue Stile oder Varianten verwandelt wird."
-        href="/image-to-image" 
-        imageUrl="/cards/card2.png" 
+        href="{base}/image-to-image" 
+        imageUrl="{assets}/cards/card2.png" 
       />
       <ImageCard 
         title="ControlNet" 
         description="Nutze Skizzen oder Posen als Leitfaden, um präzise Bilder mit voller kreativer Kontrolle zu erzeugen."
-        href="/control-net" 
-        imageUrl="/cards/card3.png" 
+        href="{base}/control-net" 
+        imageUrl="{assets}/cards/card3.png" 
       />
     </div>
     
@@ -40,7 +41,7 @@
     <section class="tutorials-teaser">
       <div class="teaser-header">
         <h2>Neu hier? Start mit unseren Tutorials</h2>
-        <a href="/guided-tutorial" class="view-all-link">Alle Tutorials ansehen</a>
+        <a href="{base}/guided-tutorial" class="view-all-link">Alle Tutorials ansehen</a>
       </div>
       
       <div class="tutorial-highlights">
@@ -48,7 +49,7 @@
           icon="🚀"
           title="Schnelleinstieg"
           description="Lerne die Grundlagen von Stable Diffusion in nur 10 Minuten"
-          href="/guided-tutorial/stable-diffusion-intro"
+          href="{base}/guided-tutorial/stable-diffusion-intro"
           linkText="Jetzt starten"
         />
 
@@ -56,7 +57,7 @@
           icon="💡"
           title="Prompt-Power"
           description="Mit besseren Prompts zu besseren Ergebnissen"
-          href="/guided-tutorial/prompt-basics"
+          href="{base}/guided-tutorial/prompt-basics"
           linkText="Tipps entdecken"
         />
 
@@ -64,7 +65,7 @@
           icon="🔧"
           title="Für Fortgeschrittene"
           description="Parameter, Stile und fortgeschrittene Techniken"
-          href="/guided-tutorial/core-parameters"
+          href="{base}/guided-tutorial/core-parameters"
           linkText="Vertiefen"
         />
       </div>

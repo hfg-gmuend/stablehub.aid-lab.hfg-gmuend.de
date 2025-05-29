@@ -6,6 +6,7 @@
   import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte';
   import StyleCopilot from "$lib/components/StyleCopilot.svelte"; 
   import { generatedImages } from "$lib/stores/generatedImages.js"; // Import des Stores
+  import { assets } from '$app/paths';
   
   // Parameter für die API
   let prompt = "combine these images";
@@ -458,8 +459,8 @@
         bind:promptValue={prompt}
         generateLabel="Generate"
         generateLoadingLabel="Generating..."
-        generateIconSrc="/icon/rightIcon.svg"
-        generateFallbackIconSrc="/icon/rightIcon.svg"
+        generateIconSrc="{assets}/icon/rightIcon.svg"
+        generateFallbackIconSrc="{assets}/icon/rightIcon.svg"
         generateLoading={loading}
         generateDisabled={loading || !image1 || !image2} 
         on:generate={combineImages}

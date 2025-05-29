@@ -2,6 +2,7 @@
   //MrNoLook
   import { favorites } from '$lib/stores/favorites';
   import { styles } from "$lib/config/styles.js";
+  import { assets } from '$app/paths';
   
   export let prompt = "";
   export let imageUrls = [];
@@ -42,7 +43,7 @@
 
 <div class="prompt-result-card">
   <div class="card-header">
-    <img src="/icon/icon.svg" alt="AI Hub Icon" class="ai-icon" />
+    <img src="{assets}/icon/icon.svg" alt="AI Hub Icon" class="ai-icon" />
     <h3 class="prompt-text">{prompt}</h3>
   </div>
   

@@ -1,5 +1,6 @@
 <script lang="ts">
   import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
+  import { assets } from '$app/paths';
 
   // Define TypeScript Interfaces
   interface StyleParameter {
@@ -77,7 +78,7 @@
         <div class="platform-card">
           <h3>A1111 Prompt Snippets</h3>
           <div class="platform-image">
-            <img src="/tutorial/a111.png" alt="A1111 Webui Styles Panel" />
+            <img src="{assets}/tutorial/a111.png" alt="A1111 Webui Styles Panel" />
           </div>
           <div class="steps-list">
             <h4>How to create styles:</h4>

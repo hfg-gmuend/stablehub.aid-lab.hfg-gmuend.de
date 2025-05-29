@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { generatedImages } from '$lib/stores/generatedImages.js';
   import { navigating } from '$app/stores';
+  import { assets } from '$app/paths';
   
   // Fix Typen beim ersten Laden und bei jedem Routing-Wechsel
   onMount(() => {
@@ -21,7 +22,7 @@
 
 <svelte:head>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="/icon/icon.svg">
+  <link rel="icon" type="image/svg+xml" href="{assets}/icon/icon.svg">
 </svelte:head>
 
 <slot></slot>

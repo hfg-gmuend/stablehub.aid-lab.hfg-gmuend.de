@@ -1,6 +1,10 @@
+<script>
+  import { base, assets } from '$app/paths';
+</script>
+
 <div class="sidebar-header">
-  <a href="/" class="logo">
-    <img src="/icon/icon.svg" alt="HfG Ai-Hub Logo" width="24" height="24" />
+  <a href="{base}/" class="logo">
+    <img src="{assets}/icon/icon.svg" alt="HfG Ai-Hub Logo" width="24" height="24" />
     <span>HfG Ai-Hub</span>
   </a>
 </div>

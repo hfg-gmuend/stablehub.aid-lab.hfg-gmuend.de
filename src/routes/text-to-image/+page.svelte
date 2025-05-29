@@ -7,6 +7,7 @@
   import { onMount, onDestroy } from "svelte";
   import { styles } from "$lib/config/styles.js";
   import { generatedImages } from '$lib/stores/generatedImages.js'; // Import des Stores
+  import { assets } from '$app/paths';
   
   // Typedefinitionen
   interface Style {
@@ -487,7 +488,7 @@
         bind:promptValue={prompt}
         generateLabel="Generate"
         generateLoadingLabel="Generating..."
-        generateIconSrc="/icon/rightIcon.svg"
+        generateIconSrc="{assets}/icon/rightIcon.svg"
         generateLoading={loading}
         generateDisabled={loading}
         on:generate={generateImage}

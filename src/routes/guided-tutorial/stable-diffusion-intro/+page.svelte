@@ -1,6 +1,7 @@
 <script lang="ts">
   import TutorialPanel from "$lib/components/TutorialPanel.svelte";
   import TutorialNavigation from "$lib/components/TutorialNavigation.svelte";
+  import { assets } from '$app/paths';
   
   // Define navigation path types
   interface NavigationProps {
@@ -84,7 +85,7 @@
           </ul>
         </div>
         <div class="image-block">
-          <img src="/tutorial/stablediffusion.png" alt="Stable Diffusion Process" class="tutorial-image" />
+          <img src="{assets}/tutorial/stablediffusion.png" alt="Stable Diffusion Process" class="tutorial-image" />
           <p class="image-caption">The Diffusion Process: From Noise to Image</p>
         </div>
       </div>

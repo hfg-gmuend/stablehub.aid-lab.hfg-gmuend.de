@@ -7,6 +7,7 @@
   import { onMount, onDestroy } from "svelte";
   import { generatedImages } from "$lib/stores/generatedImages.js"; // Import des Stores
   import type { GeneratedResult } from '$lib/types';
+  import { assets } from '$app/paths';
 
   // --- Type Definitions ---
   interface ControlNetParams {
@@ -558,7 +559,7 @@
         bind:promptValue={prompt}
         generateLabel="Generate"
         generateLoadingLabel="Generating..."
-        generateIconSrc="/icon/rightIcon.svg" 
+        generateIconSrc="{assets}/icon/rightIcon.svg" 
         generateLoading={loading}
         generateDisabled={loading || !image} 
         on:generate={processWithControlNet}

@@ -1,6 +1,7 @@
 <script lang="ts">
   import MinimalSidebar from "$lib/components/uicomponents/SidePanel/MinimalSidebar.svelte";
   import { onMount } from 'svelte';
+  import { assets } from '$app/paths';
   
   // Types
   interface Step {
@@ -125,7 +126,7 @@
               
               <div class="os-selection">
                 <button class="os-card" on:click={() => downloadClient('mac')} on:keydown={e => e.key === 'Enter' && downloadClient('mac')}>
-                  <img src="/vpn/apple-icon.svg" alt="Apple Logo" class="os-icon">
+                  <img src="{assets}/vpn/apple-icon.svg" alt="Apple Logo" class="os-icon">
                   <div class="os-info">
                     <h3>macOS</h3>
                     <p>Tunnelblick</p>
@@ -133,7 +134,7 @@
                 </button>
                 
                 <button class="os-card" on:click={() => downloadClient('windows')} on:keydown={e => e.key === 'Enter' && downloadClient('windows')}>
-                  <img src="/vpn/windows-icon.svg" alt="Windows Logo" class="os-icon">
+                  <img src="{assets}/vpn/windows-icon.svg" alt="Windows Logo" class="os-icon">
                   <div class="os-info">
                     <h3>Windows</h3>
                     <p>OpenVPN</p>
