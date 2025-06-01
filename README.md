@@ -61,10 +61,10 @@ StableHub is an educational project by the AI-D Lab at HfG Gmünd, providing stu
    Navigate to `http://localhost:3000` and start experimenting!
 
 ### First Steps 👋
-1. 🎨 Choose a pre-installed model or upload your own
-2. ✍️ Enter a text prompt (e.g., "A sunset over the mountains")
-3. 🎛️ Experiment with parameters like Steps, Guidance Scale, and Sampling Method
-4. 👀 Observe how changes affect the result
+1. ✍️ Enter a text prompt (e.g., "A sunset over the mountains")
+2. 🎛️ Experiment with parameters like Steps, Guidance Scale, and Sampling Method
+3. 🎬 Click generate to create your image
+4. 👀 Observe how changes to parameters affect the result
 
 ## Managing Models 🗃️
 
