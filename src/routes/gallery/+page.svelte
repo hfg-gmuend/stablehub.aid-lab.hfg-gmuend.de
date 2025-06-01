@@ -11,9 +11,9 @@
     try {
       await navigator.clipboard.writeText(prompt);
       // Kurze Rückmeldung anzeigen
-      alert("Prompt in die Zwischenablage kopiert!");
+      alert("Prompt copied to clipboard!");
     } catch (err) {
-      console.error('Fehler beim Kopieren: ', err);
+      console.error('Error copying: ', err);
     }
   }
   
@@ -24,17 +24,17 @@
   
   // Funktion zum Behandeln von Bildlade-Fehlern
   function handleImageError(event) {
-    console.error("Fehler beim Laden des Bildes:", event);
+    console.error("Error loading image:", event);
     event.target.onerror = null;
     event.target.src = '/fallback-image.png'; // Hier Pfad zu einem Platzhalterbild
   }
 
   // Logging zur Fehlersuche
-  $: console.log("Favoriten in der Gallery:", $favorites.length);
+  $: console.log("Favorites in Gallery:", $favorites.length);
 </script>
 
 <svelte:head>
-  <title>Bildergalerie | HfG Ai-Hub</title>
+  <title>Image Gallery | HfG AI-Hub</title>
 </svelte:head>
 
 <div class="app-container">
@@ -43,11 +43,11 @@
     <NavigationBar active="gallery" />
     
     <div class="gallery-container">
-      <h1>Favorisierte Bilder</h1>
+      <h1>Favorite Images</h1>
       
       {#if $favorites.length === 0}
         <div class="empty-gallery">
-          <p>Noch keine favorisierten Bilder. Generiere Bilder und markiere sie als Favoriten.</p>
+          <p>No favorite images yet. Generate images and mark them as favorites.</p>
         </div>
       {:else}
         <div class="image-grid">
@@ -57,7 +57,7 @@
                  on:mouseleave={() => displayPrompt = null}>
               <img 
                 src={favorite.imageData || favorite.imageUrl} 
-                alt="Favorisiertes Bild" 
+                alt="Favorite image" 
                 class="gallery-image" 
                 on:error={handleImageError}
               />
@@ -67,10 +67,10 @@
                   <p class="prompt-text">{favorite.prompt}</p>
                   <div class="action-buttons">
                     <button class="copy-button" on:click={() => copyPromptToClipboard(favorite.prompt)}>
-                      <span class="copy-icon">📋</span> Kopieren
+                      <span class="copy-icon">📋</span> Copy
                     </button>
                     <button class="remove-button" on:click={() => removeFavorite(favorite.imageData || favorite.imageUrl)}>
-                      <span class="remove-icon">🗑️</span> Entfernen
+                      <span class="remove-icon">🗑️</span> Remove
                     </button>
                   </div>
                 </div>
