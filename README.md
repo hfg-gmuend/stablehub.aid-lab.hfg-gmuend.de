@@ -66,14 +66,6 @@ StableHub is an educational project by the AI-D Lab at HfG Gmünd, providing stu
 3. 🎬 Click generate to create your image
 4. 👀 Observe how changes to parameters affect the result
 
-## Managing Models 🗃️
-
-StableHub supports various Stable Diffusion models. New models can be uploaded via the web interface or placed in the `models/` folder.
-
-**🌟 Recommended models for beginners:**
-- 🏃 Stable Diffusion 1.5 (versatile and fast)
-- 🎨 Stable Diffusion 2.1 (higher quality)
-- 🎭 Specialized models for specific styles or applications
 
 ## For Educators 👩‍🏫
 
