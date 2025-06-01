@@ -51,16 +51,16 @@
 
   // Tooltip-Texte
   const tooltips: TooltipData = {
-    prompt: "Beschreibe, wie das Bild verändert werden soll.",
-    negativePrompt: "Ein negativer Prompt beschreibt, was im Bild nicht erscheinen soll. Dies hilft, unerwünschte Elemente zu vermeiden.",
-    steps: "Mehr Steps bedeuten eine längere Renderzeit, aber oft ein detaillierteres Bild. Übliche Werte liegen zwischen 5 und 50.",
-    cfg: "Steuert, wie stark sich das Modell an den Prompt halten soll. Höhere Werte bedeuten mehr Prompt-Treue, aber manchmal weniger Kreativität.",
-    seed: "Ein bestimmter Seed erzeugt immer das gleiche Bild bei identischen anderen Parametern. Nützlich, um Ergebnisse zu reproduzieren.",
-    controlnetStrength: "Steuert, wie stark sich das Modell an die Vorlage halten soll. Höhere Werte bedeuten mehr Kontrolle durch die Vorlage.",
-    startPercent: "Prozentualer Wert, ab dem die Kontrolle durch die Vorlage beginnen soll (0 bedeutet direkt zu Beginn der Bildgenerierung).",
-    endPercent: "Prozentualer Wert, bis zu dem die Kontrolle durch die Vorlage angewendet werden soll (1 bedeutet bis zum Ende der Bildgenerierung).",
-    image: "Lade ein Bild hoch, das als Vorlage/Kontrolle für den ControlNet-Prozess dienen soll.",
-    percentRange: "Bestimmt, in welchem Bereich des Generierungsprozesses die Kontrolle angewendet wird."
+    prompt: "Describe how the image should be modified.",
+    negativePrompt: "A negative prompt describes what should not appear in the image. This helps avoid unwanted elements.",
+    steps: "More steps mean longer rendering time, but often a more detailed image. Common values are between 5 and 50.",
+    cfg: "Controls how strongly the model should follow the prompt. Higher values mean more prompt adherence, but sometimes less creativity.",
+    seed: "A specific seed always produces the same image with identical other parameters. Useful for reproducing results.",
+    controlnetStrength: "Controls how strongly the model should follow the template. Higher values mean more control through the template.",
+    startPercent: "Percentage value from which control through the template should begin (0 means directly at the start of image generation).",
+    endPercent: "Percentage value until which control through the template should be applied (1 means until the end of image generation).",
+    image: "Upload an image that should serve as a template/control for the ControlNet process.",
+    percentRange: "Determines in which range of the generation process the control is applied."
   };
 
   // Zustand der Anwendung
@@ -120,7 +120,7 @@
   // Funktion zum Generieren des ControlNet-Bildes
   async function processWithControlNet(): Promise<void> {
     if (!image) {
-      error = "Bitte lade ein Bild hoch, um ControlNet zu nutzen.";
+      error = "Please upload an image to use ControlNet.";
       return;
     }
 
@@ -154,9 +154,9 @@
 
       // Erweiterte Fehlerbehandlung
       if (!response.ok) {
-        const errorText = await response.text().catch(() => "Keine Fehlermeldung verfügbar");
-        console.error("API Fehlerdetails:", errorText);
-        throw new Error(`API Fehler: ${response.status} - ${errorText}`);
+        const errorText = await response.text().catch(() => "No error message available");
+        console.error("API Error details:", errorText);
+        throw new Error(`API Error: ${response.status} - ${errorText}`);
       }
 
       // Die Antwort als Blob behandeln (Binärdaten/Bild)
@@ -181,8 +181,8 @@
       generatedImages.addToHistory(historyEntry);
 
     } catch (e) {
-      error = e instanceof Error ? e.message : "Unbekannter Fehler";
-      console.error("Fehler bei der ControlNet-Verarbeitung:", e);
+      error = e instanceof Error ? e.message : "Unknown error";
+      console.error("Error in ControlNet processing:", e);
     } finally {
       loading = false;
     }
@@ -281,7 +281,7 @@
         <!-- Bild-Upload-Bereich -->
         <div class="parameter-group full-width">
           <div class="label-container">
-            <label>ControlNet Vorlage</label>
+            <label>ControlNet Template</label>
             <div class="info-icon" 
                 on:mouseenter={() => activeTooltip = 'image'}
                 on:mouseleave={() => activeTooltip = null}>
@@ -300,13 +300,13 @@
             on:drop={handleImageDrop}
           >
             {#if imagePreview}
-              <img src={imagePreview} alt="Bild Vorschau" class="image-preview" />
+              <img src={imagePreview} alt="Image Preview" class="image-preview" />
               <button class="remove-image" on:click={() => { image = null; imagePreview = null; }}>×</button>
             {:else}
               <div class="upload-placeholder">
                 <span class="upload-icon">+</span>
-                <span>Vorlage hochladen</span>
-                <span class="upload-hint">Klicken oder ziehen</span>
+                <span>Upload Template</span>
+                <span class="upload-hint">Click or drag</span>
                 <input 
                   type="file" 
                   id="controlnet-image" 
@@ -322,7 +322,7 @@
         <!-- ControlNet-spezifische Parameter -->
         <div class="parameter-group full-width">
           <div class="label-container">
-            <label for="controlnet-strength">ControlNet Stärke</label>
+            <label for="controlnet-strength">ControlNet Strength</label>
             <div class="info-icon" 
                 on:mouseenter={() => activeTooltip = 'controlnetStrength'}
                 on:mouseleave={() => activeTooltip = null}>
@@ -348,13 +348,13 @@
         
         <div class="parameter-group full-width">
           <div class="label-container">
-            <label>Anwendungsbereich</label>
+            <label>Application Range</label>
             <div class="info-icon" 
                 on:mouseenter={() => activeTooltip = 'percentRange'}
                 on:mouseleave={() => activeTooltip = null}>
               i
               {#if activeTooltip === 'percentRange'}
-                <div class="tooltip">Bestimmt, in welchem Bereich des Generierungsprozesses die Kontrolle angewendet wird.</div>
+                <div class="tooltip">Determines in which range of the generation process the control is applied.</div>
               {/if}
             </div>
           </div>
@@ -384,7 +384,7 @@
             </div>
             
             <div class="label-container small">
-              <label for="end-percent">Ende</label>
+              <label for="end-percent">End</label>
               <input 
                 type="number" 
                 id="end-percent" 
@@ -412,7 +412,7 @@
         <!-- Negatives Prompt (volle Breite) -->
         <div class="parameter-group full-width">
           <div class="label-container">
-            <label for="negative-prompt">Negativer Prompt</label>
+            <label for="negative-prompt">Negative Prompt</label>
             <div class="info-icon" 
                 on:mouseenter={() => activeTooltip = 'negativePrompt'}
                 on:mouseleave={() => activeTooltip = null}>
@@ -491,13 +491,13 @@
         </div>
         
         <div class="api-url-display">
-          <h3>API Anfrage</h3>
+          <h3>API Request</h3>
           <div class="url-box">
             <span class="method">POST</span> 
             {`${apiBaseUrl}?controlnet_strength=${controlnetStrength}&start_percent=${startPercent}&end_percent=${endPercent}&prompt=${encodeURIComponent(prompt)}${negativePrompt ? `&negative_prompt=${encodeURIComponent(negativePrompt)}` : ''}&cfg=${cfg}&steps=${steps}&seed=${seed}&uid=default`}
             <div class="post-data">
               <span class="post-label">Form Data:</span>
-              <span class="post-field">image1: {image ? image.name : 'Kein Bild ausgewählt'}</span>
+              <span class="post-field">image1: {image ? image.name : 'No image selected'}</span>
             </div>
           </div>
         </div>
@@ -510,11 +510,11 @@
         {#if loading}
           <div class="loading-indicator">
             <div class="spinner"></div>
-            <p>Wende ControlNet an...</p>
+            <p>Applying ControlNet...</p>
           </div>
         {:else if error}
           <div class="error-message">
-            <p>Fehler: {error}</p>
+            <p>Error: {error}</p>
           </div>
         {:else if generatedResults.length > 0}
           <div class="results-container">
@@ -522,16 +522,16 @@
               <div class="result-card">
                 <div class="controlnet-info">
                   <div class="source-image-container">
-                    <img src={result.sourceImage} alt="Quellbild" class="source-image" />
+                    <img src={result.sourceImage} alt="Source image" class="source-image" />
                     <div class="arrow-icon">→</div>
                   </div>
                   <div class="params-display">
                     <div class="param-item">
-                      <span class="param-label">Stärke:</span>
+                      <span class="param-label">Strength:</span>
                       <span class="param-value">{result.controlnetParams.strength.toFixed(2)}</span>
                     </div>
                     <div class="param-item">
-                      <span class="param-label">Bereich:</span>
+                      <span class="param-label">Range:</span>
                       <span class="param-value">{result.controlnetParams.startPercent.toFixed(2)} - {result.controlnetParams.endPercent.toFixed(2)}</span>
                     </div>
                   </div>
@@ -547,7 +547,7 @@
         {:else}
           <div class="empty-state">
             <div class="empty-state-content">
-              <p>Lade ein Bild hoch und klicke auf "Anwenden", um ControlNet zu nutzen.</p>
+              <p>Upload an image and click "Generate" to use ControlNet.</p>
             </div>
           </div>
         {/if}

@@ -26,13 +26,13 @@
   
   // Tooltip-Texte
   const tooltips = {
-    prompt: "Beschreibe, wie die Bilder kombiniert werden sollen.",
-    negativePrompt: "Ein negativer Prompt beschreibt, was im Bild nicht erscheinen soll. Dies hilft, unerwünschte Elemente zu vermeiden.",
-    steps: "Mehr Steps bedeuten eine längere Renderzeit, aber oft ein detaillierteres Bild. Übliche Werte liegen zwischen 5 und 50.",
-    cfg: "Steuert, wie stark sich das Modell an den Prompt halten soll. Höhere Werte bedeuten mehr Prompt-Treue, aber manchmal weniger Kreativität.",
-    seed: "Ein bestimmter Seed erzeugt immer das gleiche Bild bei identischen anderen Parametern. Nützlich, um Ergebnisse zu reproduzieren.",
-    image1: "Lade das erste Bild hoch, das kombiniert werden soll.",
-    image2: "Lade das zweite Bild hoch, das kombiniert werden soll."
+    prompt: "Describe how the images should be combined.",
+    negativePrompt: "A negative prompt describes what should not appear in the image. This helps avoid unwanted elements.",
+    steps: "More steps mean longer rendering time, but often a more detailed image. Common values are between 5 and 50.",
+    cfg: "Controls how strongly the model should follow the prompt. Higher values mean more prompt adherence, but sometimes less creativity.",
+    seed: "A specific seed always produces the same image with identical other parameters. Useful for reproducing results.",
+    image1: "Upload the first image to be combined.",
+    image2: "Upload the second image to be combined."
   };
   
   // Zustand der Anwendung
@@ -109,7 +109,7 @@
   // Funktion zum Generieren des kombinierten Bildes
   async function combineImages() {
     if (!image1 || !image2) {
-      error = "Bitte lade zwei Bilder hoch, um sie zu kombinieren.";
+      error = "Please upload two images to combine them.";
       return;
     }
     
@@ -147,9 +147,9 @@
       
       // Erweiterte Fehlerbehandlung
       if (!response.ok) {
-        const errorText = await response.text().catch(() => "Keine Fehlermeldung verfügbar");
-        console.error("API Fehlerdetails:", errorText);
-        throw new Error(`API Fehler: ${response.status} - ${errorText}`);
+        const errorText = await response.text().catch(() => "No error message available");
+        console.error("API Error details:", errorText);
+        throw new Error(`API Error: ${response.status} - ${errorText}`);
       }
       
       // Die Antwort als Blob behandeln (Binärdaten/Bild)
@@ -170,7 +170,7 @@
       
     } catch (e) {
       error = e.message;
-      console.error("Fehler beim Kombinieren der Bilder:", e);
+      console.error("Error combining images:", e);
     } finally {
       loading = false;
     }
@@ -249,13 +249,13 @@
         <!-- Bild-Upload-Bereiche -->
         <div class="parameter-group full-width">
           <div class="label-container">
-            <label>Bilder zum Kombinieren</label>
+            <label>Images to Combine</label>
             <div class="info-icon" 
                 on:mouseenter={() => activeTooltip = 'images'}
                 on:mouseleave={() => activeTooltip = null}>
               i
               {#if activeTooltip === 'images'}
-                <div class="tooltip">Lade zwei Bilder hoch, die kombiniert werden sollen.</div>
+                <div class="tooltip">Upload two images that should be combined.</div>
               {/if}
             </div>
           </div>
@@ -270,13 +270,13 @@
               on:drop={(e) => handleImageDrop(e, 1)}
             >
               {#if image1Preview}
-                <img src={image1Preview} alt="Bild 1 Vorschau" class="image-preview" />
+                <img src={image1Preview} alt="Image 1 Preview" class="image-preview" />
                 <button class="remove-image" on:click={() => { image1 = null; image1Preview = null; }}>×</button>
               {:else}
                 <div class="upload-placeholder">
                   <span class="upload-icon">+</span>
-                  <span>Bild 1</span>
-                  <span class="upload-hint">Klicken oder ziehen</span>
+                  <span>Image 1</span>
+                  <span class="upload-hint">Click or drag</span>
                   <input 
                     type="file" 
                     id="image1" 
@@ -297,13 +297,13 @@
               on:drop={(e) => handleImageDrop(e, 2)}
             >
               {#if image2Preview}
-                <img src={image2Preview} alt="Bild 2 Vorschau" class="image-preview" />
+                <img src={image2Preview} alt="Image 2 Preview" class="image-preview" />
                 <button class="remove-image" on:click={() => { image2 = null; image2Preview = null; }}>×</button>
               {:else}
                 <div class="upload-placeholder">
                   <span class="upload-icon">+</span>
-                  <span>Bild 2</span>
-                  <span class="upload-hint">Klicken oder ziehen</span>
+                  <span>Image 2</span>
+                  <span class="upload-hint">Click or drag</span>
                   <input 
                     type="file" 
                     id="image2" 
@@ -320,7 +320,7 @@
         <!-- Negatives Prompt (volle Breite) -->
         <div class="parameter-group full-width">
           <div class="label-container">
-            <label for="negative-prompt">Negativer Prompt</label>
+            <label for="negative-prompt">Negative Prompt</label>
             <div class="info-icon" 
                 on:mouseenter={() => activeTooltip = 'negativePrompt'}
                 on:mouseleave={() => activeTooltip = null}>
@@ -399,14 +399,14 @@
         </div>
         
         <div class="api-url-display">
-          <h3>API Anfrage</h3>
+          <h3>API Request</h3>
           <div class="url-box">
             <span class="method">POST</span> 
             {`${apiBaseUrl}?cfg=${cfg}&steps=${steps}&seed=${seed}&uid=default${prompt ? `&prompt=${encodeURIComponent(prompt)}` : ''}${negativePrompt ? `&negative_prompt=${encodeURIComponent(negativePrompt)}` : ''}`}
             <div class="post-data">
               <span class="post-label">Form Data:</span>
-              <span class="post-field">image1: {image1 ? image1.name : 'Kein Bild ausgewählt'}</span>
-              <span class="post-field">image2: {image2 ? image2.name : 'Kein Bild ausgewählt'}</span>
+              <span class="post-field">image1: {image1 ? image1.name : 'No image selected'}</span>
+              <span class="post-field">image2: {image2 ? image2.name : 'No image selected'}</span>
             </div>
           </div>
         </div>
@@ -419,11 +419,11 @@
         {#if loading}
           <div class="loading-indicator">
             <div class="spinner"></div>
-            <p>Kombiniere Bilder...</p>
+            <p>Combining images...</p>
           </div>
         {:else if error}
           <div class="error-message">
-            <p>Fehler: {error}</p>
+            <p>Error: {error}</p>
           </div>
         {:else if generatedResults.length > 0}
           <div class="results-container">
@@ -431,9 +431,9 @@
               <div class="result-card">
                 <div class="source-images">
                   {#if result.sourceImages && result.sourceImages.length === 2}
-                    <img src={result.sourceImages[0]} alt="Quellbild 1" class="source-image" />
+                    <img src={result.sourceImages[0]} alt="Source image 1" class="source-image" />
                     <span class="plus-icon">+</span>
-                    <img src={result.sourceImages[1]} alt="Quellbild 2" class="source-image" />
+                    <img src={result.sourceImages[1]} alt="Source image 2" class="source-image" />
                     <span class="equals-icon">=</span>
                   {/if}
                 </div>
@@ -448,7 +448,7 @@
         {:else}
           <div class="empty-state">
             <div class="empty-state-content">
-              <p>Lade zwei Bilder hoch und klicke auf "Kombinieren", um sie zu mischen.</p>
+              <p>Upload two images and click "Generate" to combine them.</p>
             </div>
           </div>
         {/if}

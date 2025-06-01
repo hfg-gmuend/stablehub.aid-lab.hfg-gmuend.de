@@ -32,7 +32,7 @@
 
 <div class="output-area">
   <div class="output-header">
-    <h2>Generierte Bilder</h2>
+    <h2>Generated Images</h2>
     <div class="generation-controls">
       <button 
         class="generate-button {loading ? 'disabled' : ''}" 
@@ -41,9 +41,9 @@
       >
         {#if loading}
           <div class="spinner"></div>
-          <span>Generiere...</span>
+          <span>Generating...</span>
         {:else}
-          <span>Generiere {imageCount} Bild{imageCount > 1 ? 'er' : ''}</span>
+          <span>Generate {imageCount} Image{imageCount > 1 ? 's' : ''}</span>
         {/if}
       </button>
     </div>
@@ -63,11 +63,11 @@
           <div class="image-actions">
             <button class="action-button" on:click={() => handleSaveImage(imageUrl)}>
               <svg viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/></svg>
-              Speichern
+              Save
             </button>
             <button class="action-button" on:click={() => handleShareImage(imageUrl)}>
               <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
-              Teilen
+              Share
             </button>
           </div>
         </div>
@@ -75,12 +75,12 @@
     </div>
   {:else if !loading}
     <div class="empty-state">
-      <p>Klicke auf "Generiere", um ein Bild zu erstellen</p>
+      <p>Click "Generate" to create an image</p>
     </div>
   {:else}
     <div class="loading-state">
       <div class="large-spinner"></div>
-      <p>Generiere Bild...</p>
+      <p>Generating image...</p>
     </div>
   {/if}
 </div>
@@ -92,7 +92,7 @@
     padding: 1.5rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     position: relative;
-    min-height: 200px; /* Füge eine Mindesthöhe hinzu, um Platz für den zentrierten Loader zu gewährleisten */
+    min-height: 200px; /* Add minimum height for centered loader space */
   }
   
   .output-header {
