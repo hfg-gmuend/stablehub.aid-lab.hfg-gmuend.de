@@ -13,25 +13,25 @@
 <div class="app-container">
   <MinimalSidebar />
   <main>
-    <h1 class="main-title">Willkommen im HfG Ai-Hub</h1>
-    <p class="subtitle">Entdecke die Möglichkeiten der künstlichen Intelligenz für deine Projekte</p>
+    <h1 class="main-title">Welcome to HfG AI-Hub</h1>
+    <p class="subtitle">Discover the possibilities of artificial intelligence for your projects</p>
     
     <div class="cards-container">
       <ImageCard 
         title="Text To Image" 
-        description="Schreibe ein Prompt, erhalte in Sekunden ein maßgeschneidertes Bild."
+        description="Write a prompt, get a custom image in seconds."
         href="{base}/text-to-image" 
         imageUrl="{assets}/cards/card1.jpg" 
       />
       <ImageCard 
         title="Image To Image" 
-        description="Lade ein Bild hoch und sieh zu, wie es in neue Stile oder Varianten verwandelt wird."
+        description="Upload an image and watch it transform into new styles or variations."
         href="{base}/image-to-image" 
         imageUrl="{assets}/cards/card2.jpg" 
       />
       <ImageCard 
         title="ControlNet" 
-        description="Nutze Skizzen oder Posen als Leitfaden, um präzise Bilder mit voller kreativer Kontrolle zu erzeugen."
+        description="Use sketches or poses as guides to generate precise images with full creative control."
         href="{base}/control-net" 
         imageUrl="{assets}/cards/card3.jpg" 
       />
@@ -40,33 +40,33 @@
     <!-- Tutorial-Teaser-Abschnitt -->
     <section class="tutorials-teaser">
       <div class="teaser-header">
-        <h2>Neu hier? Start mit unseren Tutorials</h2>
-        <a href="{base}/guided-tutorial" class="view-all-link">Alle Tutorials ansehen</a>
+        <h2>New here? Start with our tutorials</h2>
+        <a href="{base}/guided-tutorial" class="view-all-link">View all tutorials</a>
       </div>
       
       <div class="tutorial-highlights">
         <TutorialHighlightCard
           icon="🚀"
-          title="Schnelleinstieg"
-          description="Lerne die Grundlagen von Stable Diffusion in nur 10 Minuten"
+          title="Quick Start"
+          description="Learn the basics of Stable Diffusion in just 10 minutes"
           href="{base}/guided-tutorial/stable-diffusion-intro"
-          linkText="Jetzt starten"
+          linkText="Start now"
         />
 
         <TutorialHighlightCard
           icon="💡"
-          title="Prompt-Power"
-          description="Mit besseren Prompts zu besseren Ergebnissen"
+          title="Prompt Power"
+          description="Better prompts lead to better results"
           href="{base}/guided-tutorial/prompt-basics"
-          linkText="Tipps entdecken"
+          linkText="Discover tips"
         />
 
         <TutorialHighlightCard
           icon="🔧"
-          title="Für Fortgeschrittene"
-          description="Parameter, Stile und fortgeschrittene Techniken"
+          title="For Advanced Users"
+          description="Parameters, styles and advanced techniques"
           href="{base}/guided-tutorial/core-parameters"
-          linkText="Vertiefen"
+          linkText="Go deeper"
         />
       </div>
     </section>

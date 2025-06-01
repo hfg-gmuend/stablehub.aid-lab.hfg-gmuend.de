@@ -5,7 +5,7 @@
 <div class="sidebar-header">
   <a href="{base}/" class="logo">
     <img src="{assets}/icon/icon.svg" alt="HfG Ai-Hub Logo" width="24" height="24" />
-    <span>HfG Ai-Hub</span>
+    <span>HfG AI-HUB</span>
   </a>
 </div>
 

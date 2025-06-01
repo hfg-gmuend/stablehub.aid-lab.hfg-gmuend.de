@@ -42,13 +42,13 @@
   <SidebarHeader />
   
   <NavigationSection 
-    title="Modi Auswahl" 
+    title="Generation Tools" 
     items={modes} 
     {currentPath} 
   />
   
   <NavigationSection 
-    title="Lernbereich" 
+    title="Learn & Explore" 
     items={tutorialItems} 
     {currentPath} 
     activeCheckFn={isTutorialActive}
