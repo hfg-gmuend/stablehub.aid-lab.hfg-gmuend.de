@@ -101,3 +101,5 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) for deta
 - 🎨 Stability AI for Stable Diffusion
 - 🌍 The Open Source community for tools and models
 - 👥 Students and educators at the AI-D Lab for feedback and contributions
+
+- Thanks for checking out the Project.
