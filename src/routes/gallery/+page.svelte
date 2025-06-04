@@ -2,9 +2,16 @@
   import MinimalSidebar from "$lib/components/uicomponents/SidePanel/MinimalSidebar.svelte";
   import NavigationBar from "$lib/components/NavigationBar.svelte";
   import { favorites } from '$lib/stores/favorites';
+  import { onMount } from 'svelte';
   
   // Zustand für das angezeigte Prompt
   let displayPrompt = null;
+  
+  // Lade Favoriten beim Mount der Komponente
+  onMount(async () => {
+    console.log("Gallery: Laden der Favoriten von API");
+    await favorites.reload();
+  });
   
   // Funktion zum Kopieren des Prompts in die Zwischenablage
   async function copyPromptToClipboard(prompt) {
@@ -18,8 +25,8 @@
   }
   
   // Funktion zum Entfernen eines Favoriten
-  function removeFavorite(imageUrl) {
-    favorites.remove(imageUrl);
+  async function removeFavorite(imageUrl) {
+    await favorites.remove(imageUrl);
   }
   
   // Funktion zum Behandeln von Bildlade-Fehlern
@@ -51,12 +58,12 @@
         </div>
       {:else}
         <div class="image-grid">
-          {#each $favorites as favorite (favorite.imageData || favorite.imageUrl)}
+          {#each $favorites as favorite (favorite.imageUrl)}
             <div class="gallery-item"
                  on:mouseenter={() => displayPrompt = favorite.imageUrl}
                  on:mouseleave={() => displayPrompt = null}>
               <img 
-                src={favorite.imageData || favorite.imageUrl} 
+                src={favorite.imageUrl} 
                 alt="Favorite image" 
                 class="gallery-image" 
                 on:error={handleImageError}
@@ -69,7 +76,7 @@
                     <button class="copy-button" on:click={() => copyPromptToClipboard(favorite.prompt)}>
                       <span class="copy-icon">📋</span> Copy
                     </button>
-                    <button class="remove-button" on:click={() => removeFavorite(favorite.imageData || favorite.imageUrl)}>
+                    <button class="remove-button" on:click={() => removeFavorite(favorite.imageUrl)}>
                       <span class="remove-icon">🗑️</span> Remove
                     </button>
                   </div>

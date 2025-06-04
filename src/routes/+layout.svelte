@@ -3,11 +3,13 @@
   import { generatedImages } from '$lib/stores/generatedImages.js';
   import { navigating } from '$app/stores';
   import { assets } from '$app/paths';
+  import { user } from '$lib/stores/user.js';
   
   // Fix Typen beim ersten Laden und bei jedem Routing-Wechsel
   onMount(() => {
     console.log("[Layout] App geladen, bereite Store vor");
     generatedImages.fixTypes();
+    console.log("userid:", $user.userid)
   });
   
   // Bei Navigation zwischen Routen Typen korrigieren

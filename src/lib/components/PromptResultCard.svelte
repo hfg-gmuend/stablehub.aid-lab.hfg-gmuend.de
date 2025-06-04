@@ -1,6 +1,7 @@
 <script>
   //MrNoLook
   import { favorites } from '$lib/stores/favorites';
+  import { user } from '$lib/stores/user.js';
   import { styles } from "$lib/config/styles.js";
   import { assets } from '$app/paths';
   
@@ -22,10 +23,11 @@
   // Initialisierung des Favoriten-Status für jedes Bild
   let favoriteStatus = imageUrls.map(() => false);
   
-  // Aktualisiere den Favoriten-Status basierend auf dem Store
+  // Aktualisiere den Favoriten-Status basierend auf dem Store und der aktuellen User-ID
   $: {
+    const currentUserId = $user.userid || '';
     favoriteStatus = imageUrls.map(url => 
-      $favorites.some(fav => fav.imageUrl === url)
+      $favorites.some(fav => fav.imageUrl === url && fav.userId === currentUserId)
     );
   }
   

@@ -1,13 +1,34 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
+import { user } from './user.js';
 
-// Funktion zum Laden der gespeicherten Favoriten aus dem Local Storage
-const loadFavorites = () => {
+// API URL für die Gallery
+const GALLERY_API_URL = 'https://aid-playground.hfg-gmuend.de/api/gallery';
+
+// Helper function to get current user ID
+const getCurrentUserId = () => {
+  let currentUserId = '';
+  const unsubscribe = user.subscribe(userState => {
+    currentUserId = userState.userid || '';
+  });
+  unsubscribe();
+  return currentUserId;
+};
+
+// Funktion zum Laden der Favoriten von der API
+const loadFavorites = async () => {
   if (browser) {
     try {
-      const storedFavorites = localStorage.getItem('favoriteImages');
-      console.log("Geladene Favoriten:", storedFavorites ? JSON.parse(storedFavorites).length : 0);
-      return storedFavorites ? JSON.parse(storedFavorites) : [];
+      const response = await fetch(GALLERY_API_URL);
+      if (response.ok) {
+        const data = await response.json();
+        const favorites = Array.isArray(data) ? data : [];
+        console.log("Geladene Favoriten von API:", favorites.length);
+        return favorites;
+      } else {
+        console.error("Fehler beim Laden der Favoriten von API:", response.status);
+        return [];
+      }
     } catch (e) {
       console.error("Fehler beim Laden der Favoriten:", e);
       return [];
@@ -18,88 +39,87 @@ const loadFavorites = () => {
 
 // Erstellen des Stores mit den gespeicherten Favoriten
 const createFavoritesStore = () => {
-  const { subscribe, update, set } = writable(loadFavorites());
+  // Initialize with empty array and proper typing
+  /** @type {Array<{prompt: string, imageUrl: string, userId: string}>} */
+  const initialFavorites = [];
+  const { subscribe, update, set } = writable(initialFavorites);
+
+  // Initial load of favorites
+  if (browser) {
+    loadFavorites().then(favorites => {
+      set(Array.isArray(favorites) ? favorites : []);
+    });
+  }
 
   return {
     subscribe,
     
-    // Favorit hinzufügen oder entfernen mit Blob-zu-Base64-Konvertierung
-    toggle: async (image) => {
+    // Favoriten neu laden
+    reload: async () => {
+      const favorites = await loadFavorites();
+      set(favorites);
+      return favorites;
+    },
+    
+    // Favorit hinzufügen oder entfernen
+    toggle: async (/** @type {any} */ image) => {
       try {
-        // Prüfen, ob das Bild bereits in den Favoriten ist
-        let existingIndex = -1;
-        
-        update(favorites => {
-          existingIndex = favorites.findIndex(fav => fav.imageUrl === image.imageUrl);
-          return favorites;
-        });
-        
-        if (existingIndex >= 0) {
-          // Wenn das Bild existiert, entferne es
-          update(favorites => {
-            const updatedFavorites = [
-              ...favorites.slice(0, existingIndex),
-              ...favorites.slice(existingIndex + 1)
-            ];
-            
-            if (browser) {
-              try {
-                localStorage.setItem('favoriteImages', JSON.stringify(updatedFavorites));
-                console.log("Favorit entfernt, neue Anzahl:", updatedFavorites.length);
-              } catch (e) {
-                console.error("Fehler beim Speichern der Favoriten:", e);
-              }
-            }
-            
-            return updatedFavorites;
+        const currentUserId = getCurrentUserId();
+
+        if (!currentUserId) {
+          console.error("Keine User-ID verfügbar");
+          return;
+        }
+
+        // Prepare the favorite object for API
+        const favoriteData = {
+          prompt: image.prompt || '',
+          imageUrl: image.imageUrl || '',
+          userId: currentUserId
+        };
+
+        // Check if it already exists by getting current favorites
+        const currentFavorites = await loadFavorites();
+        const existingFavorite = currentFavorites.find(fav => 
+          fav.imageUrl === favoriteData.imageUrl && fav.userId === currentUserId
+        );
+
+        if (existingFavorite) {
+          // Remove favorite using DELETE request
+          const response = await fetch(GALLERY_API_URL, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(existingFavorite)
           });
-        } else {
-          // Wenn es nicht existiert, füge es hinzu und konvertiere es zu Base64
-          let imageData = null;
-          
-          if (image.imageUrl.startsWith('blob:')) {
-            try {
-              const response = await fetch(image.imageUrl);
-              if (response.ok) {
-                const blob = await response.blob();
-                
-                // Konvertiere Blob zu Base64
-                imageData = await new Promise((resolve) => {
-                  const reader = new FileReader();
-                  reader.onloadend = () => resolve(reader.result);
-                  reader.readAsDataURL(blob);
-                });
-                
-                console.log("Bild erfolgreich zu Base64 konvertiert");
-              } else {
-                console.error("Fehler beim Abrufen des Blob:", response.statusText);
-              }
-            } catch (error) {
-              console.error("Fehler bei der Konvertierung zu Base64:", error);
-            }
+
+          if (response.ok) {
+            console.log("Favorit erfolgreich entfernt");
+            // Reload favorites to get updated list
+            const updatedFavorites = await loadFavorites();
+            set(updatedFavorites);
+          } else {
+            console.error("Fehler beim Entfernen des Favoriten:", response.status);
           }
-          
-          // Füge das Bild hinzu (mit Base64-Daten, wenn verfügbar)
-          update(favorites => {
-            const newFavorite = {
-              ...image,
-              imageData: imageData || image.imageUrl,
-              timestamp: new Date().toISOString()
-            };
-            
-            const updatedFavorites = [...favorites, newFavorite];
-            
-            if (browser) {
-              try {
-                localStorage.setItem('favoriteImages', JSON.stringify(updatedFavorites));
-                console.log("Favorit hinzugefügt, neue Anzahl:", updatedFavorites.length);
-              } catch (e) {
-                console.error("Fehler beim Speichern der Favoriten:", e);
-              }
-            }
-            
-            return updatedFavorites;
+        } else {
+          // Add favorite using POST request
+          const response = await fetch(GALLERY_API_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(favoriteData)
           });
+
+          if (response.ok) {
+            console.log("Favorit erfolgreich hinzugefügt");
+            // Reload favorites to get updated list
+            const updatedFavorites = await loadFavorites();
+            set(updatedFavorites);
+          } else {
+            console.error("Fehler beim Hinzufügen des Favoriten:", response.status);
+          }
         }
       } catch (error) {
         console.error("Fehler beim Umschalten des Favoriten-Status:", error);
@@ -107,32 +127,57 @@ const createFavoritesStore = () => {
     },
     
     // Favorit entfernen (wird in der Gallerie-Ansicht verwendet)
-    remove: (imageUrl) => {
-      update(favorites => {
-        console.log("Entferne Favorit mit URL:", imageUrl);
-        
-        const updatedFavorites = favorites.filter(fav => 
-          fav.imageUrl !== imageUrl && fav.imageData !== imageUrl
-        );
-        
-        if (browser) {
-          try {
-            localStorage.setItem('favoriteImages', JSON.stringify(updatedFavorites));
-            console.log("Favorit entfernt, neue Anzahl:", updatedFavorites.length);
-          } catch (e) {
-            console.error("Fehler beim Speichern der Favoriten:", e);
-          }
+    remove: async (/** @type {string} */ imageUrl) => {
+      try {
+        const currentUserId = getCurrentUserId();
+
+        if (!currentUserId) {
+          console.error("Keine User-ID verfügbar");
+          return;
         }
-        
-        return updatedFavorites;
-      });
+
+        // Find the favorite to remove
+        const currentFavorites = await loadFavorites();
+        const favoriteToRemove = currentFavorites.find(fav => 
+          (fav.imageUrl === imageUrl) && fav.userId === currentUserId
+        );
+
+        if (favoriteToRemove) {
+          const response = await fetch(GALLERY_API_URL, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(favoriteToRemove)
+          });
+
+          if (response.ok) {
+            console.log("Favorit erfolgreich entfernt");
+            // Reload favorites to get updated list
+            const updatedFavorites = await loadFavorites();
+            set(updatedFavorites);
+          } else {
+            console.error("Fehler beim Entfernen des Favoriten:", response.status);
+          }
+        } else {
+          console.log("Favorit nicht gefunden zum Entfernen");
+        }
+      } catch (error) {
+        console.error("Fehler beim Entfernen des Favoriten:", error);
+      }
     },
     
     // Prüfen, ob ein Bild bereits ein Favorit ist
-    isFavorite: (imageUrl) => {
+    isFavorite: (/** @type {string} */ imageUrl) => {
       let result = false;
+      const currentUserId = getCurrentUserId();
+
       update(favorites => {
-        result = favorites.some(fav => fav.imageUrl === imageUrl);
+        if (Array.isArray(favorites)) {
+          result = favorites.some(fav => 
+            fav && fav.imageUrl === imageUrl && fav.userId === currentUserId
+          );
+        }
         return favorites;
       });
       return result;
