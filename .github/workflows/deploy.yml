@@ -5,6 +5,9 @@ on:
     branches: 'main'
   workflow_dispatch:
 
+env:
+  VITE_CHAT_API_KEY: ${{ secrets.VITE_CHAT_API_KEY }}
+
 jobs:
   build_site:
     runs-on: ubuntu-latest
