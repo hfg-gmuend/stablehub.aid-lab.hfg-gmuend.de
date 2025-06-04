@@ -11,6 +11,7 @@
   // Access the environment variable for the API key
   // With fallback in case the environment variable is not available
   const apiKey = import.meta.env.VITE_CHAT_API_KEY
+  console.log(import.meta)
   
   // State
   let userPrompt = '';
