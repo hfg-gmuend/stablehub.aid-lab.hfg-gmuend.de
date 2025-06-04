@@ -10,7 +10,7 @@
   
   // Access the environment variable for the API key
   // With fallback in case the environment variable is not available
-  const apiKey = browser ? import.meta.env.VITE_CHAT_API_KEY || '' : '';
+  const apiKey = import.meta.env.VITE_CHAT_API_KEY
   
   // State
   let userPrompt = '';
