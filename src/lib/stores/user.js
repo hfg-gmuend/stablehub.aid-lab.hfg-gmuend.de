@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import { browser } from '$app/environment';
 
 function uuidv4() {
     return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) =>
@@ -12,6 +13,7 @@ function uuidv4() {
 
 
 function setCookie(cname, cvalue, exdays) {
+    if (!browser) return; // Skip if not in browser
     const d = new Date();
     d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
     let expires = "expires=" + d.toUTCString();
@@ -20,6 +22,7 @@ function setCookie(cname, cvalue, exdays) {
 
 
 function getCookie(cname) {
+    if (!browser) return ""; // Return empty string if not in browser
     let name = cname + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
     let ca = decodedCookie.split(";");
@@ -36,6 +39,7 @@ function getCookie(cname) {
 }
 
 function setRandomUserId() {
+    if (!browser) return ""; // Return empty string if not in browser
     const userid = uuidv4();
     setCookie("userid", userid, 365);
     console.log("User Store: Neue User-ID gesetzt:", userid);
@@ -44,13 +48,16 @@ function setRandomUserId() {
 
 const createUserStore = () => {
   const { subscribe, update, set } = writable({
-    userid: getCookie("userid") || setRandomUserId()
+    userid: browser ? (getCookie("userid") || setRandomUserId()) : ""
   });
 
     return {
     subscribe,
     // Setzt die User-ID
     setUserId: (userid) => {
+      if (browser) {
+        setCookie("userid", userid, 365);
+      }
       update((state) => {
         const newState = { ...state, userid };
         console.log("User Store: User ID gesetzt:", newState);
@@ -59,8 +66,11 @@ const createUserStore = () => {
     },
     // Löscht die User-ID
     clearUserId: () => {
+      if (browser) {
+        setCookie("userid", "", -1); // Expire the cookie
+      }
       update((state) => {
-        const newState = { ...state, userid: null };
+        const newState = { ...state, userid: "" };
         console.log("User Store: User ID gelöscht:", newState);
         return newState;
       });
@@ -75,8 +85,11 @@ const createUserStore = () => {
     },
     // Löscht den gesamten User-Status
     clearUserStatus: () => {
+      if (browser) {
+        setCookie("userid", "", -1); // Expire the cookie
+      }
       update((state) => {
-        const newState = { userid: null };
+        const newState = { userid: "" };
         console.log("User Store: User Status gelöscht:", newState);
         return newState;
       });
@@ -84,4 +97,4 @@ const createUserStore = () => {
   };
 }
 
-export const userStore = createUserStore();
+export const user = createUserStore();
