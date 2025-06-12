@@ -1,15 +1,21 @@
 <script>
   //MrNoLook
-  import { favorites } from '$lib/stores/favorites';
+  import { serverImages } from '$lib/stores/serverImages.js';
   import { styles } from "$lib/config/styles.js";
   import { assets } from '$app/paths';
+  import { onMount } from 'svelte';
   
+  /** @type {string} */
   export let prompt = "";
+  /** @type {string[]} */
   export let imageUrls = [];
+  /** @type {(prompt: string) => void} */
   export let onEdit = () => {};
+  /** @type {string[]} */
   export let usedStyles = [];
   
   // Funktion zum Herunterladen eines Bildes
+  /** @param {string} imageUrl */
   function downloadImage(imageUrl) {
     const link = document.createElement('a');
     link.href = imageUrl;
@@ -20,24 +26,72 @@
   }
   
   // Initialisierung des Favoriten-Status für jedes Bild
+  /** @type {boolean[]} */
   let favoriteStatus = imageUrls.map(() => false);
+  /** @type {any[]} */
+  let galleryItems = [];
+  let galleryLoaded = false;
   
-  // Aktualisiere den Favoriten-Status basierend auf dem Store
-  $: {
-    favoriteStatus = imageUrls.map(url => 
-      $favorites.some(fav => fav.imageUrl === url)
-    );
+  // Lade die Galerie-Items beim Mounten
+  async function loadGalleryStatus() {
+    if (galleryLoaded) return; // Verhindere mehrfache Ladungen
+    
+    try {
+      console.log('[PromptResultCard] Loading gallery status...');
+      galleryItems = await serverImages.loadGallery();
+      galleryLoaded = true;
+      console.log('[PromptResultCard] Gallery loaded:', galleryItems.length, 'items');
+      
+      // Aktualisiere den Favoriten-Status
+      favoriteStatus = imageUrls.map(url => {
+        const isFavorite = galleryItems.some(item => item.imageUrl === url);
+        console.log('[PromptResultCard] Image', url, 'is favorite:', isFavorite);
+        return isFavorite;
+      });
+      console.log('[PromptResultCard] Favorite status updated:', favoriteStatus);
+    } catch (error) {
+      console.error('[PromptResultCard] Error loading gallery status:', error);
+    }
   }
   
+  // Lade den Status nur beim ersten Mount
+  onMount(() => {
+    loadGalleryStatus();
+  });
+  
   // Funktion zum Umschalten des Favoriten-Status
+  /** @param {string} imageUrl @param {number} index */
   async function toggleFavorite(imageUrl, index) {
     console.log("Favorit umschalten:", imageUrl);
     
-    // Verwende die toggle-Methode des Stores
-    await favorites.toggle({
-      imageUrl,
-      prompt
-    });
+    try {
+      const isCurrentlyFavorite = favoriteStatus[index];
+      
+      if (isCurrentlyFavorite) {
+        // Entferne aus Favoriten
+        const galleryItem = galleryItems.find(item => item.imageUrl === imageUrl);
+        if (galleryItem) {
+          await serverImages.removeFromFavorites(galleryItem);
+          // Aktualisiere nur den lokalen Status ohne neu zu laden
+          favoriteStatus[index] = false;
+          favoriteStatus = [...favoriteStatus]; // Trigger Svelte reactivity
+        }
+      } else {
+        // Füge zu Favoriten hinzu
+        await serverImages.addToFavorites({
+          prompt,
+          imageUrl,
+          type: 'text-to-image',
+          styles: usedStyles
+        });
+        // Aktualisiere nur den lokalen Status ohne neu zu laden
+        favoriteStatus[index] = true;
+        favoriteStatus = [...favoriteStatus]; // Trigger Svelte reactivity
+      }
+      
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
   }
 </script>
 
@@ -79,7 +133,7 @@
       {#each usedStyles as styleId}
         {#if styles.find(s => s.id === styleId)}
           <div class="used-style-tag">
-            {styles.find(s => s.id === styleId).name}
+            {styles.find(s => s.id === styleId)?.name}
           </div>
         {/if}
       {/each}

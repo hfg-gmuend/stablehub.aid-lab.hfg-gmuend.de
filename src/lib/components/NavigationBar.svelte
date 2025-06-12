@@ -1,8 +1,18 @@
 <script>
   import { goto } from '$app/navigation';
+  import UidSwitcher from './UidSwitcher.svelte';
+  import { serverImages } from '$lib/stores/serverImages.js';
   
   // Props: aktiver Tab (erweitert um 'controlnet')
   export let active = 'generate';
+  
+  function handleUidChanged(event) {
+    console.log('[NavigationBar] UID changed:', event.detail);
+    // Lade die Bilder für die neue UID
+    serverImages.loadUserImages(event.detail.newUid);
+    // Optional: Leere den lokalen Cache
+    serverImages.clearLocalData();
+  }
 </script>
 
 <div class="header-bar">
@@ -28,6 +38,10 @@
       Galerie
     </button>
   </div>
+  
+  <div class="header-actions">
+    <UidSwitcher on:uidChanged={handleUidChanged} />
+  </div>
 </div>
 
 <style>
@@ -39,12 +53,17 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between; /* Ändere von center zu space-between */
   }
   
   .nav-tabs {
     display: flex;
     gap: 0.75rem;
+  }
+  
+  .header-actions {
+    display: flex;
+    align-items: center;
   }
   
   .tab-button {

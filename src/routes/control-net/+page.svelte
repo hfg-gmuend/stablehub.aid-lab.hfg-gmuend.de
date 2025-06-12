@@ -5,7 +5,9 @@
   import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte';
   import StyleCopilot from "$lib/components/StyleCopilot.svelte";
   import { onMount, onDestroy } from "svelte";
-  import { generatedImages } from "$lib/stores/generatedImages.js"; // Import des Stores
+  import { serverImages } from "$lib/stores/serverImages.js";
+  import { user } from "$lib/stores/user.js";
+  import { ApiService } from "$lib/services/apiService.js";
   import type { GeneratedResult } from '$lib/types';
   import { assets } from '$app/paths';
 
@@ -70,13 +72,15 @@
   // Historie der generierten Bilder
   let generatedResults: GeneratedResult[] = [];
   
-  // Verbesserte Filterung mit Logging
-  const unsubscribe = generatedImages.subscribe(history => {
-    // Nur exakt vom Typ "controlnet" anzeigen
-    generatedResults = history.filter(entry => entry.type === "controlnet") as GeneratedResult[];
-    console.log("[ControlNet] Filtered results:", generatedResults.length, 
-                "von insgesamt", history.length);
+  // Store subscription für Server-basierte Bilder
+  const unsubscribe = serverImages.subscribe(images => {
+    // Filtere nach "controlnet" Typ
+    generatedResults = images.filter(entry => entry.type === "controlnet") as GeneratedResult[];
+    console.log("[ControlNet] Server images loaded:", generatedResults.length);
   });
+  
+  // Reaktive Variable für aktuelle UID
+  $: currentUid = $user.userid || 'default';
 
   // API URL Basis
   const apiBaseUrl: string = "https://aid-playground.hfg-gmuend.de/api/controlnet";
@@ -128,57 +132,46 @@
     error = null;
 
     try {
-      // FormData für den POST-Request erstellen
-      const formData = new FormData();
-      formData.append("image1", image); // API expects 'image1'
-
-      // URL mit Parametern erstellen
-      const url = new URL(apiBaseUrl);
-      url.searchParams.append("controlnet_strength", controlnetStrength.toString());
-      url.searchParams.append("start_percent", startPercent.toString());
-      url.searchParams.append("end_percent", endPercent.toString());
-      url.searchParams.append("prompt", encodeURIComponent(prompt));
-      url.searchParams.append("cfg", cfg.toString());
-      url.searchParams.append("steps", steps.toString());
-      url.searchParams.append("seed", seed.toString());
-      url.searchParams.append("uid", "default"); // Standardwert verwenden
-      if (negativePrompt) url.searchParams.append("negative_prompt", encodeURIComponent(negativePrompt));
-
-      console.log("API Request URL:", url.toString()); // Debugging
-      
-      // POST-Request mit FormData
-      const response = await fetch(url, {
-        method: "POST",
-        body: formData
+      // Verwende den neuen API Service
+      const result = await ApiService.generateControlNet({
+        prompt,
+        negativePrompt,
+        cfg,
+        steps,
+        seed,
+        image,
+        controlnetStrength,
+        startPercent,
+        endPercent
       });
-
-      // Erweiterte Fehlerbehandlung
-      if (!response.ok) {
-        const errorText = await response.text().catch(() => "No error message available");
-        console.error("API Error details:", errorText);
-        throw new Error(`API Error: ${response.status} - ${errorText}`);
-      }
-
-      // Die Antwort als Blob behandeln (Binärdaten/Bild)
-      const blob = await response.blob();
-
-      // Objekt-URL für den Blob erstellen
-      const resultUrl = URL.createObjectURL(blob);
-
-      // In den Store speichern mit explizitem Typ
-      const historyEntry = {
+      
+      // Neues Ergebnis für lokale Anzeige erstellen
+      const newResult: GeneratedResult = {
+        id: Date.now(),
         prompt: prompt,
-        imageUrls: [resultUrl],
+        imageUrls: [result.imageUrl || result],  // Unterstütze beide Formate
         sourceImage: imagePreview,
         controlnetParams: {
           strength: controlnetStrength,
           startPercent: startPercent,
           endPercent: endPercent
         },
-        type: "controlnet" // Expliziten Typ definieren
+        timestamp: new Date()
       };
       
-      generatedImages.addToHistory(historyEntry);
+      // Zur lokalen Liste hinzufügen für sofortige Anzeige
+      generatedResults = [newResult, ...generatedResults];
+      
+      console.log("[ControlNet] Image generated successfully, loading server data...");
+      
+      // Prompt-Daten werden jetzt automatisch in der API-Service gespeichert
+      // Keine manuelle Speicherung mehr notwendig
+      
+      // DEAKTIVIERT: Das setTimeout überschreibt die korrekt angezeigten Prompts 
+      // mit fehlerhaften Server-Daten aufgrund von ID-Matching-Problemen
+      // setTimeout(async () => {
+      //   await serverImages.loadUserImages();
+      // }, 1500);
 
     } catch (e) {
       error = e instanceof Error ? e.message : "Unknown error";
@@ -201,9 +194,11 @@
   }
 
   // --- Lifecycle ---
-  onMount(() => {
-    // Fix Store-Typen beim Laden
-    generatedImages.fixTypes();
+  onMount(async () => {
+    console.log("[ControlNet] Component mounted, loading user images...");
+    
+    // Lade Bilder vom Server für die aktuelle UID
+    await serverImages.loadUserImages();
 
     const url = new URL(window.location.href);
 
@@ -247,7 +242,7 @@
   });
 
   onDestroy(() => {
-    // Objekt-URL freigeben, wenn vorhanden
+    // Objekt-URLs freigeben, wenn vorhanden
     generatedResults.forEach(result => {
       if (result.imageUrls) {
         result.imageUrls.forEach(url => {
@@ -261,6 +256,15 @@
     // Store-Subscription beenden
     unsubscribe();
   });
+  
+  // Reagiere auf UID-Änderungen
+  $: {
+    if (currentUid) {
+      console.log("[ControlNet] UID changed to:", currentUid);
+      // Lade Bilder für neue UID
+      serverImages.loadUserImages();
+    }
+  }
 
 </script>
 
@@ -494,7 +498,7 @@
           <h3>API Request</h3>
           <div class="url-box">
             <span class="method">POST</span> 
-            {`${apiBaseUrl}?controlnet_strength=${controlnetStrength}&start_percent=${startPercent}&end_percent=${endPercent}&prompt=${encodeURIComponent(prompt)}${negativePrompt ? `&negative_prompt=${encodeURIComponent(negativePrompt)}` : ''}&cfg=${cfg}&steps=${steps}&seed=${seed}&uid=default`}
+            {`${apiBaseUrl}?controlnet_strength=${controlnetStrength}&start_percent=${startPercent}&end_percent=${endPercent}&prompt=${encodeURIComponent(prompt)}${negativePrompt ? `&negative_prompt=${encodeURIComponent(negativePrompt)}` : ''}&cfg=${cfg}&steps=${steps}&seed=${seed}&uid=${currentUid}`}
             <div class="post-data">
               <span class="post-label">Form Data:</span>
               <span class="post-field">image1: {image ? image.name : 'No image selected'}</span>

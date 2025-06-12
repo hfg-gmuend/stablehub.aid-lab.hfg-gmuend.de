@@ -6,7 +6,9 @@
   import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte';
   import { onMount, onDestroy } from "svelte";
   import { styles } from "$lib/config/styles.js";
-  import { generatedImages } from '$lib/stores/generatedImages.js'; // Import des Stores
+  import { serverImages } from '$lib/stores/serverImages.js';
+  import { user } from '$lib/stores/user.js';
+  import { ApiService } from '$lib/services/apiService.js';
   import { assets } from '$app/paths';
   
   // Typedefinitionen
@@ -63,15 +65,29 @@
   // Historie der generierten Bilder
   let generatedResults: GeneratedResult[] = [];
   
-  // Verbesserte Filterung - strikter Check auf Typ
-  const unsubscribe = generatedImages.subscribe(history => {
-    // Nur exakt vom Typ "text-to-image" anzeigen
-    generatedResults = history.filter(entry => entry.type === "text-to-image") as GeneratedResult[];
-    console.log("[TextToImage] Filtered results:", generatedResults.length, 
-                "von insgesamt", history.length);
+  // Store subscription für Server-basierte Bilder
+  const unsubscribe = serverImages.subscribe((images: any[]) => {
+    console.log("[TextToImage] Store subscription triggered, raw images:", images.length);
+    // Filtere nach "text-to-image" Typ
+    const filteredImages = images.filter((entry: any) => {
+      console.log("[TextToImage] Image entry:", entry?.type, entry);
+      return entry?.type === "text-to-image";
+    });
+    // Sortiere noch einmal nach Timestamp (neueste zuerst) für zusätzliche Sicherheit
+    const sortedImages = filteredImages.sort((a: any, b: any) => 
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+    generatedResults = sortedImages as GeneratedResult[];
+    console.log("[TextToImage] Server images loaded:", generatedResults.length, "filtered from", images.length);
   });
   
-  // API URL Basis
+  // Reaktive Variable für aktuelle UID
+  $: currentUid = $user.userid || 'default';
+  
+  // Variable um den letzten geladenen UID zu verfolgen
+  let lastLoadedUid: string | null = null;
+  
+  // API URL Basis (für Anzeige)
   const apiBaseUrl: string = "https://aid-playground.hfg-gmuend.de/api/txt2img";
   
   // Funktion zum Generieren des Bildes
@@ -79,71 +95,40 @@
     loading = true;
     error = null;
     
-    // Alte Bild-URL bereinigen, falls vorhanden
-    if (imageUrl && imageUrl.startsWith('blob:')) {
-      URL.revokeObjectURL(imageUrl);
-      imageUrl = null;
-    }
-    
     try {
-      const variantImages: string[] = []; // Array für mehrere Bilder
+      // Verwende den neuen API Service
+      const result = await ApiService.generateTextToImage({
+        prompt,
+        negativePrompt,
+        cfg,
+        steps,
+        seed,
+        variants
+      });
       
-      // Generiere die gewählte Anzahl an Varianten
-      for (let i = 0; i < variants; i++) {
-        // URL mit Parametern erstellen
-        const url = new URL(apiBaseUrl);
-        
-        // Korrekt formatierte Parameter - Verwende encodeURIComponent für Strings
-        url.searchParams.append("prompt", encodeURIComponent(prompt));
-        if (negativePrompt) {
-          url.searchParams.append("negative_prompt", encodeURIComponent(negativePrompt));
-        }
-        url.searchParams.append("cfg", cfg.toString());
-        url.searchParams.append("steps", steps.toString());
-        
-        // Für verschiedene Varianten unterschiedliche Seeds verwenden
-        const currentSeed = i === 0 ? seed : seed + i;
-        url.searchParams.append("seed", currentSeed.toString());
-        url.searchParams.append("uid", "default"); // Standardwert verwenden
-        
-        console.log("API Request URL:", url.toString()); // Debugging
-        
-        const response = await fetch(url);
-        
-        // Erweiterte Fehlerbehandlung
-        if (!response.ok) {
-          const errorText = await response.text().catch(() => "No error message available");
-          console.error("API Error details:", errorText);
-          throw new Error(`API Error: ${response.status} - ${errorText}`);
-        }
-        
-        // Die Antwort als Blob behandeln (Binärdaten/Bild)
-        const blob = await response.blob();
-        
-        // Objekt-URL für den Blob erstellen
-        const variantUrl = URL.createObjectURL(blob);
-        variantImages.push(variantUrl);
-      }
-      
-      // Neues Ergebnis erstellen
+      // Neues Ergebnis erstellen für die lokale Anzeige
       const newResult: GeneratedResult = { 
         id: Date.now(), 
         prompt: prompt,
-        imageUrls: variantImages,
+        imageUrls: result.imageUrls,
         timestamp: new Date(),
-        styles: [...selectedStyles] // Speichern der verwendeten Stile
+        styles: [...selectedStyles],
+        type: "text-to-image"
       };
       
-      // Zum Verlauf hinzufügen
-      generatedResults = [newResult, ...generatedResults];
+      // Zur lokalen Liste hinzufügen für sofortige Anzeige (an den Anfang)
+      generatedResults = [newResult, ...generatedResults.slice(0, 29)]; // Behalte nur die neuesten 30 insgesamt
       
-      // Im localStorage speichern mit klarem Typ
-      await generatedImages.addToHistory({
-        prompt: prompt,
-        imageUrls: variantImages,
-        styles: selectedStyles,
-        type: "text-to-image" // Expliziten Typ definieren
-      });
+      console.log("[TextToImage] Image generated successfully, loading server data...");
+      
+      // Speichere Prompt-Daten werden jetzt automatisch in der API-Service gespeichert
+      // Keine manuelle Speicherung mehr notwendig
+      
+      // DEAKTIVIERT: Das setTimeout überschreibt die korrekt angezeigten Prompts 
+      // mit fehlerhaften Server-Daten aufgrund von ID-Matching-Problemen
+      // setTimeout(async () => {
+      //   await serverImages.loadUserImages();
+      // }, 1500);
       
     } catch (e) {
       error = e instanceof Error ? e.message : "Unknown error";
@@ -165,20 +150,12 @@
   }
   
   // Parameter aus URL auslesen, wenn die Seite geladen wird
-  onMount(() => {
-    // Fix Store-Typen beim Laden
-    generatedImages.fixTypes();
+  onMount(async () => {
+    console.log("[TextToImage] Component mounted, loading user images...");
     
-    // Lade gespeicherte Bilder aus dem localStorage
-    if ($generatedImages.length > 0) {
-      generatedResults = $generatedImages.map(entry => ({
-        id: entry.id || Date.now(),
-        prompt: entry.prompt,
-        imageUrls: entry.imageUrls,
-        timestamp: new Date(entry.timestamp || new Date()),
-        styles: entry.styles || []
-      })) as GeneratedResult[];
-    }
+    // Lade Bilder vom Server für die aktuelle UID
+    lastLoadedUid = currentUid;
+    await serverImages.loadUserImages();
     
     const url = new URL(window.location.href);
     
@@ -218,11 +195,11 @@
   
   // Aufräumen bei Komponenten-Zerstörung
   onDestroy(() => {
-    // Objekt-URL freigeben, wenn vorhanden
+    // Objekt-URLs freigeben, wenn vorhanden
     generatedResults.forEach(result => {
       if (result.imageUrls) {
         result.imageUrls.forEach(url => {
-          if (url.startsWith('blob:')) {
+          if (url && typeof url === 'string' && url.startsWith('blob:')) {
             URL.revokeObjectURL(url);
           }
         });
@@ -231,6 +208,16 @@
     // Store-Subscription beenden
     unsubscribe();
   });
+  
+  // Reagiere auf UID-Änderungen nur wenn sich die UID tatsächlich geändert hat
+  $: {
+    if (currentUid && currentUid !== lastLoadedUid) {
+      console.log("[TextToImage] UID changed from", lastLoadedUid, "to:", currentUid);
+      lastLoadedUid = currentUid;
+      // Lade Bilder für neue UID
+      serverImages.loadUserImages();
+    }
+  }
   
   // Hilfsfunktion zum Anpassen des Style-Prompts
   function addStyle(style: Style): void {
@@ -426,12 +413,12 @@
           </div>
           
           <!-- Ausgewählte Stil-Tags -->
-          {#if selectedStyles.length > 0}
+          {#if selectedStyles && selectedStyles.length > 0}
             <div class="selected-styles">
               {#each selectedStyles as styleId}
                 {#if styles.find(s => s.id === styleId)}
                   <div class="style-tag">
-                    {styles.find(s => s.id === styleId).name}
+                    {styles.find(s => s.id === styleId)?.name}
                     <button class="tag-remove-btn" on:click={() => removeStyle(styleId)}>×</button>
                   </div>
                 {/if}
@@ -445,7 +432,7 @@
           <h3>API Request</h3>
           <div class="url-box">
             <span class="method">GET</span> 
-            {`${apiBaseUrl}?prompt=${encodeURIComponent(prompt)}${negativePrompt ? `&negative_prompt=${encodeURIComponent(negativePrompt)}` : ''}&cfg=${cfg}&steps=${steps}&seed=${seed}&uid=default`}
+            {`${apiBaseUrl}?prompt=${encodeURIComponent(prompt)}${negativePrompt ? `&negative_prompt=${encodeURIComponent(negativePrompt)}` : ''}&cfg=${cfg}&steps=${steps}&seed=${seed}&uid=${currentUid}`}
           </div>
         </div>
       </div>

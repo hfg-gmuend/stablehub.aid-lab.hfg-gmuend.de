@@ -47,8 +47,25 @@ function setRandomUserId() {
 }
 
 const createUserStore = () => {
+  // Generiere eine zufällige UUID wenn keine gespeichert ist
+  const getOrCreateUserId = () => {
+    if (!browser) return "default"; // Fallback für Server-Side Rendering
+    
+    const existingUserId = getCookie("userid");
+    if (existingUserId) {
+      console.log("User Store: Existierende User ID gefunden:", existingUserId);
+      return existingUserId;
+    }
+    
+    // Generiere neue UUID im gewünschten Format
+    const newUserId = uuidv4();
+    setCookie("userid", newUserId, 365);
+    console.log("User Store: Neue User ID generiert:", newUserId);
+    return newUserId;
+  };
+
   const { subscribe, update, set } = writable({
-    userid: browser ? (getCookie("userid") || setRandomUserId()) : ""
+    userid: getOrCreateUserId()
   });
 
     return {

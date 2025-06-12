@@ -5,7 +5,9 @@
   import { onMount, onDestroy } from "svelte";
   import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte';
   import StyleCopilot from "$lib/components/StyleCopilot.svelte"; 
-  import { generatedImages } from "$lib/stores/generatedImages.js"; // Import des Stores
+  import { serverImages } from "$lib/stores/serverImages.js";
+  import { user } from "$lib/stores/user.js";
+  import { ApiService } from "$lib/services/apiService.js";
   import { assets } from '$app/paths';
   
   // Parameter für die API
@@ -40,19 +42,26 @@
   let imageUrl = null;
   let error = null;
   
+  // Current user ID for reactive updates
+  let currentUid = null;
+  
   // Historie der generierten Bilder
   let generatedResults = [];
   
-  // Verbesserte Filterung mit Logging
-  const unsubscribe = generatedImages.subscribe(history => {
-    // Nur exakt vom Typ "image-to-image" anzeigen
-    generatedResults = history.filter(entry => entry.type === "image-to-image");
-    console.log("[ImageToImage] Filtered results:", generatedResults.length, 
-                "von insgesamt", history.length);
+  // Subscribe to server images and filter for image-to-image type
+  const unsubscribeServerImages = serverImages.subscribe(images => {
+    generatedResults = images.filter(entry => entry.type === "image-to-image");
+    console.log("[ImageToImage] Server results:", generatedResults.length);
   });
   
-  // API URL Basis
-  const apiBaseUrl = "https://aid-playground.hfg-gmuend.de/api/combine";
+  // Subscribe to user changes to refresh data
+  const unsubscribeUser = user.subscribe(userData => {
+    if (userData.userid !== currentUid) {
+      currentUid = userData.userid;
+      // Load images when UID changes
+      serverImages.loadUserImages();
+    }
+  });
   
   // Funktionen zum Verarbeiten des Bild-Uploads
   function handleImage1Upload(event) {
@@ -123,53 +132,38 @@
     }
     
     try {
-      // FormData für den POST-Request erstellen
-      const formData = new FormData();
-      formData.append("image1", image1);
-      formData.append("image2", image2);
-      
-      // URL mit Parametern erstellen
-      const url = new URL(apiBaseUrl);
-      url.searchParams.append("cfg", cfg.toString());
-      url.searchParams.append("steps", steps.toString());
-      url.searchParams.append("seed", seed.toString());
-      url.searchParams.append("uid", "default"); // Standardwert verwenden
-      if (prompt) url.searchParams.append("prompt", encodeURIComponent(prompt));
-      if (negativePrompt) url.searchParams.append("negative_prompt", encodeURIComponent(negativePrompt));
-      
-      console.log("API Request URL:", url.toString()); // Debugging
-      
-      // POST-Request mit FormData
-      const response = await fetch(url, {
-        method: "POST",
-        body: formData
+      // Use the new API service
+      const result = await ApiService.combineImages({
+        prompt,
+        negativePrompt,
+        cfg,
+        steps,
+        seed,
+        image1,
+        image2
       });
       
-      // Erweiterte Fehlerbehandlung
-      if (!response.ok) {
-        const errorText = await response.text().catch(() => "No error message available");
-        console.error("API Error details:", errorText);
-        throw new Error(`API Error: ${response.status} - ${errorText}`);
-      }
-      
-      // Die Antwort als Blob behandeln (Binärdaten/Bild)
-      const blob = await response.blob();
-      
-      // Objekt-URL für den Blob erstellen
-      const resultUrl = URL.createObjectURL(blob);
-      
-      // In den Store speichern mit explizitem Typ
+      // Save to server storage with image type
       const historyEntry = {
         prompt: prompt,
-        imageUrls: [resultUrl],
+        imageUrls: [result.imageUrl || result],  // Unterstütze beide Formate
         sourceImages: [image1Preview, image2Preview],
-        type: "image-to-image" // Expliziten Typ definieren
+        type: "image-to-image",
+        timestamp: Date.now(),
+        parameters: { cfg, steps, seed, negativePrompt }
       };
       
-      generatedImages.addToHistory(historyEntry);
+      // Images are automatically saved on the server during generation
+      // Just refresh the local store to show the new image
+      console.log("[ImageToImage] Image generated successfully, loading server data...");
+      
+      // Prompt-Daten werden jetzt automatisch in der API-Service gespeichert
+      // Keine manuelle Speicherung mehr notwendig
+      
+      await serverImages.refreshAfterGeneration();
       
     } catch (e) {
-      error = e.message;
+      error = e instanceof Error ? e.message : 'Unknown error occurred';
       console.error("Error combining images:", e);
     } finally {
       loading = false;
@@ -179,7 +173,10 @@
   // Funktion zum Bearbeiten eines vorherigen Prompts
   function editPrompt(oldPrompt) {
     prompt = oldPrompt;
-    document.querySelector('#main-prompt').scrollIntoView({ behavior: 'smooth' });
+    const promptElement = document.querySelector('#main-prompt');
+    if (promptElement) {
+      promptElement.scrollIntoView({ behavior: 'smooth' });
+    }
   }
   
   // --- Copilot State ---
@@ -199,36 +196,40 @@
 
   // Parameter aus URL auslesen, wenn die Seite geladen wird
   onMount(() => {
-    // Fix Store-Typen beim Laden
-    generatedImages.fixTypes();
+    // Load images when component mounts
+    serverImages.loadUserImages();
     
     const url = new URL(window.location.href);
     
     if (url.searchParams.has("prompt")) {
-      prompt = url.searchParams.get("prompt");
+      prompt = url.searchParams.get("prompt") || "";
     }
     
     if (url.searchParams.has("negative_prompt")) {
-      negativePrompt = url.searchParams.get("negative_prompt");
+      negativePrompt = url.searchParams.get("negative_prompt") || "";
     }
     
     if (url.searchParams.has("cfg")) {
-      cfg = parseFloat(url.searchParams.get("cfg"));
+      const cfgParam = url.searchParams.get("cfg");
+      if (cfgParam) cfg = parseFloat(cfgParam);
     }
     
     if (url.searchParams.has("steps")) {
-      steps = parseInt(url.searchParams.get("steps"));
+      const stepsParam = url.searchParams.get("steps");
+      if (stepsParam) steps = parseInt(stepsParam);
     }
     
     if (url.searchParams.has("seed")) {
-      seed = parseInt(url.searchParams.get("seed"));
+      const seedParam = url.searchParams.get("seed");
+      if (seedParam) seed = parseInt(seedParam);
     }
   });
   
   // Aufräumen bei Komponenten-Zerstörung
   onDestroy(() => {
-    // Store-Subscription beenden
-    unsubscribe();
+    // Store-Subscriptions beenden
+    unsubscribeServerImages();
+    unsubscribeUser();
   });
 </script>
 
@@ -402,7 +403,7 @@
           <h3>API Request</h3>
           <div class="url-box">
             <span class="method">POST</span> 
-            {`${apiBaseUrl}?cfg=${cfg}&steps=${steps}&seed=${seed}&uid=default${prompt ? `&prompt=${encodeURIComponent(prompt)}` : ''}${negativePrompt ? `&negative_prompt=${encodeURIComponent(negativePrompt)}` : ''}`}
+            {`https://aid-playground.hfg-gmuend.de/api/combine?cfg=${cfg}&steps=${steps}&seed=${seed}&uid=${$user.userid || 'default'}${prompt ? `&prompt=${encodeURIComponent(prompt)}` : ''}${negativePrompt ? `&negative_prompt=${encodeURIComponent(negativePrompt)}` : ''}`}
             <div class="post-data">
               <span class="post-label">Form Data:</span>
               <span class="post-field">image1: {image1 ? image1.name : 'No image selected'}</span>

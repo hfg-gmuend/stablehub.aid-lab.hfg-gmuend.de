@@ -1,0 +1,240 @@
+import { writable } from 'svelte/store';
+import { browser } from '$app/environment';
+import { ApiService } from '$lib/services/apiService.js';
+import { user } from './user.js';
+import { get } from 'svelte/store';
+
+/**
+ * Store für Server-basierte Bildverwaltung
+ * Dieser Store ersetzt die lokale Speicherung und nutzt die API-Endpunkte
+ */
+const createServerImagesStore = () => {
+  const { subscribe, update, set } = writable([]);
+  
+  const store = {
+    subscribe,
+    
+    /**
+     * Lädt die Bilder für den aktuellen Benutzer vom Server mit Prompt-Daten
+     */
+    loadUserImages: async (uid = null) => {
+      try {
+        const userId = uid || get(user).userid || 'default';
+        console.log('[ServerImages] Loading images with prompts for UID:', userId);
+        
+        // Verwende die neue kombinierte API-Funktion
+        const imagesWithPrompts = await ApiService.loadUserImagesWithPrompts(userId);
+        
+        console.log('[ServerImages] Successfully loaded', imagesWithPrompts.length, 'images with prompt data');
+        
+        set(imagesWithPrompts);
+        return imagesWithPrompts;
+        
+      } catch (error) {
+        console.error('[ServerImages] Error loading user images with prompts:', error);
+        
+        // Fallback: Versuche die alte Methode
+        try {
+          console.log('[ServerImages] Falling back to separate API calls...');
+          const userId = uid || get(user).userid || 'default';
+          
+          const serverImages = await ApiService.loadUserImages(userId);
+          console.log('[ServerImages] Raw server response:', serverImages);
+          
+          // Konvertiere Server-Format zu lokalem Format (alter Code als Fallback)
+          const convertedImages = Array.isArray(serverImages) ? serverImages.map((imagePath, index) => {
+            console.log('[ServerImages] Processing image path:', imagePath);
+            
+            let imageUrls = [];
+            let imageId = '';
+            let prompt = '';
+            let timestamp = new Date();
+            
+            if (typeof imagePath === 'string') {
+              imageUrls = [`https://aid-playground.hfg-gmuend.de/api/${imagePath}`];
+              const pathParts = imagePath.split('/');
+              const fileName = pathParts[pathParts.length - 1];
+              imageId = fileName ? fileName.replace('.jpg', '').replace('.png', '') : `generated-${Date.now()}-${index}`;
+              prompt = `Generated Image ${index + 1}`;
+              
+              if (pathParts.length >= 3) {
+                const datePart = pathParts[2];
+                if (datePart && datePart.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                  timestamp = new Date(datePart);
+                }
+              }
+            }
+            
+            return {
+              id: imageId || `generated-${Date.now()}-${index}`,
+              prompt: prompt,
+              imageUrls: imageUrls,
+              timestamp: timestamp,
+              type: 'text-to-image',
+              styles: [],
+              userid: userId
+            };
+          }) : [];
+          
+          const sortedImages = convertedImages
+            .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+            .slice(0, 30);
+          
+          set(sortedImages);
+          return sortedImages;
+          
+        } catch (fallbackError) {
+          console.error('[ServerImages] Fallback also failed:', fallbackError);
+          set([]);
+          return [];
+        }
+      }
+    },
+    
+    /**
+     * Speichert Benutzerdaten auf dem Server
+     */
+    saveUserData: async (data, uid = null) => {
+      try {
+        const userId = uid || get(user).userid || 'default';
+        console.log('[ServerImages] Saving user data for UID:', userId);
+        
+        return await ApiService.saveUserData(data, userId);
+      } catch (error) {
+        console.error('[ServerImages] Error saving user data:', error);
+        throw error;
+      }
+    },
+    
+    /**
+     * Lädt Benutzerdaten vom Server
+     */
+    loadUserData: async (uid = null) => {
+      try {
+        const userId = uid || get(user).userid || 'default';
+        console.log('[ServerImages] Loading user data for UID:', userId);
+        
+        return await ApiService.loadUserData(userId);
+      } catch (error) {
+        console.error('[ServerImages] Error loading user data:', error);
+        return null;
+      }
+    },
+    
+    /**
+     * Aktualisiert die Bilder-Liste nach einer Generierung
+     * (Die Bilder werden automatisch über die UID auf dem Server gespeichert)
+     */
+    refreshAfterGeneration: async (uid = null) => {
+      // Lade die aktuellen Bilder vom Server neu
+      return await store.loadUserImages(uid);
+    },
+
+    /**
+     * Speichert Prompt-Daten für ein generiertes Bild mit Image-ID als Schlüssel
+     */
+    savePromptData: async (promptData, uid = null) => {
+      try {
+        const userId = uid || get(user).userid || 'default';
+        console.log('[ServerImages] Saving prompt data for UID:', userId, 'ImageID:', promptData.imageId);
+        
+        // Lade bestehende Benutzerdaten
+        let userData = await ApiService.loadUserData(userId) || {};
+        
+        // Stelle sicher, dass prompts Objekt existiert (nicht Array!)
+        if (!userData.prompts || Array.isArray(userData.prompts)) {
+          userData.prompts = {};
+        }
+        
+        // Speichere Prompt-Daten mit Image-ID als Schlüssel
+        userData.prompts[promptData.imageId] = {
+          prompt: promptData.prompt,
+          negativePrompt: promptData.negativePrompt,
+          parameters: promptData.parameters,
+          styles: promptData.styles,
+          type: promptData.type,
+          timestamp: new Date().toISOString()
+        };
+        
+        console.log('[ServerImages] Saving prompt data:', userData.prompts[promptData.imageId]);
+        
+        // Speichere zurück
+        return await ApiService.saveUserData(userData, userId);
+      } catch (error) {
+        console.error('[ServerImages] Error saving prompt data:', error);
+        throw error;
+      }
+    },
+    
+    /**
+     * Fügt ein Bild zu den Favoriten hinzu (Galerie)
+     */
+    addToFavorites: async (imageData) => {
+      try {
+        const favoriteEntry = {
+          prompt: imageData.prompt,
+          imageUrl: imageData.imageUrl || (imageData.imageUrls && imageData.imageUrls[0]),
+          type: imageData.type || 'text-to-image',
+          styles: imageData.styles || []
+        };
+        
+        console.log('[ServerImages] Adding to favorites:', favoriteEntry);
+        
+        return await ApiService.addToGallery(favoriteEntry);
+      } catch (error) {
+        console.error('[ServerImages] Error adding to favorites:', error);
+        throw error;
+      }
+    },
+    
+    /**
+     * Entfernt ein Bild aus den Favoriten
+     */
+    removeFromFavorites: async (imageData) => {
+      try {
+        console.log('[ServerImages] Removing from favorites:', imageData);
+        
+        return await ApiService.removeFromGallery(imageData);
+      } catch (error) {
+        console.error('[ServerImages] Error removing from favorites:', error);
+        throw error;
+      }
+    },
+    
+    /**
+     * Lädt alle Galerie-Einträge (Favoriten)
+     */
+    loadGallery: async () => {
+      try {
+        console.log('[ServerImages] Loading gallery');
+        
+        const galleryData = await ApiService.loadGallery();
+        
+        // Filtere nach aktueller UID
+        const currentUid = get(user).userid || 'default';
+        const userGallery = Array.isArray(galleryData) 
+          ? galleryData.filter(item => item.userid === currentUid)
+          : [];
+        
+        console.log('[ServerImages] Gallery loaded:', userGallery.length, 'items for user', currentUid);
+        
+        return userGallery;
+      } catch (error) {
+        console.error('[ServerImages] Error loading gallery:', error);
+        return [];
+      }
+    },
+    
+    /**
+     * Löscht alle lokalen Daten (für UID-Wechsel)
+     */
+    clearLocalData: () => {
+      set([]);
+      console.log('[ServerImages] Local data cleared');
+    }
+  };
+  
+  return store;
+};
+
+export const serverImages = createServerImagesStore();
