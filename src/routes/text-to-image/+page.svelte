@@ -453,6 +453,7 @@
                 imageUrls={result.imageUrls}
                 onEdit={editPrompt}
                 usedStyles={result.styles || []}
+                type="text-to-image"
               />
             {/each}
           </div>

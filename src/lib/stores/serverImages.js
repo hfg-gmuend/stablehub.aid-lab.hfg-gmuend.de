@@ -217,9 +217,17 @@ const createServerImagesStore = () => {
      */
     addToFavorites: async (imageData) => {
       try {
+        // Prüfe ob es eine gültige Server-URL ist
+        const imageUrl = imageData.imageUrl || (imageData.imageUrls && imageData.imageUrls[0]);
+        
+        if (!imageUrl || imageUrl.startsWith('blob:')) {
+          console.warn('[ServerImages] Cannot add blob URL to favorites, skipping:', imageUrl);
+          throw new Error('Cannot add temporary blob URLs to favorites. Please wait for the image to be uploaded to the server.');
+        }
+        
         const favoriteEntry = {
           prompt: imageData.prompt,
-          imageUrl: imageData.imageUrl || (imageData.imageUrls && imageData.imageUrls[0]),
+          imageUrl: imageUrl,
           type: imageData.type || 'text-to-image',
           styles: imageData.styles || []
         };
@@ -248,23 +256,25 @@ const createServerImagesStore = () => {
     },
     
     /**
-     * Lädt alle Galerie-Einträge (Favoriten)
+     * Lädt alle Galerie-Einträge (Favoriten aller Benutzer)
      */
     loadGallery: async () => {
       try {
-        console.log('[ServerImages] Loading gallery');
+        console.log('[ServerImages] Loading global gallery');
         
         const galleryData = await ApiService.loadGallery();
+        console.log('[ServerImages] Raw gallery data:', galleryData);
         
-        // Filtere nach aktueller UID
-        const currentUid = get(user).userid || 'default';
-        const userGallery = Array.isArray(galleryData) 
-          ? galleryData.filter(item => item.userid === currentUid)
+        // Begrenze auf maximal 100 Einträge und sortiere nach Timestamp
+        const limitedGallery = Array.isArray(galleryData) 
+          ? galleryData
+              .sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime())
+              .slice(0, 100)
           : [];
         
-        console.log('[ServerImages] Gallery loaded:', userGallery.length, 'items for user', currentUid);
+        console.log('[ServerImages] Gallery loaded:', limitedGallery.length, 'total items from all users');
         
-        return userGallery;
+        return limitedGallery;
       } catch (error) {
         console.error('[ServerImages] Error loading gallery:', error);
         return [];

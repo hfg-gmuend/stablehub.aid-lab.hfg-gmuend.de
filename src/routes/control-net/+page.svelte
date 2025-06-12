@@ -557,6 +557,7 @@
                   prompt={result.prompt}
                   imageUrls={result.imageUrls}
                   onEdit={(oldPrompt) => prompt = oldPrompt}
+                  type="controlnet"
                 />
               </div>
             {/each}

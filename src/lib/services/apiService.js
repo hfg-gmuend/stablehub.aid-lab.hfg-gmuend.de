@@ -620,7 +620,9 @@ export class ApiService {
       throw new Error(`Failed to load gallery: ${response.status}`);
     }
     
-    return await response.json();
+    const galleryData = await response.json();
+    console.log('[ApiService] Gallery data loaded:', galleryData);
+    return galleryData;
   }
 
   /**

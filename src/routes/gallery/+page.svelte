@@ -22,8 +22,18 @@
     try {
       loading = true;
       error = null;
-      galleryItems = await serverImages.loadGallery();
-      console.log("Gallery loaded:", galleryItems.length, "items");
+      const rawGalleryItems = await serverImages.loadGallery();
+      
+      // Filtere ungültige blob-URLs heraus
+      galleryItems = rawGalleryItems.filter(item => {
+        const isValidUrl = item.imageUrl && !item.imageUrl.startsWith('blob:');
+        if (!isValidUrl) {
+          console.warn('[Gallery] Filtering out invalid image URL:', item.imageUrl);
+        }
+        return isValidUrl;
+      });
+      
+      console.log("Gallery loaded:", galleryItems.length, "valid items (from", rawGalleryItems.length, "total)");
     } catch (err) {
       console.error('Error loading gallery:', err);
       error = err instanceof Error ? err.message : 'Unknown error';
@@ -60,6 +70,12 @@
   // Funktion zum Entfernen eines Favoriten
   /** @param {any} galleryItem */
   async function removeFavorite(galleryItem) {
+    // Prüfe ob es ein Bild des aktuellen Benutzers ist
+    if (galleryItem.userid !== currentUid) {
+      alert('You can only remove your own favorites!');
+      return;
+    }
+    
     try {
       await serverImages.removeFromFavorites(galleryItem);
       // Galerie neu laden
@@ -67,6 +83,37 @@
     } catch (err) {
       console.error('Error removing favorite:', err);
       alert('Error removing favorite: ' + (err instanceof Error ? err.message : 'Unknown error'));
+    }
+  }
+
+  // Funktion zum Herunterladen eines Bildes
+  /** @param {string} imageUrl */
+  /** @param {string} prompt */
+  async function downloadImage(imageUrl, prompt) {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      
+      // Erstelle einen Download-Link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      
+      // Generiere Dateinamen aus dem Prompt (die ersten 50 Zeichen, bereinigt)
+      const fileName = prompt ? 
+        prompt.substring(0, 50).replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.jpg' :
+        'favorite_image.jpg';
+      
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      
+      // Cleanup
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error('Error downloading image:', err);
+      alert('Error downloading image: ' + (err instanceof Error ? err.message : 'Unknown error'));
     }
   }
   
@@ -90,7 +137,8 @@
     <NavigationBar active="gallery" />
     
     <div class="gallery-container">
-      <h1>Favorite Images</h1>
+      <h1>Community Gallery</h1>
+      <p class="gallery-description">Discover favorite images from all users. Click to copy prompts and download images you like!</p>
       
       {#if loading}
         <div class="loading-state">
@@ -104,7 +152,7 @@
         </div>
       {:else if galleryItems.length === 0}
         <div class="empty-gallery">
-          <p>No favorite images yet. Generate images and mark them as favorites.</p>
+          <p>No favorite images yet. Generate images and mark them as favorites to see them here.</p>
         </div>
       {:else}
         <div class="image-grid">
@@ -119,6 +167,12 @@
                 on:error={handleImageError}
               />
               
+              <!-- User Info Badge -->
+              <div class="user-badge">
+                <span class="user-id">{galleryItem.userid}</span>
+                <span class="image-type">{galleryItem.type || 'text-to-image'}</span>
+              </div>
+              
               <!-- Prompt-Overlay -->
               {#if displayPrompt === galleryItem.imageUrl && galleryItem.prompt}
                 <div class="prompt-overlay">
@@ -126,16 +180,20 @@
                 </div>
               {/if}
               
-              <!-- Action-Buttons -->
+              <!-- Action-Buttons - erscheinen beim Hover -->
               <div class="gallery-actions">
-                <button class="copy-button" on:click={() => copyPromptToClipboard(galleryItem.prompt)}>
-                  <span class="copy-icon">📋</span>
-                  Copy Prompt
+                <button class="action-button copy-button" on:click={() => copyPromptToClipboard(galleryItem.prompt)} title="Copy Prompt">
+                  <img src="/icon/penIcon.svg" alt="Copy" />
                 </button>
-                <button class="remove-button" on:click={() => removeFavorite(galleryItem)}>
-                  <span class="remove-icon">🗑️</span>
-                  Remove
+                <button class="action-button download-button" on:click={() => downloadImage(galleryItem.imageUrl, galleryItem.prompt)} title="Download Image">
+                  <img src="/icon/downloadIcon.svg" alt="Download" />
                 </button>
+                <!-- Nur eigene Bilder löschen -->
+                {#if galleryItem.userid === currentUid}
+                  <button class="action-button remove-button" on:click={() => removeFavorite(galleryItem)} title="Remove from Favorites">
+                    <img src="/icon/delete.svg" alt="Remove" />
+                  </button>
+                {/if}
               </div>
             </div>
           {/each}
@@ -167,6 +225,13 @@
     font-size: 1.75rem;
   }
   
+  .gallery-description {
+    margin: 0 0 2rem 0;
+    color: #888888;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
   .gallery-container {
     flex: 1;
     padding: 0.75rem;
@@ -239,21 +304,49 @@
   
   .image-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    padding: 1rem 0;
+  }
+  
+  @media (min-width: 1400px) {
+    .image-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+  @media (max-width: 1200px) {
+    .image-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  @media (max-width: 900px) {
+    .image-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .image-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
   }
   
   .gallery-item {
     position: relative;
     aspect-ratio: 1;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background-color: #1e1e1e;
   }
   
   .gallery-item:hover {
-    transform: scale(1.02);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     z-index: 10;
   }
   
@@ -266,62 +359,151 @@
   
   .prompt-overlay {
     position: absolute;
-    bottom: 0;
+    top: 0;
     left: 0;
     width: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(4px);
-    padding: 1rem;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    padding: 1.5rem;
     color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .gallery-item:hover .prompt-overlay {
+    opacity: 1;
   }
   
   .prompt-text {
-    margin: 0 0 1rem 0;
-    font-size: 0.9rem;
+    margin: 0;
+    font-size: 1rem;
     line-height: 1.4;
-    max-height: 5rem;
-    overflow-y: auto;
     font-family: 'Inter', sans-serif;
   }
   
-  .gallery-actions {
+  .user-badge {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
     display: flex;
-    gap: 0.5rem;
+    flex-direction: column;
+    gap: 0.25rem;
+    z-index: 20;
   }
   
-  .copy-button, .remove-button {
+  .user-id {
+    background-color: rgba(252, 234, 43, 0.9);
+    color: #121212;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    backdrop-filter: blur(5px);
+  }
+  
+  .image-type {
+    background-color: rgba(30, 30, 30, 0.9);
+    color: #ffffff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    backdrop-filter: blur(5px);
+  }
+  
+  .gallery-actions {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .gallery-item:hover .gallery-actions {
+    opacity: 1;
+  }
+  
+  .copy-button, .remove-button, .download-button {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: center;
     border: none;
-    border-radius: 4px;
-    padding: 0.5rem 1rem;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.8rem;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
     cursor: pointer;
-    transition: background-color 0.2s;
-    flex: 1;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
   
   .copy-button {
-    background-color: #FCEA2B;
-    color: #121212;
+    background-color: rgba(252, 234, 43, 0.9);
   }
   
   .copy-button:hover {
-    background-color: #ffe566;
+    background-color: rgba(252, 234, 43, 1);
+    transform: scale(1.05);
+  }
+  
+  .download-button {
+    background-color: rgba(40, 167, 69, 0.9);
+  }
+  
+  .download-button:hover {
+    background-color: rgba(40, 167, 69, 1);
+    transform: scale(1.05);
   }
   
   .remove-button {
-    background-color: #444;
-    color: #fff;
+    background-color: rgba(220, 53, 69, 0.9);
   }
   
   .remove-button:hover {
-    background-color: #d64545;
+    background-color: rgba(220, 53, 69, 1);
+    transform: scale(1.05);
   }
   
-  .copy-icon, .remove-icon {
-    font-size: 1rem;
+  .action-button img {
+    width: 18px;
+    height: 18px;
+    filter: brightness(0) invert(1); /* Macht SVGs weiß */
+  }
+  
+  .copy-button img {
+    filter: brightness(0); /* Macht SVGs schwarz für gelben Hintergrund */
+  }
+  
+  /* Mobile: Buttons immer sichtbar auf Touch-Geräten */
+  @media (hover: none) and (pointer: coarse) {
+    .gallery-actions {
+      opacity: 1;
+    }
+    
+    .gallery-item {
+      padding-bottom: 4rem; /* Platz für Buttons */
+    }
+    
+    .prompt-overlay {
+      bottom: 4rem; /* Über den Buttons */
+      height: calc(100% - 4rem);
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .gallery-actions {
+      flex-direction: row;
+      gap: 0.5rem;
+    }
   }
 </style>

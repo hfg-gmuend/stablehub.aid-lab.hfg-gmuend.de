@@ -1,6 +1,7 @@
 <script>
   //MrNoLook
   import { serverImages } from '$lib/stores/serverImages.js';
+  import { user } from '$lib/stores/user.js';
   import { styles } from "$lib/config/styles.js";
   import { assets } from '$app/paths';
   import { onMount } from 'svelte';
@@ -13,6 +14,8 @@
   export let onEdit = () => {};
   /** @type {string[]} */
   export let usedStyles = [];
+  /** @type {string} */
+  export let type = "text-to-image"; // Neuer Type-Parameter
   
   // Funktion zum Herunterladen eines Bildes
   /** @param {string} imageUrl */
@@ -64,6 +67,12 @@
   async function toggleFavorite(imageUrl, index) {
     console.log("Favorit umschalten:", imageUrl);
     
+    // Prüfe ob es eine gültige Server-URL ist
+    if (imageUrl.startsWith('blob:')) {
+      alert('Please wait a moment for the image to be uploaded to the server before adding it to favorites.');
+      return;
+    }
+    
     try {
       const isCurrentlyFavorite = favoriteStatus[index];
       
@@ -81,16 +90,20 @@
         await serverImages.addToFavorites({
           prompt,
           imageUrl,
-          type: 'text-to-image',
+          type: type || 'text-to-image', // Verwende den korrekten Typ
           styles: usedStyles
         });
         // Aktualisiere nur den lokalen Status ohne neu zu laden
         favoriteStatus[index] = true;
         favoriteStatus = [...favoriteStatus]; // Trigger Svelte reactivity
+        
+        // Zeige Erfolgs-Nachricht
+        console.log('[PromptResultCard] Successfully added to favorites!');
       }
       
     } catch (error) {
       console.error('Error toggling favorite:', error);
+      alert('Error updating favorites: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   }
 </script>
@@ -106,11 +119,17 @@
       <div class="image-container">
         <img src={imageUrl} alt="Generiertes Bild {index + 1}" class="generated-image" />
         
+        <!-- User Info Badge - immer sichtbar -->
+        <div class="user-badge">
+          <span class="user-id">{$user.userid || 'default'}</span>
+          <span class="image-type">{type}</span>
+        </div>
+        
         <div class="image-overlay">
           <div class="action-buttons top-left">
             <button class="action-button favorite-button {favoriteStatus[index] ? 'active' : ''}" 
                     on:click={() => toggleFavorite(imageUrl, index)}>
-              <span class="favorite-icon">{favoriteStatus[index] ? '★' : '☆'}</span>
+              <img src="/icon/{favoriteStatus[index] ? 'heart.svg' : 'heart-outline.svg'}" alt="Favorite" class="favorite-icon" />
             </button>
           </div>
           
@@ -257,6 +276,40 @@
     opacity: 1;
   }
   
+  .user-badge {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    z-index: 15;
+  }
+  
+  .user-id {
+    background-color: rgba(252, 234, 43, 0.9);
+    color: #121212;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    backdrop-filter: blur(5px);
+    text-align: center;
+  }
+  
+  .image-type {
+    background-color: rgba(30, 30, 30, 0.9);
+    color: #ffffff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    backdrop-filter: blur(5px);
+    text-align: center;
+  }
+  
   .top-left {
     position: absolute;
     top: 1rem;
@@ -272,8 +325,13 @@
   }
   
   .favorite-icon {
-    font-size: 1.2rem;
-    line-height: 1;
+    width: 18px;
+    height: 18px;
+    filter: invert(88%) sepia(100%) saturate(377%) hue-rotate(359deg) brightness(104%) contrast(104%); /* FCEA2B color */
+  }
+  
+  .favorite-button.active .favorite-icon {
+    filter: brightness(0) saturate(100%) invert(88%) sepia(100%) saturate(377%) hue-rotate(359deg) brightness(104%) contrast(104%); /* Full yellow */
   }
   
   /* Stil-Tags unter dem Bild */
