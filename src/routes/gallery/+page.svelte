@@ -355,7 +355,7 @@
     height: 100%;
     object-fit: cover;
     display: block;
-    /* border-radius: 12px; */
+    border-radius: 12px;
   }
   
   .prompt-overlay {
@@ -364,7 +364,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(8px);
     padding: 1.5rem;
     color: white;
@@ -374,6 +374,7 @@
     text-align: center;
     opacity: 0;
     transition: opacity 0.3s ease;
+    border-radius: 12px;
   }
   
   .gallery-item:hover .prompt-overlay {
