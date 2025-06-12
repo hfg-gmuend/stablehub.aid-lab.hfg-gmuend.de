@@ -355,6 +355,7 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    /* border-radius: 12px; */
   }
   
   .prompt-overlay {
@@ -363,7 +364,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(8px);
     padding: 1.5rem;
     color: white;
@@ -445,43 +446,18 @@
     transition: all 0.2s ease;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(30, 30, 30, 0.85);
   }
   
-  .copy-button {
-    background-color: rgba(252, 234, 43, 0.9);
-  }
-  
-  .copy-button:hover {
-    background-color: rgba(252, 234, 43, 1);
-    transform: scale(1.05);
-  }
-  
-  .download-button {
-    background-color: rgba(40, 167, 69, 0.9);
-  }
-  
-  .download-button:hover {
-    background-color: rgba(40, 167, 69, 1);
-    transform: scale(1.05);
-  }
-  
-  .remove-button {
-    background-color: rgba(220, 53, 69, 0.9);
-  }
-  
-  .remove-button:hover {
-    background-color: rgba(220, 53, 69, 1);
+  .copy-button:hover, .download-button:hover, .remove-button:hover {
+    background-color: rgba(40, 40, 40, 0.95);
     transform: scale(1.05);
   }
   
   .action-button img {
     width: 18px;
     height: 18px;
-    filter: brightness(0) invert(1); /* Macht SVGs weiß */
-  }
-  
-  .copy-button img {
-    filter: brightness(0); /* Macht SVGs schwarz für gelben Hintergrund */
+    filter: brightness(0) invert(1); /* Macht alle SVGs weiß */
   }
   
   /* Mobile: Buttons immer sichtbar auf Touch-Geräten */
