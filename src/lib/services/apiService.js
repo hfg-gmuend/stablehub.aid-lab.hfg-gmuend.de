@@ -92,7 +92,7 @@ export class ApiService {
         const tempId = `temp-${Date.now()}-${i}`;
         imageIds.push(tempId);
         
-        // Verzögerte Speicherung mit echter Server-ID in einem Promise
+        // Verzögerte Speicherung mit echter Server-ID - WARTEN bis abgeschlossen
         const saveWithRealId = async () => {
           try {
             // Warte 1 Sekunde damit der Server das Bild speichert
@@ -127,8 +127,8 @@ export class ApiService {
           }
         };
         
-        // Starte die verzögerte Speicherung (ohne await, läuft im Hintergrund)
-        saveWithRealId();
+        // WICHTIG: Warte auf die Prompt-Speicherung bevor API-Call als abgeschlossen gilt
+        await saveWithRealId();
       }
     }
     

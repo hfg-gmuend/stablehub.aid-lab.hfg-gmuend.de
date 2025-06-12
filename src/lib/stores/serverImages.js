@@ -131,9 +131,31 @@ const createServerImagesStore = () => {
     refreshAfterGenerationByType: async (type, uid = null) => {
       console.log(`[ServerImages] Refreshing ${type} images after generation...`);
       
-      // Kleine Verzögerung, damit Server das Bild speichern kann
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Retry-Logik: Exponential backoff 500ms, 1s, 1.5s, 2s, 2.5s
+      let attempts = 0;
+      const maxAttempts = 5;
       
+      while (attempts < maxAttempts) {
+        const images = await store.loadUserImagesByType(type, uid);
+        
+        // Prüfe ob neuestes Bild echten Prompt hat
+        if (images.length > 0) {
+          const latestImage = images[0];
+          const hasRealPrompt = latestImage.prompt && !latestImage.prompt.match(/^Generated Image \d+$/);
+          
+          if (hasRealPrompt) {
+            console.log(`[ServerImages] Found real prompt after ${attempts + 1} attempts:`, latestImage.prompt);
+            return images; // ✅ Erfolg!
+          }
+        }
+        
+        attempts++;
+        const delay = 500 * (attempts + 1); // 1000ms, 1500ms, 2000ms, 2500ms, 3000ms
+        console.log(`[ServerImages] Attempt ${attempts}/${maxAttempts} - waiting ${delay}ms for prompt data...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+      
+      console.warn(`[ServerImages] Warning: Could not find real prompt data after ${maxAttempts} attempts`);
       return await store.loadUserImagesByType(type, uid);
     },
 

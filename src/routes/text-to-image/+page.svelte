@@ -5,6 +5,7 @@
   import StyleCopilot from "$lib/components/StyleCopilot.svelte";
   import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte';
   import { onMount, onDestroy } from "svelte";
+  import { get } from 'svelte/store';
   import { styles } from "$lib/config/styles.js";
   import { serverImages } from '$lib/stores/serverImages.js';
   import { user } from '$lib/stores/user.js';
@@ -117,13 +118,9 @@
       console.log("[TextToImage] Image generated successfully, loading server data...");
       
       // Speichere Prompt-Daten werden jetzt automatisch in der API-Service gespeichert
-      // Keine manuelle Speicherung mehr notwendig
-      
-      // DEAKTIVIERT: Das setTimeout überschreibt die korrekt angezeigten Prompts 
-      // mit fehlerhaften Server-Daten aufgrund von ID-Matching-Problemen
-      // setTimeout(async () => {
-      //   await serverImages.loadUserImages();
-      // }, 1500);
+      // Aktualisiere den Store nach der Generierung für korrekte Server-URLs (ermöglicht Favorisierung)
+      const userData = get(user);
+      await serverImages.refreshAfterGenerationByType("text-to-image", userData.userid);
       
     } catch (e) {
       error = e instanceof Error ? e.message : "Unknown error";

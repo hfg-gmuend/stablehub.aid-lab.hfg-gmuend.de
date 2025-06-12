@@ -1,6 +1,7 @@
 <script>
   //MrNoLook
   import { serverImages } from '$lib/stores/serverImages.js';
+  import { user } from '$lib/stores/user.js';
   import { styles } from "$lib/config/styles.js";
   import { assets } from '$app/paths';
   import { onMount } from 'svelte';
@@ -66,10 +67,39 @@
   async function toggleFavorite(imageUrl, index) {
     console.log("Favorit umschalten:", imageUrl);
     
-    // Prüfe ob es eine gültige Server-URL ist
+    // Wenn es eine Blob-URL ist, versuche die entsprechende Server-URL zu finden
+    let serverImageUrl = imageUrl;
     if (imageUrl.startsWith('blob:')) {
-      alert('Please wait a moment for the image to be uploaded to the server before adding it to favorites.');
-      return;
+      console.log('[PromptResultCard] Blob URL detected, trying to find server URL...');
+      
+      try {
+        // Lade aktuelle Server-Bilder für den Benutzer
+        const currentUserId = $user.userid || 'default';
+        await serverImages.refreshAfterGenerationByType(type || 'text-to-image', currentUserId);
+        
+        // Warte kurz auf Store-Update
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Versuche das entsprechende Server-Bild zu finden (neuestes Bild mit gleichem Prompt)
+        const allImages = $serverImages;
+        const matchingImage = allImages.find(img => 
+          img.prompt === prompt && 
+          img.type === (type || 'text-to-image') &&
+          !img.imageUrl?.startsWith('blob:')
+        );
+        
+        if (matchingImage && matchingImage.imageUrl) {
+          serverImageUrl = matchingImage.imageUrl;
+          console.log('[PromptResultCard] Found matching server URL:', serverImageUrl);
+        } else {
+          alert('Please wait a moment for the image to be uploaded to the server before adding it to favorites.');
+          return;
+        }
+      } catch (error) {
+        console.error('[PromptResultCard] Error finding server URL:', error);
+        alert('Please wait a moment for the image to be uploaded to the server before adding it to favorites.');
+        return;
+      }
     }
     
     try {
@@ -77,7 +107,7 @@
       
       if (isCurrentlyFavorite) {
         // Entferne aus Favoriten
-        const galleryItem = galleryItems.find(item => item.imageUrl === imageUrl);
+        const galleryItem = galleryItems.find(item => item.imageUrl === serverImageUrl);
         if (galleryItem) {
           await serverImages.removeFromFavorites(galleryItem);
           // Aktualisiere nur den lokalen Status ohne neu zu laden
@@ -88,7 +118,7 @@
         // Füge zu Favoriten hinzu
         await serverImages.addToFavorites({
           prompt,
-          imageUrl,
+          imageUrl: serverImageUrl,
           type: type || 'text-to-image', // Verwende den korrekten Typ
           styles: usedStyles
         });
