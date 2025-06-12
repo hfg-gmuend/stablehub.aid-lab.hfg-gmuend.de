@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { goto } from '$app/navigation';
   import UidSwitcher from './UidSwitcher.svelte';
   import { serverImages } from '$lib/stores/serverImages.js';
@@ -6,7 +6,7 @@
   // Props: aktiver Tab (erweitert um 'controlnet')
   export let active = 'generate';
   
-  function handleUidChanged(event) {
+  function handleUidChanged(event: CustomEvent) {
     console.log('[NavigationBar] UID changed:', event.detail);
     // Leere den lokalen Cache - jede Seite lädt ihre eigenen type-spezifischen Bilder
     serverImages.clearLocalData();
