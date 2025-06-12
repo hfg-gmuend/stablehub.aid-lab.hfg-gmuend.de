@@ -92,6 +92,52 @@ const createServerImagesStore = () => {
     },
     
     /**
+     * NEUE FUNKTION: Lädt Bilder gefiltert nach Generierungstyp
+     * @param {string} type - "text-to-image", "controlnet", "image-to-image"
+     * @param {string} uid - User ID (optional)
+     */
+    loadUserImagesByType: async (type, uid = null) => {
+      try {
+        const userId = uid || get(user).userid || 'default';
+        console.log(`[ServerImages] Loading ${type} images for UID:`, userId);
+        
+        // Verwende die kombinierte API-Funktion
+        const allImages = await ApiService.loadUserImagesWithPrompts(userId);
+        
+        // Filtere nach Typ
+        const filteredImages = allImages.filter(image => {
+          const imageType = image.type || 'text-to-image'; // Fallback für alte Bilder
+          return imageType === type;
+        });
+        
+        console.log(`[ServerImages] Successfully loaded ${filteredImages.length} ${type} images (from ${allImages.length} total)`);
+        
+        // Speichere nur die gefilterten Bilder im Store
+        set(filteredImages);
+        return filteredImages;
+        
+      } catch (error) {
+        console.error(`[ServerImages] Error loading ${type} images:`, error);
+        set([]);
+        return [];
+      }
+    },
+    
+    /**
+     * NEUE FUNKTION: Aktualisiert nach einer Generierung - lädt nur den spezifischen Typ neu
+     * @param {string} type - "text-to-image", "controlnet", "image-to-image"
+     * @param {string} uid - User ID (optional)
+     */
+    refreshAfterGenerationByType: async (type, uid = null) => {
+      console.log(`[ServerImages] Refreshing ${type} images after generation...`);
+      
+      // Kleine Verzögerung, damit Server das Bild speichern kann
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      return await store.loadUserImagesByType(type, uid);
+    },
+
+    /**
      * Speichert Benutzerdaten auf dem Server
      */
     saveUserData: async (data, uid = null) => {

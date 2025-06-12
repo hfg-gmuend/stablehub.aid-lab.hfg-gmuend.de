@@ -8,9 +8,7 @@
   
   function handleUidChanged(event) {
     console.log('[NavigationBar] UID changed:', event.detail);
-    // Lade die Bilder für die neue UID
-    serverImages.loadUserImages(event.detail.newUid);
-    // Optional: Leere den lokalen Cache
+    // Leere den lokalen Cache - jede Seite lädt ihre eigenen type-spezifischen Bilder
     serverImages.clearLocalData();
   }
 </script>

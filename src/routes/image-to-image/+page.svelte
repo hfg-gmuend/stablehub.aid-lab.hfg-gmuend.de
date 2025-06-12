@@ -7,6 +7,7 @@
   import StyleCopilot from "$lib/components/StyleCopilot.svelte"; 
   import { serverImages } from "$lib/stores/serverImages.js";
   import { user } from "$lib/stores/user.js";
+  import { get } from 'svelte/store';
   import { ApiService } from "$lib/services/apiService.js";
   import { assets } from '$app/paths';
   
@@ -48,9 +49,9 @@
   // Historie der generierten Bilder
   let generatedResults = [];
   
-  // Subscribe to server images and filter for image-to-image type
+  // Subscribe to server images - no filtering needed, store contains pre-filtered data
   const unsubscribeServerImages = serverImages.subscribe(images => {
-    generatedResults = images.filter(entry => entry.type === "image-to-image");
+    generatedResults = images;
     console.log("[ImageToImage] Server results:", generatedResults.length);
   });
   
@@ -58,8 +59,8 @@
   const unsubscribeUser = user.subscribe(userData => {
     if (userData.userid !== currentUid) {
       currentUid = userData.userid;
-      // Load images when UID changes
-      serverImages.loadUserImages();
+      // Load images by type when UID changes
+      serverImages.loadUserImagesByType("image-to-image", userData.userid);
     }
   });
   
@@ -122,6 +123,9 @@
       return;
     }
     
+    console.log('[ImageToImage] Starting generation with prompt:', prompt);
+    console.log('[ImageToImage] Current parameters:', { prompt, negativePrompt, cfg, steps, seed });
+    
     loading = true;
     error = null;
     
@@ -143,6 +147,8 @@
         image2
       });
       
+      console.log('[ImageToImage] API result:', result);
+      
       // Save to server storage with image type
       const historyEntry = {
         prompt: prompt,
@@ -158,9 +164,10 @@
       console.log("[ImageToImage] Image generated successfully, loading server data...");
       
       // Prompt-Daten werden jetzt automatisch in der API-Service gespeichert
-      // Keine manuelle Speicherung mehr notwendig
+      // Die API wartet jetzt auf die Prompt-Speicherung
       
-      await serverImages.refreshAfterGeneration();
+      const userData = get(user);
+      await serverImages.refreshAfterGenerationByType("image-to-image", userData.userid);
       
     } catch (e) {
       error = e instanceof Error ? e.message : 'Unknown error occurred';
@@ -195,9 +202,12 @@
   }
 
   // Parameter aus URL auslesen, wenn die Seite geladen wird
-  onMount(() => {
-    // Load images when component mounts
-    serverImages.loadUserImages();
+  onMount(async () => {
+    console.log("[ImageToImage] Component mounted, loading user images...");
+    
+    // Load images by type when component mounts
+    const userData = get(user);
+    await serverImages.loadUserImagesByType("image-to-image", userData.userid);
     
     const url = new URL(window.location.href);
     

@@ -65,20 +65,15 @@
   // Historie der generierten Bilder
   let generatedResults: GeneratedResult[] = [];
   
-  // Store subscription für Server-basierte Bilder
+  // Store subscription für Server-basierte Bilder (nur text-to-image)
   const unsubscribe = serverImages.subscribe((images: any[]) => {
-    console.log("[TextToImage] Store subscription triggered, raw images:", images.length);
-    // Filtere nach "text-to-image" Typ
-    const filteredImages = images.filter((entry: any) => {
-      console.log("[TextToImage] Image entry:", entry?.type, entry);
-      return entry?.type === "text-to-image";
-    });
-    // Sortiere noch einmal nach Timestamp (neueste zuerst) für zusätzliche Sicherheit
-    const sortedImages = filteredImages.sort((a: any, b: any) => 
+    console.log("[TextToImage] Store subscription triggered, images:", images.length);
+    // Keine Filterung mehr nötig - Store enthält bereits nur text-to-image Bilder
+    const sortedImages = images.sort((a: any, b: any) => 
       new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     );
     generatedResults = sortedImages as GeneratedResult[];
-    console.log("[TextToImage] Server images loaded:", generatedResults.length, "filtered from", images.length);
+    console.log("[TextToImage] Text-to-image images loaded:", generatedResults.length);
   });
   
   // Reaktive Variable für aktuelle UID
@@ -153,9 +148,9 @@
   onMount(async () => {
     console.log("[TextToImage] Component mounted, loading user images...");
     
-    // Lade Bilder vom Server für die aktuelle UID
+    // Lade Bilder vom Server für die aktuelle UID mit Text-to-Image Filter
     lastLoadedUid = currentUid;
-    await serverImages.loadUserImages();
+    await serverImages.loadUserImagesByType("text-to-image", currentUid);
     
     const url = new URL(window.location.href);
     
@@ -214,8 +209,8 @@
     if (currentUid && currentUid !== lastLoadedUid) {
       console.log("[TextToImage] UID changed from", lastLoadedUid, "to:", currentUid);
       lastLoadedUid = currentUid;
-      // Lade Bilder für neue UID
-      serverImages.loadUserImages();
+      // Lade Bilder für neue UID mit Text-to-Image Filter
+      serverImages.loadUserImagesByType("text-to-image", currentUid);
     }
   }
   

@@ -76,7 +76,7 @@
     console.error("Error loading image:", event);
     const target = /** @type {HTMLImageElement} */ (event.target);
     target.onerror = null;
-    target.src = '/fallback-image.png'; // Hier Pfad zu einem Platzhalterbild
+    target.style.display = 'none'; // Verstecke das Bild wenn es nicht geladen werden kann
   }
 </script>
 

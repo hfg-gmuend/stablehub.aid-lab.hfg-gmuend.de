@@ -7,8 +7,8 @@
   import { onMount, onDestroy } from "svelte";
   import { serverImages } from "$lib/stores/serverImages.js";
   import { user } from "$lib/stores/user.js";
+  import { get } from 'svelte/store';
   import { ApiService } from "$lib/services/apiService.js";
-  import type { GeneratedResult } from '$lib/types';
   import { assets } from '$app/paths';
 
   // --- Type Definitions ---
@@ -22,8 +22,8 @@
     id: number;
     prompt: string;
     imageUrls: string[];
-    sourceImage: string | ArrayBuffer | null;
-    controlnetParams: ControlNetParams;
+    controlnetParams?: ControlNetParams;
+    parameters?: any;
     timestamp: Date;
   }
 
@@ -71,16 +71,22 @@
 
   // Historie der generierten Bilder
   let generatedResults: GeneratedResult[] = [];
+  let currentUid = null;
   
-  // Store subscription für Server-basierte Bilder
-  const unsubscribe = serverImages.subscribe(images => {
-    // Filtere nach "controlnet" Typ
-    generatedResults = images.filter(entry => entry.type === "controlnet") as GeneratedResult[];
-    console.log("[ControlNet] Server images loaded:", generatedResults.length);
+  // Store subscription für Server-basierte Bilder (nur controlnet)
+  const unsubscribeServerImages = serverImages.subscribe(images => {
+    generatedResults = images as GeneratedResult[];
+    console.log("[ControlNet] Server results:", generatedResults.length);
   });
   
-  // Reaktive Variable für aktuelle UID
-  $: currentUid = $user.userid || 'default';
+  // Subscribe to user changes to refresh data
+  const unsubscribeUser = user.subscribe(userData => {
+    if (userData.userid !== currentUid) {
+      currentUid = userData.userid;
+      // Load images by type when UID changes
+      serverImages.loadUserImagesByType("controlnet", userData.userid);
+    }
+  });
 
   // API URL Basis
   const apiBaseUrl: string = "https://aid-playground.hfg-gmuend.de/api/controlnet";
@@ -149,8 +155,7 @@
       const newResult: GeneratedResult = {
         id: Date.now(),
         prompt: prompt,
-        imageUrls: [result.imageUrl || result],  // Unterstütze beide Formate
-        sourceImage: imagePreview,
+        imageUrls: [typeof result === 'string' ? result : result.imageUrl],  // Handle both formats properly
         controlnetParams: {
           strength: controlnetStrength,
           startPercent: startPercent,
@@ -165,13 +170,10 @@
       console.log("[ControlNet] Image generated successfully, loading server data...");
       
       // Prompt-Daten werden jetzt automatisch in der API-Service gespeichert
-      // Keine manuelle Speicherung mehr notwendig
+      // Die API wartet jetzt auf die Prompt-Speicherung
       
-      // DEAKTIVIERT: Das setTimeout überschreibt die korrekt angezeigten Prompts 
-      // mit fehlerhaften Server-Daten aufgrund von ID-Matching-Problemen
-      // setTimeout(async () => {
-      //   await serverImages.loadUserImages();
-      // }, 1500);
+      const userData = get(user);
+      await serverImages.refreshAfterGenerationByType("controlnet", userData.userid);
 
     } catch (e) {
       error = e instanceof Error ? e.message : "Unknown error";
@@ -197,8 +199,9 @@
   onMount(async () => {
     console.log("[ControlNet] Component mounted, loading user images...");
     
-    // Lade Bilder vom Server für die aktuelle UID
-    await serverImages.loadUserImages();
+    // Load images by type when component mounts
+    const userData = get(user);
+    await serverImages.loadUserImagesByType("controlnet", userData.userid);
 
     const url = new URL(window.location.href);
 
@@ -253,19 +256,11 @@
       }
     });
 
-    // Store-Subscription beenden
-    unsubscribe();
+    // Store-Subscriptions beenden
+    unsubscribeServerImages();
+    unsubscribeUser();
   });
   
-  // Reagiere auf UID-Änderungen
-  $: {
-    if (currentUid) {
-      console.log("[ControlNet] UID changed to:", currentUid);
-      // Lade Bilder für neue UID
-      serverImages.loadUserImages();
-    }
-  }
-
 </script>
 
 <svelte:head>
@@ -525,19 +520,37 @@
             {#each generatedResults as result (result.id)}
               <div class="result-card">
                 <div class="controlnet-info">
-                  <div class="source-image-container">
-                    <img src={result.sourceImage} alt="Source image" class="source-image" />
+                  <div class="input-indicator">
+                    <span class="input-label">Input</span>
                     <div class="arrow-icon">→</div>
                   </div>
                   <div class="params-display">
-                    <div class="param-item">
-                      <span class="param-label">Strength:</span>
-                      <span class="param-value">{result.controlnetParams.strength.toFixed(2)}</span>
-                    </div>
-                    <div class="param-item">
-                      <span class="param-label">Range:</span>
-                      <span class="param-value">{result.controlnetParams.startPercent.toFixed(2)} - {result.controlnetParams.endPercent.toFixed(2)}</span>
-                    </div>
+                    {#if result.controlnetParams}
+                      <div class="param-item">
+                        <span class="param-label">Strength:</span>
+                        <span class="param-value">{result.controlnetParams.strength.toFixed(2)}</span>
+                      </div>
+                      <div class="param-item">
+                        <span class="param-label">Range:</span>
+                        <span class="param-value">{result.controlnetParams.startPercent.toFixed(2)} - {result.controlnetParams.endPercent.toFixed(2)}</span>
+                      </div>
+                    {:else if result.parameters}
+                      <!-- Fallback für Server-Bilder mit parameters statt controlnetParams -->
+                      <div class="param-item">
+                        <span class="param-label">Strength:</span>
+                        <span class="param-value">{result.parameters.controlnetStrength?.toFixed(2) || 'N/A'}</span>
+                      </div>
+                      <div class="param-item">
+                        <span class="param-label">Range:</span>
+                        <span class="param-value">{result.parameters.startPercent?.toFixed(2) || '0'} - {result.parameters.endPercent?.toFixed(2) || '1'}</span>
+                      </div>
+                    {:else}
+                      <!-- Fallback wenn keine Parameter verfügbar sind -->
+                      <div class="param-item">
+                        <span class="param-label">Type:</span>
+                        <span class="param-value">ControlNet</span>
+                      </div>
+                    {/if}
                   </div>
                 </div>
                 <PromptResultCard 
