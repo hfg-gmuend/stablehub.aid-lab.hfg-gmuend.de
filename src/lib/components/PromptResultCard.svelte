@@ -19,13 +19,44 @@
   
   // Funktion zum Herunterladen eines Bildes
   /** @param {string} imageUrl */
-  function downloadImage(imageUrl) {
-    const link = document.createElement('a');
-    link.href = imageUrl;
-    link.download = `ai-image-${new Date().getTime()}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  async function downloadImage(imageUrl) {
+    try {
+      // Generiere Dateinamen aus dem Prompt (die ersten 30 Zeichen, bereinigt)
+      const fileName = prompt ? 
+        prompt.substring(0, 30).replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.png' :
+        `ai-image-${new Date().getTime()}.png`;
+
+      // Für Blob-URLs: Direkter Download
+      if (imageUrl.startsWith('blob:')) {
+        const link = document.createElement('a');
+        link.href = imageUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return;
+      }
+
+      // Für externe URLs: Fetch und Download als Blob
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      
+      // Erstelle Blob-URL für Download
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Cleanup Blob-URL
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error('Download failed:', error);
+      // Fallback: Öffne in neuem Tab
+      window.open(imageUrl, '_blank');
+    }
   }
   
   // Initialisierung des Favoriten-Status für jedes Bild
