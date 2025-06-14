@@ -1,6 +1,10 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 
+/**
+ * Generiert eine UUID v4
+ * @returns {string} UUID v4 String
+ */
 function uuidv4() {
     return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) =>
         (
@@ -11,7 +15,12 @@ function uuidv4() {
     );
 }
 
-
+/**
+ * Setzt ein Cookie
+ * @param {string} cname - Cookie-Name
+ * @param {string} cvalue - Cookie-Wert
+ * @param {number} exdays - Anzahl Tage bis Ablauf
+ */
 function setCookie(cname, cvalue, exdays) {
     if (!browser) return; // Skip if not in browser
     const d = new Date();
@@ -20,7 +29,11 @@ function setCookie(cname, cvalue, exdays) {
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
-
+/**
+ * Liest ein Cookie aus
+ * @param {string} cname - Cookie-Name
+ * @returns {string} Cookie-Wert oder leerer String
+ */
 function getCookie(cname) {
     if (!browser) return ""; // Return empty string if not in browser
     let name = cname + "=";
@@ -70,7 +83,10 @@ const createUserStore = () => {
 
     return {
     subscribe,
-    // Setzt die User-ID
+    /**
+     * Setzt die User-ID
+     * @param {string} userid - Die neue User-ID
+     */
     setUserId: (userid) => {
       if (browser) {
         setCookie("userid", userid, 365);
@@ -92,7 +108,10 @@ const createUserStore = () => {
         return newState;
       });
     },
-    // Setzt den gesamten User-Status
+    /**
+     * Setzt den gesamten User-Status
+     * @param {Object} status - Der neue User-Status
+     */
     setUserStatus: (status) => {
       update((state) => {
         const newState = { ...state, ...status };
