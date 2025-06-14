@@ -174,7 +174,11 @@
     <h3 class="prompt-text">{prompt}</h3>
   </div>
   
-  <div class="images-grid" class:single-image={imageUrls.length === 1}>
+  <div class="images-grid" 
+       class:single-image={imageUrls.length === 1}
+       class:two-images={imageUrls.length === 2}
+       class:three-images={imageUrls.length === 3}
+       class:multiple-images={imageUrls.length > 3}>
     {#each imageUrls as imageUrl, index}
       <div class="image-container">
         <img src={imageUrl} alt="Generiertes Bild {index + 1}" class="generated-image" />
@@ -259,6 +263,71 @@
     max-width: 65%; /* Kleinere Skalierung für einzelne Bilder */
     margin: 0 auto; /* Zentrieren des einzelnen Bildes */
     padding: 1.5rem; /* Mehr Padding für ein einzelnes Bild */
+  }
+  
+  /* 2 Bilder: Nebeneinander in gleicher Größe */
+  .two-images {
+    grid-template-columns: 1fr 1fr;
+    max-width: 80%;
+    margin: 0 auto;
+  }
+  
+  /* 3 Bilder: Alle nebeneinander */
+  .three-images {
+    grid-template-columns: 1fr 1fr 1fr;
+    max-width: 90%;
+    margin: 0 auto;
+  }
+  
+  /* Mehr als 3 Bilder: Responsives Grid */
+  .multiple-images {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    max-width: 100%;
+  }
+  
+  /* Mobile Responsive Anpassungen */
+  @media (max-width: 768px) {
+    .single-image {
+      max-width: 90%;
+      padding: 1rem;
+    }
+    
+    .two-images {
+      grid-template-columns: 1fr 1fr;
+      max-width: 95%;
+      gap: 6px;
+      padding: 6px;
+    }
+    
+    .three-images {
+      grid-template-columns: 1fr 1fr 1fr;
+      max-width: 100%;
+      gap: 4px;
+      padding: 4px;
+    }
+    
+    .multiple-images {
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 4px;
+      padding: 4px;
+    }
+    
+    .image-container {
+      aspect-ratio: 1;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .three-images {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+    }
+    
+    .three-images .image-container:nth-child(3) {
+      grid-column: 1 / -1;
+      max-width: 60%;
+      margin: 0 auto;
+    }
   }
   
   .image-container {

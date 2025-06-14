@@ -68,12 +68,53 @@
   // Store subscription für Server-basierte Bilder (nur text-to-image)
   const unsubscribe = serverImages.subscribe((images: any[]) => {
     console.log("[TextToImage] Store subscription triggered, images:", images.length);
-    // Keine Filterung mehr nötig - Store enthält bereits nur text-to-image Bilder
+    
+    // Sortiere Bilder nach Timestamp (neueste zuerst)
     const sortedImages = images.sort((a: any, b: any) => 
       new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     );
-    generatedResults = sortedImages as GeneratedResult[];
-    console.log("[TextToImage] Text-to-image images loaded:", generatedResults.length);
+    
+    // Gruppiere Bilder mit demselben Prompt und nahem Zeitstempel (innerhalb von 10 Sekunden)
+    const groupedResults: GeneratedResult[] = [];
+    const processed = new Set<number>();
+    
+    sortedImages.forEach((image: any, index: number) => {
+      if (processed.has(index)) return;
+      
+      // Finde alle Bilder mit demselben Prompt innerhalb von 10 Sekunden
+      const relatedImages: any[] = [image];
+      const imageTime = new Date(image.timestamp).getTime();
+      
+      sortedImages.forEach((otherImage: any, otherIndex: number) => {
+        if (otherIndex !== index && !processed.has(otherIndex)) {
+          const otherTime = new Date(otherImage.timestamp).getTime();
+          const timeDiff = Math.abs(imageTime - otherTime);
+          
+          // Gruppiere wenn: gleicher Prompt UND innerhalb von 10 Sekunden
+          if (image.prompt === otherImage.prompt && timeDiff <= 10000) {
+            relatedImages.push(otherImage);
+            processed.add(otherIndex);
+          }
+        }
+      });
+      
+      processed.add(index);
+      
+      // Erstelle gruppiertes Result
+      const groupedResult: GeneratedResult = {
+        id: image.id || Date.now() + index,
+        prompt: image.prompt,
+        imageUrls: relatedImages.map(img => img.imageUrl || (img.imageUrls && img.imageUrls[0])),
+        timestamp: new Date(image.timestamp),
+        styles: image.styles || [],
+        type: "text-to-image"
+      };
+      
+      groupedResults.push(groupedResult);
+    });
+    
+    generatedResults = groupedResults;
+    console.log("[TextToImage] Text-to-image images grouped:", generatedResults.length, "groups from", images.length, "individual images");
   });
   
   // Reaktive Variable für aktuelle UID
@@ -101,11 +142,11 @@
         variants
       });
       
-      // Neues Ergebnis erstellen für die lokale Anzeige
+      // Neues Ergebnis erstellen für die lokale Anzeige - ALLE Bilder in einer Card
       const newResult: GeneratedResult = { 
         id: Date.now(), 
         prompt: prompt,
-        imageUrls: result.imageUrls,
+        imageUrls: result.imageUrls, // Alle generierten Bilder in einem Array
         timestamp: new Date(),
         styles: [...selectedStyles],
         type: "text-to-image"
@@ -421,7 +462,7 @@
           <h3>API Request</h3>
           <div class="url-box">
             <span class="method">GET</span> 
-            {`${apiBaseUrl}?prompt=${encodeURIComponent(prompt)}${negativePrompt ? `&negative_prompt=${encodeURIComponent(negativePrompt)}` : ''}&cfg=${cfg}&steps=${steps}&seed=${seed}&uid=${currentUid}`}
+            {`${apiBaseUrl}?prompt=${encodeURIComponent(prompt)}${negativePrompt ? `&negative_prompt=${encodeURIComponent(negativePrompt)}` : ''}&cfg=${cfg}&steps=${steps}&seed=${seed}&variants=${variants}&uid=${currentUid}`}
           </div>
         </div>
       </div>
