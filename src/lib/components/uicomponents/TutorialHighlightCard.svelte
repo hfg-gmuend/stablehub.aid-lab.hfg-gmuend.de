@@ -7,7 +7,13 @@
 </script>
 
 <div class="tutorial-highlight-card">
-  <div class="highlight-icon">{icon}</div>
+  {#if icon.endsWith('.svg')}
+    <div class="highlight-icon">
+      <img src={icon} alt="Tutorial Icon" class="icon-svg" />
+    </div>
+  {:else}
+    <div class="highlight-icon">{icon}</div>
+  {/if}
   <div class="highlight-content">
     <h3>{title}</h3>
     <p>{description}</p>
@@ -38,6 +44,16 @@
     font-size: 2rem;
     margin-right: 1rem;
     line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 64px;
+  }
+
+  .icon-svg {
+    width: 48px;
+    height: 48px;
+    /* Gelber Filter entfernt - natürliche SVG-Farben beibehalten */
   }
 
   .highlight-content {

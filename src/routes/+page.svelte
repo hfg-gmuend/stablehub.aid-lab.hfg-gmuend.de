@@ -77,7 +77,7 @@
       
       <div class="tutorial-highlights">
         <TutorialHighlightCard
-          icon="🚀"
+          icon="/icon/rocket.svg"
           title="Quick Start"
           description="Learn the basics of Stable Diffusion in just 10 minutes"
           href="{base}/guided-tutorial/stable-diffusion-intro"
@@ -85,7 +85,7 @@
         />
 
         <TutorialHighlightCard
-          icon="💡"
+          icon="/icon/idea.svg"
           title="Prompt Power"
           description="Better prompts lead to better results"
           href="{base}/guided-tutorial/prompt-basics"
@@ -93,7 +93,7 @@
         />
 
         <TutorialHighlightCard
-          icon="🔧"
+          icon="/icon/tool.svg"
           title="For Advanced Users"
           description="Parameters, styles and advanced techniques"
           href="{base}/guided-tutorial/core-parameters"
