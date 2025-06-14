@@ -4,9 +4,7 @@
   import { user } from '$lib/stores/user.js';
   import { onMount } from 'svelte';
   
-  // Zustand für das angezeigte Prompt
-  /** @type {string | null} */
-  let displayPrompt = null;
+  // Zustand für die Gallery
   /** @type {any[]} */
   let galleryItems = [];
   let loading = true;
@@ -154,9 +152,7 @@
       {:else}
         <div class="image-grid">
           {#each galleryItems as galleryItem (galleryItem.imageUrl)}
-            <div class="gallery-item"
-                 on:mouseenter={() => displayPrompt = galleryItem.imageUrl}
-                 on:mouseleave={() => displayPrompt = null}>
+            <div class="gallery-item">
               <img 
                 src={galleryItem.imageUrl} 
                 alt="Favorite image" 
@@ -164,20 +160,13 @@
                 on:error={handleImageError}
               />
               
-              <!-- User Info Badge -->
+              <!-- User Info Badge - bleibt immer sichtbar -->
               <div class="user-badge">
                 <span class="user-id">{galleryItem.userid}</span>
                 <span class="image-type">{galleryItem.type || 'text-to-image'}</span>
               </div>
               
-              <!-- Prompt-Overlay -->
-              {#if displayPrompt === galleryItem.imageUrl && galleryItem.prompt}
-                <div class="prompt-overlay">
-                  <p class="prompt-text">{galleryItem.prompt}</p>
-                </div>
-              {/if}
-              
-              <!-- Action-Buttons - erscheinen beim Hover -->
+              <!-- Action-Buttons - nur diese erscheinen beim Hover -->
               <div class="gallery-actions">
                 <button class="action-button copy-button" on:click={() => copyPromptToClipboard(galleryItem.prompt)} title="Copy Prompt">
                   <img src="/icon/penIcon.svg" alt="Copy" />
@@ -365,7 +354,6 @@
   .gallery-item:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    z-index: 10;
   }
   
   .gallery-image {
@@ -374,36 +362,6 @@
     object-fit: cover;
     display: block;
     border-radius: 12px;
-  }
-  
-  .prompt-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(8px);
-    padding: 1.5rem;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    border-radius: 12px;
-  }
-  
-  .gallery-item:hover .prompt-overlay {
-    opacity: 1;
-  }
-  
-  .prompt-text {
-    margin: 0;
-    font-size: 1rem;
-    line-height: 1.4;
-    font-family: 'Inter', sans-serif;
   }
   
   .user-badge {
@@ -441,19 +399,21 @@
   .gallery-actions {
     position: absolute;
     bottom: 1rem;
-    left: 1rem;
     right: 1rem;
     display: flex;
     gap: 0.5rem;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    z-index: 10;
   }
   
   .gallery-item:hover .gallery-actions {
     opacity: 1;
+    transform: translateY(0);
   }
   
-  .copy-button, .remove-button, .download-button {
+  .action-button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -468,7 +428,7 @@
     background-color: rgba(30, 30, 30, 0.85);
   }
   
-  .copy-button:hover, .download-button:hover, .remove-button:hover {
+  .action-button:hover {
     background-color: rgba(40, 40, 40, 0.95);
     transform: scale(1.05);
   }
@@ -483,15 +443,7 @@
   @media (hover: none) and (pointer: coarse) {
     .gallery-actions {
       opacity: 1;
-    }
-    
-    .gallery-item {
-      padding-bottom: 4rem; /* Platz für Buttons */
-    }
-    
-    .prompt-overlay {
-      bottom: 4rem; /* Über den Buttons */
-      height: calc(100% - 4rem);
+      transform: translateY(0);
     }
   }
   
@@ -499,6 +451,13 @@
     .gallery-actions {
       flex-direction: row;
       gap: 0.5rem;
+      bottom: 0.75rem;
+      right: 0.75rem;
+    }
+    
+    .action-button {
+      width: 36px;
+      height: 36px;
     }
   }
 </style>
