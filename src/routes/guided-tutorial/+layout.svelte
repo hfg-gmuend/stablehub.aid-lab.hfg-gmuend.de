@@ -37,4 +37,22 @@
       radial-gradient(circle at 25% 25%, rgba(60, 60, 60, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 75% 75%, rgba(40, 40, 40, 0.15) 0%, transparent 50%);
   }
+
+  /* Mobile responsive adjustments */
+  @media (max-width: 768px) {
+    .app-container {
+      position: relative;
+    }
+
+    main {
+      padding-top: 5rem; /* Space for both mobile buttons */
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    main {
+      padding-top: 4.5rem;
+    }
+  }
 </style>
