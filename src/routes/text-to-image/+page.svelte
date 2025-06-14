@@ -500,6 +500,37 @@
     display: flex;
     flex-direction: column;
   }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .app-container {
+      flex-direction: column;
+    }
+    
+    main {
+      padding: 80px 1rem 1rem; /* Extra top padding for burger menu */
+      min-height: calc(100vh - 80px);
+    }
+    
+    .content-wrapper {
+      grid-template-columns: 1fr !important;
+      grid-template-rows: auto auto auto !important;
+      gap: 1rem !important;
+      height: auto !important;
+    }
+    
+    .parameters-panel {
+      grid-column: 1 !important;
+      grid-row: 1 !important;
+      margin-bottom: 1rem;
+    }
+    
+    .output-area {
+      grid-column: 1 !important;
+      grid-row: 2 !important;
+      min-height: 300px;
+    }
+  }
   
   h1, h2, h3 {
     font-family: 'IBM Plex Mono', monospace;

@@ -214,6 +214,27 @@
     display: flex;
     flex-direction: column;
   }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .app-container {
+      flex-direction: column;
+    }
+    
+    main {
+      padding: 80px 1rem 1rem; /* Extra top padding for burger menu */
+      min-height: calc(100vh - 80px);
+    }
+    
+    .gallery-container {
+      padding: 0; /* Remove extra padding on mobile */
+    }
+    
+    .image-grid {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+      gap: 1rem !important;
+    }
+  }
   
   h1 {
     font-family: 'IBM Plex Mono', monospace;
