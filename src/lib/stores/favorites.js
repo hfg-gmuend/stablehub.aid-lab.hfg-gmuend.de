@@ -1,7 +1,10 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 
-// Funktion zum Laden der gespeicherten Favoriten aus dem Local Storage
+/**
+ * Funktion zum Laden der gespeicherten Favoriten aus dem Local Storage
+ * @returns {any[]} Array von Favoriten-Objekten
+ */
 const loadFavorites = () => {
   if (browser) {
     try {
@@ -16,20 +19,27 @@ const loadFavorites = () => {
   return [];
 };
 
-// Erstellen des Stores mit den gespeicherten Favoriten
+/**
+ * Erstellen des Stores mit den gespeicherten Favoriten
+ * @returns {Object} Favorites Store mit Methoden
+ */
 const createFavoritesStore = () => {
   const { subscribe, update, set } = writable(loadFavorites());
 
   return {
     subscribe,
     
-    // Favorit hinzufügen oder entfernen mit Blob-zu-Base64-Konvertierung
+    /**
+     * Favorit hinzufügen oder entfernen mit Blob-zu-Base64-Konvertierung
+     * @param {any} image - Das Bild-Objekt
+     */
     toggle: async (image) => {
       try {
         // Prüfen, ob das Bild bereits in den Favoriten ist
         let existingIndex = -1;
         
         update(favorites => {
+          /** @type {any} */
           existingIndex = favorites.findIndex(fav => fav.imageUrl === image.imageUrl);
           return favorites;
         });
@@ -106,11 +116,15 @@ const createFavoritesStore = () => {
       }
     },
     
-    // Favorit entfernen (wird in der Gallerie-Ansicht verwendet)
+    /**
+     * Favorit entfernen (wird in der Gallerie-Ansicht verwendet)
+     * @param {string} imageUrl - Die URL des zu entfernenden Bildes
+     */
     remove: (imageUrl) => {
       update(favorites => {
         console.log("Entferne Favorit mit URL:", imageUrl);
         
+        /** @type {any[]} */
         const updatedFavorites = favorites.filter(fav => 
           fav.imageUrl !== imageUrl && fav.imageData !== imageUrl
         );
@@ -128,10 +142,15 @@ const createFavoritesStore = () => {
       });
     },
     
-    // Prüfen, ob ein Bild bereits ein Favorit ist
+    /**
+     * Prüfen, ob ein Bild bereits ein Favorit ist
+     * @param {string} imageUrl - Die URL des zu prüfenden Bildes
+     * @returns {boolean} True wenn das Bild ein Favorit ist
+     */
     isFavorite: (imageUrl) => {
       let result = false;
       update(favorites => {
+        /** @type {any} */
         result = favorites.some(fav => fav.imageUrl === imageUrl);
         return favorites;
       });
