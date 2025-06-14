@@ -210,7 +210,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    overflow-y: auto; /* Ermöglicht Scrolling */
+    /* Kein overflow für Desktop - UidSwitcher kann überfließen */
   }
 
   .sidebar-footer {
