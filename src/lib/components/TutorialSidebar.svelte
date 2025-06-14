@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
 
@@ -58,8 +58,8 @@
   }
 
   // Close tutorial sidebar when clicking outside
-  function handleClickOutside(event) {
-    const target = event.target;
+  function handleClickOutside(event: MouseEvent) {
+    const target = event.target as Node;
     const sidebar = document.querySelector('.tutorial-sidebar');
     const button = document.querySelector('.mobile-tutorial-button');
     
