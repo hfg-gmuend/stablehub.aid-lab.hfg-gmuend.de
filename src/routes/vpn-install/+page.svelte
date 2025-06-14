@@ -557,6 +557,8 @@
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
     margin: 1.5rem 0;
+    width: 100%;
+    box-sizing: border-box;
   }
   
   .instruction-card {
@@ -564,6 +566,11 @@
     border-radius: 8px;
     padding: 1.5rem;
     border: 1px solid #333;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
   }
   
   .instruction-card h3 {
@@ -674,24 +681,390 @@
   
   /* Responsive Styling */
   @media (max-width: 768px) {
+    .main-content {
+      padding: 1rem;
+    }
+    
+    h1 {
+      font-size: 1.8rem;
+    }
+    
+    .subtitle {
+      font-size: 1rem;
+    }
+    
     .stepper {
       flex-wrap: wrap;
       justify-content: center;
       gap: 1.5rem;
+      margin-bottom: 2rem;
     }
     
     .step {
       flex: 0 0 40%;
     }
     
+    .step-number {
+      width: 35px;
+      height: 35px;
+      font-size: 0.9rem;
+    }
+    
+    .step-title {
+      font-size: 0.75rem;
+    }
+    
     .step-line {
       display: none;
+    }
+    
+    .step-content {
+      padding: 1.5rem;
+    }
+    
+    .step-panel h2 {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
     }
     
     .os-selection,
     .import-instructions,
     .connect-instructions {
       grid-template-columns: 1fr;
+      gap: 1rem;
+      min-width: 0;
+    }
+    
+    .instruction-card,
+    .os-card {
+      min-width: 0;
+      max-width: 100%;
+    }
+    
+    .os-card {
+      padding: 1.2rem;
+    }
+    
+    .os-icon {
+      width: 40px;
+      height: 40px;
+      margin-right: 0.8rem;
+    }
+    
+    .os-info h3 {
+      font-size: 1.1rem;
+    }
+    
+    .instruction-card {
+      padding: 1.2rem;
+    }
+    
+    .instruction-card h3 {
+      font-size: 1rem;
+    }
+    
+    .download-section {
+      padding: 1.5rem;
+    }
+    
+    .download-button {
+      padding: 0.8rem 1.2rem;
+      font-size: 0.9rem;
+    }
+    
+    .step-navigation {
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .nav-button {
+      width: 100%;
+      justify-content: center;
+      padding: 1rem;
+    }
+    
+    .step-indicator {
+      order: -1;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .main-content {
+      padding: 0.5rem;
+      overflow-x: hidden;
+    }
+    
+    h1 {
+      font-size: 1.6rem;
+    }
+    
+    .step {
+      flex: 0 0 45%;
+    }
+    
+    .step-content {
+      padding: 1rem;
+      overflow-x: hidden;
+    }
+    
+    .step-panel {
+      overflow-x: hidden;
+    }
+    
+    .step-panel h2 {
+      font-size: 1.2rem;
+      word-wrap: break-word;
+    }
+    
+    .step-panel p {
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    
+    .os-card {
+      padding: 1rem;
+      flex-direction: column;
+      text-align: center;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .os-icon {
+      margin-right: 0;
+      margin-bottom: 0.5rem;
+    }
+    
+    .connect-instructions {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+    }
+    
+    .instruction-card {
+      padding: 1rem;
+      width: 100%;
+      box-sizing: border-box;
+      overflow-x: hidden;
+      word-wrap: break-word;
+    }
+    
+    .instruction-card h3 {
+      font-size: 0.95rem;
+      margin-bottom: 0.8rem;
+      word-wrap: break-word;
+    }
+    
+    .instruction-card ol {
+      padding-left: 1rem;
+      margin: 0;
+    }
+    
+    .instruction-card li {
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+    
+    .instruction-card p {
+      font-size: 0.85rem;
+      margin-bottom: 0.8rem;
+      line-height: 1.4;
+    }
+    
+    /* Spezielle Regeln für Auth-Info Karte */
+    .auth-info {
+      margin-top: 1rem;
+    }
+    
+    .auth-info h3 {
+      font-size: 0.9rem;
+    }
+    
+    .auth-info p {
+      font-size: 0.8rem;
+      margin-bottom: 0.6rem;
+    }
+    
+    .auth-info ol {
+      padding-left: 0.8rem;
+    }
+    
+    .auth-info li {
+      font-size: 0.8rem;
+      margin-bottom: 0.4rem;
+    }
+    
+    .download-section {
+      padding: 1rem;
+      overflow-x: hidden;
+    }
+    
+    .download-button {
+      padding: 0.7rem 1rem;
+      font-size: 0.85rem;
+      width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .download-icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+    }
+    
+    .auth-note {
+      padding: 0.8rem;
+      margin-top: 1rem;
+      overflow-x: hidden;
+    }
+    
+    .auth-note h4 {
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .auth-note p {
+      font-size: 0.8rem;
+      margin-bottom: 0.6rem;
+    }
+    
+    .auth-note ol {
+      padding-left: 0.8rem;
+    }
+    
+    .auth-note li {
+      font-size: 0.8rem;
+      margin-bottom: 0.3rem;
+    }
+    
+    .auth-note a {
+      word-break: break-all;
+      line-height: 1.3;
+    }
+    
+    .success-message {
+      padding: 1rem;
+      margin-top: 1rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .success-message h3 {
+      font-size: 1rem;
+      margin-bottom: 0.6rem;
+    }
+    
+    .success-message p {
+      font-size: 0.85rem;
+      margin: 0;
+    }
+    
+    /* Navigation Fixes */
+    .step-navigation {
+      padding: 1rem 0;
+      margin-top: 1.5rem;
+    }
+    
+    .nav-button {
+      font-size: 0.9rem;
+      padding: 0.8rem 1rem;
+    }
+    
+    .step-indicator {
+      font-size: 0.85rem;
+      text-align: center;
+    }
+  }
+  
+  /* Extra kleine Bildschirme (320px und kleiner) */
+  @media (max-width: 320px) {
+    .main-content {
+      padding: 0.25rem;
+    }
+    
+    h1 {
+      font-size: 1.4rem;
+      line-height: 1.3;
+    }
+    
+    .subtitle {
+      font-size: 0.9rem;
+    }
+    
+    .step-content {
+      padding: 0.75rem;
+    }
+    
+    .step-panel h2 {
+      font-size: 1.1rem;
+      margin-bottom: 0.8rem;
+    }
+    
+    .step-panel p {
+      font-size: 0.85rem;
+    }
+    
+    .instruction-card {
+      padding: 0.75rem;
+    }
+    
+    .instruction-card h3 {
+      font-size: 0.9rem;
+      margin-bottom: 0.6rem;
+    }
+    
+    .instruction-card li,
+    .instruction-card p {
+      font-size: 0.8rem;
+    }
+    
+    .auth-info {
+      padding: 0.75rem;
+    }
+    
+    .auth-note {
+      padding: 0.6rem;
+    }
+    
+    .auth-note h4 {
+      font-size: 0.8rem;
+    }
+    
+    .auth-note p,
+    .auth-note li {
+      font-size: 0.75rem;
+    }
+    
+    .success-message {
+      padding: 0.75rem;
+    }
+    
+    .success-message h3 {
+      font-size: 0.95rem;
+    }
+    
+    .success-message p {
+      font-size: 0.8rem;
+    }
+    
+    .download-button {
+      padding: 0.6rem 0.8rem;
+      font-size: 0.8rem;
+    }
+    
+    .nav-button {
+      padding: 0.7rem 0.8rem;
+      font-size: 0.85rem;
+    }
+    
+    .step-indicator {
+      font-size: 0.8rem;
     }
   }
   
