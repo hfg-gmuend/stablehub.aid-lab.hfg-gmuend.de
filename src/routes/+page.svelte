@@ -160,11 +160,6 @@
       <div class="features-header">
         <h2>Choose Your AI Tool</h2>
         <p class="features-subtitle">Transform your ideas into stunning visuals with our powerful AI models</p>
-        <div class="features-decoration">
-          <div class="floating-icon">⚡</div>
-          <div class="floating-icon">🎭</div>
-          <div class="floating-icon">🌟</div>
-        </div>
       </div>
 
       <div class="cards-container">
@@ -194,11 +189,6 @@
       <div class="community-header">
         <h2>Join Our Creative Community</h2>
         <p class="community-subtitle">Discover, share, and get inspired by the HfG AI community</p>
-        <div class="header-decoration">
-          <div class="floating-icon">🎨</div>
-          <div class="floating-icon">✨</div>
-          <div class="floating-icon">🚀</div>
-        </div>
       </div>
       
       <div class="community-features">
@@ -270,11 +260,6 @@
       <div class="tutorials-header">
         <h2>New here? Start with our tutorials</h2>
         <p class="tutorials-subtitle">Master AI image generation with our step-by-step guides</p>
-        <div class="tutorials-decoration">
-          <div class="floating-icon">🚀</div>
-          <div class="floating-icon">📚</div>
-          <div class="floating-icon">💡</div>
-        </div>
       </div>
       
       <div class="teaser-actions">
