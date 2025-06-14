@@ -174,7 +174,7 @@
   .uid-dropdown {
     position: absolute;
     bottom: 100%;
-    left: -17%; 
+    left: -9%; 
     background-color: #1e1e1e;
     border: 1px solid #444;
     border-radius: 8px;
