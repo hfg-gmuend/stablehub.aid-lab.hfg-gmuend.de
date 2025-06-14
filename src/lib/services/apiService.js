@@ -10,6 +10,12 @@ export class ApiService {
   /**
    * Generiert ein Bild mit Text-to-Image
    * @param {Object} params - Parameter für die Bildgenerierung
+   * @param {string} params.prompt - Der Prompt für die Bildgenerierung
+   * @param {string} [params.negativePrompt] - Negativer Prompt
+   * @param {number} params.cfg - CFG-Wert
+   * @param {number} params.steps - Anzahl der Steps
+   * @param {number} params.seed - Seed-Wert
+   * @param {number} [params.variants] - Anzahl der Varianten
    * @returns {Promise<{imageUrls: string[], imageIds: string[]}>} URLs und IDs der generierten Bilder
    */
   static async generateTextToImage(params) {
@@ -137,6 +143,16 @@ export class ApiService {
 
   /**
    * Generiert ein Bild mit ControlNet
+   * @param {Object} params - Parameter für die ControlNet-Generierung
+   * @param {string} params.prompt - Der Prompt
+   * @param {string} [params.negativePrompt] - Negativer Prompt
+   * @param {number} params.cfg - CFG-Wert
+   * @param {number} params.steps - Anzahl der Steps
+   * @param {number} params.seed - Seed-Wert
+   * @param {File} params.image - Das zu verarbeitende Bild
+   * @param {number} params.controlnetStrength - ControlNet-Stärke
+   * @param {number} params.startPercent - Start-Prozent
+   * @param {number} params.endPercent - End-Prozent
    * @returns {Promise<{imageUrl: string, imageId: string}>} URL und ID des generierten Bildes
    */
   static async generateControlNet(params) {
@@ -295,6 +311,14 @@ export class ApiService {
 
   /**
    * Kombiniert zwei Bilder
+   * @param {Object} params - Parameter für die Image-to-Image-Generierung
+   * @param {string} params.prompt - Der Prompt
+   * @param {string} [params.negativePrompt] - Negativer Prompt
+   * @param {number} params.cfg - CFG-Wert
+   * @param {number} params.steps - Anzahl der Steps
+   * @param {number} params.seed - Seed-Wert
+   * @param {File} params.image1 - Erstes Bild
+   * @param {File} params.image2 - Zweites Bild
    * @returns {Promise<{imageUrl: string, imageId: string}>} URL und ID des kombinierten Bildes
    */
   static async combineImages(params) {
@@ -462,6 +486,8 @@ export class ApiService {
 
   /**
    * Lädt alle Bilder für eine UID
+   * @param {string|null} [uid] - User ID, falls null wird aus Store geholt
+   * @returns {Promise<string[]>} Array von Bild-URLs
    */
   static async loadUserImages(uid = null) {
     const userId = uid || get(user).userid || 'default';
@@ -476,8 +502,8 @@ export class ApiService {
 
   /**
    * Lädt Bilder mit zugehörigen Prompt-Daten in einem Request
-   * @param {string} uid - User ID
-   * @returns {Promise<Array>} Bilder mit Prompt-Daten
+   * @param {string|null} [uid] - User ID
+   * @returns {Promise<Object[]>} Bilder mit Prompt-Daten
    */
   static async loadUserImagesWithPrompts(uid = null) {
     const userId = uid || get(user).userid || 'default';
@@ -575,6 +601,8 @@ export class ApiService {
 
   /**
    * Lädt Benutzerdaten für eine UID
+   * @param {string|null} [uid] - User ID
+   * @returns {Promise<Object|null>} Benutzerdaten oder null
    */
   static async loadUserData(uid = null) {
     const userId = uid || get(user).userid || 'default';
@@ -592,6 +620,9 @@ export class ApiService {
 
   /**
    * Speichert Benutzerdaten für eine UID
+   * @param {Object} data - Die zu speichernden Daten
+   * @param {string|null} [uid] - User ID
+   * @returns {Promise<Object>} Antwort vom Server
    */
   static async saveUserData(data, uid = null) {
     const userId = uid || get(user).userid || 'default';
@@ -613,6 +644,7 @@ export class ApiService {
 
   /**
    * Lädt die Galerie-Einträge
+   * @returns {Promise<Object[]>} Array von Galerie-Einträgen
    */
   static async loadGallery() {
     const response = await fetch(`${API_BASE_URL}/gallery`);
@@ -627,6 +659,8 @@ export class ApiService {
 
   /**
    * Fügt einen Eintrag zur Galerie hinzu
+   * @param {Object} entry - Der Galerie-Eintrag
+   * @returns {Promise<Object>} Antwort vom Server
    */
   static async addToGallery(entry) {
     const uid = get(user).userid || 'default';
@@ -654,6 +688,8 @@ export class ApiService {
 
   /**
    * Entfernt einen Eintrag aus der Galerie
+   * @param {Object} entry - Der zu entfernende Galerie-Eintrag
+   * @returns {Promise<Object>} Antwort vom Server
    */
   static async removeFromGallery(entry) {
     const response = await fetch(`${API_BASE_URL}/gallery`, {
@@ -675,7 +711,14 @@ export class ApiService {
    * Speichert Prompt-Daten direkt am Server mit neuer type-basierter Struktur
    * @param {string} uid - User ID
    * @param {string} imageId - Image ID
-   * @param {object} promptData - Prompt-Daten (prompt, negativePrompt, parameters, type, etc.)
+   * @param {Object} promptData - Prompt-Daten
+   * @param {string} promptData.prompt - Der Prompt
+   * @param {string} [promptData.negativePrompt] - Negativer Prompt
+   * @param {Object} [promptData.parameters] - Parameter-Objekt
+   * @param {string} promptData.type - Typ der Generierung
+   * @param {string} [promptData.timestamp] - Zeitstempel
+   * @param {string[]} [promptData.styles] - Array von Styles
+   * @returns {Promise<boolean>} True wenn erfolgreich gespeichert
    */
   static async savePromptToServer(uid, imageId, promptData) {
     try {
@@ -687,6 +730,7 @@ export class ApiService {
       });
       
       // Lade aktuelle Benutzerdaten
+      /** @type {{prompts: {[key: string]: any}, images: {[key: string]: any}}} */
       let userData = { prompts: {}, images: {} };
       try {
         const userDataResponse = await fetch(`${API_BASE_URL}/userdata/${uid}`);
