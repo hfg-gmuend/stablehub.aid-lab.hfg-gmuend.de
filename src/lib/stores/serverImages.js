@@ -9,6 +9,7 @@ import { get } from 'svelte/store';
  * Dieser Store ersetzt die lokale Speicherung und nutzt die API-Endpunkte
  */
 const createServerImagesStore = () => {
+  /** @type {import('svelte/store').Writable<any[]>} */
   const { subscribe, update, set } = writable([]);
   
   const store = {
@@ -16,6 +17,8 @@ const createServerImagesStore = () => {
     
     /**
      * Lädt die Bilder für den aktuellen Benutzer vom Server mit Prompt-Daten
+     * @param {string|null} [uid] - User ID
+     * @returns {Promise<any[]>} Array von Bildern mit Prompt-Daten
      */
     loadUserImages: async (uid = null) => {
       try {
@@ -45,6 +48,7 @@ const createServerImagesStore = () => {
           const convertedImages = Array.isArray(serverImages) ? serverImages.map((imagePath, index) => {
             console.log('[ServerImages] Processing image path:', imagePath);
             
+            /** @type {string[]} */
             let imageUrls = [];
             let imageId = '';
             let prompt = '';
@@ -94,7 +98,8 @@ const createServerImagesStore = () => {
     /**
      * NEUE FUNKTION: Lädt Bilder gefiltert nach Generierungstyp
      * @param {string} type - "text-to-image", "controlnet", "image-to-image"
-     * @param {string} uid - User ID (optional)
+     * @param {string|null} [uid] - User ID (optional)
+     * @returns {Promise<any[]>} Gefilterte Bilder nach Typ
      */
     loadUserImagesByType: async (type, uid = null) => {
       try {
@@ -106,7 +111,9 @@ const createServerImagesStore = () => {
         
         // Filtere nach Typ
         const filteredImages = allImages.filter(image => {
-          const imageType = image.type || 'text-to-image'; // Fallback für alte Bilder
+          /** @type {any} */
+          const imageObj = image;
+          const imageType = imageObj.type || 'text-to-image'; // Fallback für alte Bilder
           return imageType === type;
         });
         
@@ -126,7 +133,8 @@ const createServerImagesStore = () => {
     /**
      * NEUE FUNKTION: Aktualisiert nach einer Generierung - lädt nur den spezifischen Typ neu
      * @param {string} type - "text-to-image", "controlnet", "image-to-image"
-     * @param {string} uid - User ID (optional)
+     * @param {string|null} [uid] - User ID (optional)
+     * @returns {Promise<any[]>} Aktualisierte Bilder
      */
     refreshAfterGenerationByType: async (type, uid = null) => {
       console.log(`[ServerImages] Refreshing ${type} images after generation...`);
@@ -140,6 +148,7 @@ const createServerImagesStore = () => {
         
         // Prüfe ob neuestes Bild echten Prompt hat
         if (images.length > 0) {
+          /** @type {any} */
           const latestImage = images[0];
           const hasRealPrompt = latestImage.prompt && !latestImage.prompt.match(/^Generated Image \d+$/);
           
@@ -161,6 +170,9 @@ const createServerImagesStore = () => {
 
     /**
      * Speichert Benutzerdaten auf dem Server
+     * @param {any} data - Die zu speichernden Daten
+     * @param {string|null} [uid] - User ID
+     * @returns {Promise<any>} Antwort vom Server
      */
     saveUserData: async (data, uid = null) => {
       try {
@@ -176,6 +188,8 @@ const createServerImagesStore = () => {
     
     /**
      * Lädt Benutzerdaten vom Server
+     * @param {string|null} [uid] - User ID
+     * @returns {Promise<any|null>} Benutzerdaten oder null
      */
     loadUserData: async (uid = null) => {
       try {
@@ -200,6 +214,9 @@ const createServerImagesStore = () => {
 
     /**
      * Speichert Prompt-Daten für ein generiertes Bild mit Image-ID als Schlüssel
+     * @param {any} promptData - Die Prompt-Daten mit imageId
+     * @param {string|null} [uid] - User ID
+     * @returns {Promise<any>} Antwort vom Server
      */
     savePromptData: async (promptData, uid = null) => {
       try {
@@ -207,6 +224,7 @@ const createServerImagesStore = () => {
         console.log('[ServerImages] Saving prompt data for UID:', userId, 'ImageID:', promptData.imageId);
         
         // Lade bestehende Benutzerdaten
+        /** @type {any} */
         let userData = await ApiService.loadUserData(userId) || {};
         
         // Stelle sicher, dass prompts Objekt existiert (nicht Array!)
@@ -236,6 +254,8 @@ const createServerImagesStore = () => {
     
     /**
      * Fügt ein Bild zu den Favoriten hinzu (Galerie)
+     * @param {any} imageData - Die Bild-Daten
+     * @returns {Promise<any>} Antwort vom Server
      */
     addToFavorites: async (imageData) => {
       try {
@@ -265,6 +285,8 @@ const createServerImagesStore = () => {
     
     /**
      * Entfernt ein Bild aus den Favoriten
+     * @param {any} imageData - Die Bild-Daten
+     * @returns {Promise<any>} Antwort vom Server
      */
     removeFromFavorites: async (imageData) => {
       try {
@@ -279,6 +301,7 @@ const createServerImagesStore = () => {
     
     /**
      * Lädt alle Galerie-Einträge (Favoriten aller Benutzer)
+     * @returns {Promise<any[]>} Array von Galerie-Einträgen
      */
     loadGallery: async () => {
       try {
@@ -290,7 +313,13 @@ const createServerImagesStore = () => {
         // Begrenze auf maximal 100 Einträge und sortiere nach Timestamp
         const limitedGallery = Array.isArray(galleryData) 
           ? galleryData
-              .sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime())
+              .sort((a, b) => {
+                /** @type {any} */
+                const itemA = a;
+                /** @type {any} */
+                const itemB = b;
+                return new Date(itemB.timestamp || 0).getTime() - new Date(itemA.timestamp || 0).getTime();
+              })
               .slice(0, 100)
           : [];
         
