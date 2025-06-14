@@ -367,10 +367,11 @@
   .user-badge {
     position: absolute;
     top: 0.75rem;
-    left: 0.75rem;
+    right: 0.75rem;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    align-items: flex-end;
     z-index: 20;
   }
   
