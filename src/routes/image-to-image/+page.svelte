@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import MinimalSidebar from "$lib/components/uicomponents/SidePanel/MinimalSidebar.svelte";
   import PromptResultCard from "$lib/components/PromptResultCard.svelte";
   import { onMount, onDestroy } from "svelte";
@@ -18,13 +18,13 @@
   let seed = 0;
   
   // Zustand für Bilder
-  let image1 = null;
-  let image2 = null;
-  let image1Preview = null;
-  let image2Preview = null;
+  let image1: File | null = null;
+  let image2: File | null = null;
+  let image1Preview: string | null = null;
+  let image2Preview: string | null = null;
   
   // Tooltip und Operationen
-  let activeTooltip = null;
+  let activeTooltip: string | null = null;
   
   // Tooltip-Texte
   const tooltips = {
@@ -39,14 +39,14 @@
   
   // Zustand der Anwendung
   let loading = false;
-  let imageUrl = null;
-  let error = null;
+  let imageUrl: string | null = null;
+  let error: string | null = null;
   
   // Current user ID for reactive updates
-  let currentUid = null;
+  let currentUid: string | null = null;
   
   // Historie der generierten Bilder
-  let generatedResults = [];
+  let generatedResults: any[] = [];
   
   // Subscribe to server images - no filtering needed, store contains pre-filtered data
   const unsubscribeServerImages = serverImages.subscribe(images => {
@@ -64,53 +64,59 @@
   });
   
   // Funktionen zum Verarbeiten des Bild-Uploads
-  function handleImage1Upload(event) {
-    const file = event.target.files[0];
+  function handleImage1Upload(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
     if (file) {
       image1 = file;
       const reader = new FileReader();
       reader.onload = (e) => {
-        image1Preview = e.target.result;
+        const result = e.target?.result;
+        image1Preview = typeof result === 'string' ? result : null;
       };
       reader.readAsDataURL(file);
     }
   }
   
-  function handleImage2Upload(event) {
-    const file = event.target.files[0];
+  function handleImage2Upload(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
     if (file) {
       image2 = file;
       const reader = new FileReader();
       reader.onload = (e) => {
-        image2Preview = e.target.result;
+        const result = e.target?.result;
+        image2Preview = typeof result === 'string' ? result : null;
       };
       reader.readAsDataURL(file);
     }
   }
   
-  function handleImageDrop(event, imageNumber) {
+  function handleImageDrop(event: DragEvent, imageNumber: number) {
     event.preventDefault();
-    const file = event.dataTransfer.files[0];
+    const file = event.dataTransfer?.files[0];
     if (file) {
       if (imageNumber === 1) {
         image1 = file;
         const reader = new FileReader();
         reader.onload = (e) => {
-          image1Preview = e.target.result;
+          const result = e.target?.result;
+          image1Preview = typeof result === 'string' ? result : null;
         };
         reader.readAsDataURL(file);
       } else {
         image2 = file;
         const reader = new FileReader();
         reader.onload = (e) => {
-          image2Preview = e.target.result;
+          const result = e.target?.result;
+          image2Preview = typeof result === 'string' ? result : null;
         };
         reader.readAsDataURL(file);
       }
     }
   }
   
-  function preventDefaults(event) {
+  function preventDefaults(event: Event) {
     event.preventDefault();
     event.stopPropagation();
   }
@@ -177,7 +183,7 @@
   }
   
   // Funktion zum Bearbeiten eines vorherigen Prompts
-  function editPrompt(oldPrompt) {
+  function editPrompt(oldPrompt: string) {
     prompt = oldPrompt;
     const promptElement = document.querySelector('#main-prompt');
     if (promptElement) {
@@ -193,7 +199,7 @@
     isStyleCopilotOpen = true;
   }
 
-  function addGeneratedStyle(event) {
+  function addGeneratedStyle(event: CustomEvent) {
     const style = event.detail.style;
     if (style) {
       prompt = prompt.trim() + (prompt ? ', ' : '') + style;
@@ -257,7 +263,7 @@
         <!-- Bild-Upload-Bereiche -->
         <div class="parameter-group full-width">
           <div class="label-container">
-            <label>Images to Combine</label>
+            <span class="form-label">Images to Combine</span>
             <div class="info-icon" 
                 on:mouseenter={() => activeTooltip = 'images'}
                 on:mouseleave={() => activeTooltip = null}>
@@ -278,7 +284,7 @@
               on:drop={(e) => handleImageDrop(e, 1)}
             >
               {#if image1Preview}
-                <img src={image1Preview} alt="Image 1 Preview" class="image-preview" />
+                <img src={image1Preview} alt="" class="image-preview" />
                 <button class="remove-image" on:click={() => { image1 = null; image1Preview = null; }}>×</button>
               {:else}
                 <div class="upload-placeholder">
@@ -305,7 +311,7 @@
               on:drop={(e) => handleImageDrop(e, 2)}
             >
               {#if image2Preview}
-                <img src={image2Preview} alt="Image 2 Preview" class="image-preview" />
+                <img src={image2Preview} alt="" class="image-preview" />
                 <button class="remove-image" on:click={() => { image2 = null; image2Preview = null; }}>×</button>
               {:else}
                 <div class="upload-placeholder">
@@ -439,9 +445,9 @@
               <div class="result-card">
                 <div class="source-images">
                   {#if result.sourceImages && result.sourceImages.length === 2}
-                    <img src={result.sourceImages[0]} alt="Source image 1" class="source-image" />
+                    <img src={result.sourceImages[0]} alt="" class="source-image" />
                     <span class="plus-icon">+</span>
-                    <img src={result.sourceImages[1]} alt="Source image 2" class="source-image" />
+                    <img src={result.sourceImages[1]} alt="" class="source-image" />
                     <span class="equals-icon">=</span>
                   {/if}
                 </div>
@@ -690,7 +696,7 @@
   }
   
   /* Labels und Input-Styles */
-  label {
+  label, .form-label {
     font-weight: 500;
     font-family: 'IBM Plex Mono', monospace;
     color: #ffffff;
@@ -888,35 +894,6 @@
     font-size: 0.75rem;
     text-transform: uppercase;
   }
-  
-  /* Prompt Panel mit 2-Spalten-Layout */
-  .prompt-panel {
-    grid-column: 2;
-    grid-row: 2;
-    background-color: #1e1e1e;
-    border-radius: 8px;
-    padding: 1rem 1.25rem;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 1.25rem;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
-    align-items: center;
-  }
-  
-  .prompt-input-container {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-  }
-  
-  .generate-button-container {
-    display: flex;
-    align-items: center;
-    height: 100%;
-  }
-
-  
-
   
   /* Ausgabebereich */
   .output-area {
