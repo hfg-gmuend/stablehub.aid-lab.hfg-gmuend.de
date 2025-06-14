@@ -1,6 +1,5 @@
 <script>
   import MinimalSidebar from "$lib/components/uicomponents/SidePanel/MinimalSidebar.svelte";
-  import NavigationBar from "$lib/components/NavigationBar.svelte";
   import PromptResultCard from "$lib/components/PromptResultCard.svelte";
   import { onMount, onDestroy } from "svelte";
   import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte';
@@ -250,8 +249,6 @@
 <div class="app-container">
   <MinimalSidebar />
   <main>
-    <NavigationBar active="image-to-image" />
-    
     <div class="content-wrapper">
       <!-- Parameter Panel (links) -->
       <div class="parameters-panel">
@@ -503,7 +500,7 @@
   
   main {
     flex: 1;
-    padding: 0 1rem 1rem; /* Entfernt den oberen Abstand, behält aber die Seitenränder */
+    padding: 1rem; /* Konsistentes Padding für besseren Abstand ohne NavigationBar */
     display: flex;
     flex-direction: column;
   }

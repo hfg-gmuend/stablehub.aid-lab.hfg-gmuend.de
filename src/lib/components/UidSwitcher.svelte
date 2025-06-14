@@ -51,7 +51,9 @@
 
 <div class="uid-switcher">
   <button class="uid-button" on:click={toggleDropdown} class:active={isOpen}>
-    <span class="uid-icon">👤</span>
+    <span class="uid-icon">
+      <img src="/icon/artist.svg" alt="User" />
+    </span>
     <span class="uid-text">{currentUid}</span>
     <span class="dropdown-arrow" class:rotated={isOpen}>▼</span>
   </button>
@@ -137,8 +139,17 @@
   }
   
   .uid-icon {
-    font-size: 1rem;
-    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  
+  .uid-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
   
   .uid-text {
@@ -162,8 +173,8 @@
   
   .uid-dropdown {
     position: absolute;
-    top: 100%;
-    right: 0;
+    bottom: 100%;
+    left: -5%; 
     background-color: #1e1e1e;
     border: 1px solid #444;
     border-radius: 8px;
@@ -171,7 +182,8 @@
     min-width: 280px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     z-index: 1000;
-    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    margin-left: 0.5rem; /* Kleiner Abstand zur Sidebar */
   }
   
   .dropdown-header {

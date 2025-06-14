@@ -1,6 +1,5 @@
 <script lang="ts">
   import MinimalSidebar from "$lib/components/uicomponents/SidePanel/MinimalSidebar.svelte";
-  import NavigationBar from "$lib/components/NavigationBar.svelte";
   import PromptResultCard from "$lib/components/PromptResultCard.svelte";
   import PromptPanel from '$lib/components/uicomponents/PromptPanel/PromptPanel.svelte';
   import StyleCopilot from "$lib/components/StyleCopilot.svelte";
@@ -270,8 +269,6 @@
 <div class="app-container">
   <MinimalSidebar />
   <main>
-    <NavigationBar active="controlnet" />
-
     <div class="content-wrapper">
       <!-- Parameter Panel (links) -->
       <div class="parameters-panel">
@@ -608,7 +605,7 @@
   
   main {
     flex: 1;
-    padding: 0 1rem 1rem;
+    padding: 1rem; /* Konsistentes Padding für besseren Abstand ohne NavigationBar */
     display: flex;
     flex-direction: column;
   }

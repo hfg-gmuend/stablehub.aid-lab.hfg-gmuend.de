@@ -1,6 +1,5 @@
 <script>
   import MinimalSidebar from "$lib/components/uicomponents/SidePanel/MinimalSidebar.svelte";
-  import NavigationBar from "$lib/components/NavigationBar.svelte";
   import { serverImages } from '$lib/stores/serverImages.js';
   import { user } from '$lib/stores/user.js';
   import { onMount } from 'svelte';
@@ -134,8 +133,6 @@
 <div class="app-container">
   <MinimalSidebar />
   <main>
-    <NavigationBar active="gallery" />
-    
     <div class="gallery-container">
       <h1>Community Gallery</h1>
       <p class="gallery-description">Discover favorite images from all users. Click to copy prompts and download images you like!</p>
@@ -213,7 +210,7 @@
   
   main {
     flex: 1;
-    padding: 0 1rem 1rem;
+    padding: 1rem; /* Konsistentes Padding für besseren Abstand ohne NavigationBar */
     display: flex;
     flex-direction: column;
   }

@@ -1,5 +1,8 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { user } from '$lib/stores/user.js';
+  import { serverImages } from '$lib/stores/serverImages.js';
+  import UidSwitcher from '../../UidSwitcher.svelte';
   // Annahme: SidebarHeader.svelte und NavigationSection.svelte befinden sich 
   // weiterhin in einem Unterordner 'subcomponents' relativ zu dieser Datei.
   import SidebarHeader from './subcomponents/SidebarHeader.svelte';
@@ -24,6 +27,12 @@
     { name: 'ControlNet', path: '/control-net' }
   ];
 
+  // Community-Bereich Daten
+  const communityItems: NavItem[] = [
+    { name: 'Gallery', path: '/gallery' }
+  ];
+  const isCommunityActive: ActiveCheckFunction = (itemPath, currentPath) => currentPath === itemPath;
+
   // Tutorial-Bereich Daten (Routenpfade bleiben unverändert)
   const tutorialItems: NavItem[] = [
     { name: 'Guided Tutorials', path: '/guided-tutorial' }
@@ -36,6 +45,12 @@
   ];
   const isVpnActive: ActiveCheckFunction = (itemPath, currentPath) => currentPath === itemPath;
 
+  function handleUidChanged(event: CustomEvent) {
+    console.log('[MinimalSidebar] UID changed:', event.detail);
+    // Leere den lokalen Cache - jede Seite lädt ihre eigenen type-spezifischen Bilder
+    serverImages.clearLocalData();
+  }
+
 </script>
 
 <aside class="minimal-sidebar">
@@ -45,6 +60,14 @@
     title="Generation Tools" 
     items={modes} 
     {currentPath} 
+  />
+  
+  <NavigationSection 
+    title="Community" 
+    items={communityItems} 
+    {currentPath} 
+    activeCheckFn={isCommunityActive}
+    isBorderTop={true}
   />
   
   <NavigationSection 
@@ -63,6 +86,11 @@
     isBorderTop={true}
   />
 
+  <!-- User ID Switcher am unteren Ende -->
+  <div class="sidebar-footer">
+    <UidSwitcher on:uidChanged={handleUidChanged} />
+  </div>
+
 </aside>
 
 <style>
@@ -75,6 +103,13 @@
     height: 100vh;
     position: sticky;
     top: 0;
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 1rem;
+    border-top: 1px solid #333;
+    background-color: rgba(42, 42, 42, 0.3);
   }
 
   /* Styles für .sidebar-header, .logo, .mode-navigation, h3, 
