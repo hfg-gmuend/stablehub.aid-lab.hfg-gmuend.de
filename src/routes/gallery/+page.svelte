@@ -84,8 +84,10 @@
   }
 
   // Funktion zum Herunterladen eines Bildes
-  /** @param {string} imageUrl */
-  /** @param {string} prompt */
+  /** 
+   * @param {string} imageUrl 
+   * @param {string} prompt 
+   */
   async function downloadImage(imageUrl, prompt) {
     try {
       const response = await fetch(imageUrl);

@@ -45,7 +45,7 @@
 
   // Zustand für Bild
   let image: File | null = null;
-  let imagePreview: string | ArrayBuffer | null = null;
+  let imagePreview: string | null = null;
 
   // Tooltip und Operationen
   let activeTooltip: string | null = null;
@@ -70,7 +70,7 @@
 
   // Historie der generierten Bilder
   let generatedResults: GeneratedResult[] = [];
-  let currentUid = null;
+  let currentUid: string | null = null;
   
   // Store subscription für Server-basierte Bilder (nur controlnet)
   const unsubscribeServerImages = serverImages.subscribe(images => {
@@ -102,7 +102,8 @@
       image = file;
       const reader = new FileReader();
       reader.onload = (e) => {
-        imagePreview = e.target?.result ?? null;
+        const result = e.target?.result;
+        imagePreview = typeof result === 'string' ? result : null;
       };
       reader.readAsDataURL(file);
     }
@@ -115,7 +116,8 @@
       image = file;
       const reader = new FileReader();
       reader.onload = (e) => {
-        imagePreview = e.target?.result ?? null;
+        const result = e.target?.result;
+        imagePreview = typeof result === 'string' ? result : null;
       };
       reader.readAsDataURL(file);
     }
@@ -277,7 +279,7 @@
         <!-- Bild-Upload-Bereich -->
         <div class="parameter-group full-width">
           <div class="label-container">
-            <label>ControlNet Template</label>
+            <label for="controlnet-image">ControlNet Template</label>
             <div class="info-icon" 
                 on:mouseenter={() => activeTooltip = 'image'}
                 on:mouseleave={() => activeTooltip = null}>
@@ -296,7 +298,7 @@
             on:drop={handleImageDrop}
           >
             {#if imagePreview}
-              <img src={imagePreview} alt="Image Preview" class="image-preview" />
+              <img src={imagePreview} alt="" class="image-preview" />
               <button class="remove-image" on:click={() => { image = null; imagePreview = null; }}>×</button>
             {:else}
               <div class="upload-placeholder">
@@ -344,7 +346,7 @@
         
         <div class="parameter-group full-width">
           <div class="label-container">
-            <label>Application Range</label>
+            <span class="form-label">Application Range</span>
             <div class="info-icon" 
                 on:mouseenter={() => activeTooltip = 'percentRange'}
                 on:mouseleave={() => activeTooltip = null}>
@@ -866,7 +868,7 @@
   }
   
   /* Labels und Input-Styles */
-  label {
+  label, .form-label {
     font-weight: 500;
     font-family: 'IBM Plex Mono', monospace;
     color: #ffffff;
@@ -914,12 +916,7 @@
     max-width: calc(100vw - 40px);
   }
   
-  [class*="info-icon"]:hover + .tooltip {
-    display: block;
-  }
-  
   /* Eingabefelder */
-  input[type="text"], 
   input[type="number"], 
   textarea {
     width: 100%;
@@ -932,7 +929,6 @@
     transition: border-color 0.2s, box-shadow 0.2s;
   }
   
-  input[type="text"]:focus, 
   input[type="number"]:focus, 
   textarea:focus {
     border-color: #FCEA2B;
@@ -1068,48 +1064,6 @@
     font-size: 0.75rem;
     text-transform: uppercase;
   }
-  
-  /* Prompt Panel mit 2-Spalten-Layout */
-  .prompt-panel {
-    grid-column: 2;
-    grid-row: 2;
-    background-color: #1e1e1e;
-    border-radius: 8px;
-    padding: 1rem 1.25rem;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 1.25rem;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
-    align-items: center;
-  }
-  
-  .prompt-input-container {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-  }
-  
-  .generate-button-container {
-    display: flex;
-    align-items: center;
-    height: 100%;
-  }
-  
-  /* Remove CSS rules specific to the old button */
-  /*
-  .prompt-panel button { ... }
-  .prompt-panel button:hover:not(.disabled) { ... }
-  .prompt-panel button:active:not(.disabled) { ... }
-  .prompt-panel button.disabled { ... }
-  .button-icon-inside { ... }
-  */
-
-  /* Keep this rule if needed for layout */
-  .generate-button-container {
-    display: flex;
-    align-items: center;
-    height: 100%;
-  }
 
   .output-area {
     grid-column: 2;
@@ -1151,20 +1105,6 @@
     gap: 1rem;
     border-bottom: 1px solid #333;
     align-items: center;
-  }
-  
-  .source-image-container {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .source-image {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 6px;
-    border: 1px solid #444;
   }
   
   .arrow-icon {
