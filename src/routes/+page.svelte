@@ -1583,8 +1583,7 @@
       padding: 2rem;
     }
 
-    .sidebar-expand-btn,
-    .sidebar-collapse-btn {
+    .sidebar-expand-btn {
       top: 1rem;
       left: 1rem;
       width: 45px;
@@ -1592,12 +1591,7 @@
     }
 
     .sidebar-collapse-btn {
-      left: 260px;
-    }
-
-    .sidebar-collapse-btn svg {
-      width: 18px;
-      height: 18px;
+      display: none; /* Ausblenden auf mobilen Geräten */
     }
 
     .hero-container {
