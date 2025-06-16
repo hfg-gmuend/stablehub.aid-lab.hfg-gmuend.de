@@ -174,7 +174,7 @@
   .uid-dropdown {
     position: absolute;
     bottom: 100%;
-    left: -9%; 
+    left: -17%; 
     background-color: #1e1e1e;
     border: 1px solid #444;
     border-radius: 8px;
@@ -303,5 +303,12 @@
     color: #b0b0b0;
     font-size: 0.8rem;
     line-height: 1.4;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .uid-dropdown {
+      left: -9%;
+    }
   }
 </style>
