@@ -18,6 +18,11 @@
   let isDeleting = false;
   let typewriterSpeed = 150;
 
+  // AI Status Panel states
+  let aiModelsStatus = 'starting'; // starting, updating, active
+  let creativeEngineStatus = 'starting'; // starting, updating, active  
+  let innovationModeStatus = 'starting'; // starting, updating, active
+
   const words = [
     'artificial intelligence',
     'creative possibilities', 
@@ -60,6 +65,32 @@
     setTimeout(typewriterEffect, typewriterSpeed);
   }
 
+  function startAIStatusSequence() {
+    // AI Models: starting -> updating -> active (2s total)
+    setTimeout(() => {
+      aiModelsStatus = 'updating';
+    }, 1000);
+    setTimeout(() => {
+      aiModelsStatus = 'active';
+    }, 2000);
+
+    // Creative Engine: starting -> updating -> active (3s total, starts 1s after AI Models)
+    setTimeout(() => {
+      creativeEngineStatus = 'updating';
+    }, 2500);
+    setTimeout(() => {
+      creativeEngineStatus = 'active';
+    }, 4000);
+
+    // Innovation Mode: starting -> updating -> active (4s total, starts 2s after Creative Engine)
+    setTimeout(() => {
+      innovationModeStatus = 'updating';
+    }, 5000);
+    setTimeout(() => {
+      innovationModeStatus = 'active';
+    }, 6500);
+  }
+
   onMount(() => {
     // Staggered animation sequence
     setTimeout(() => mounted = true, 100);
@@ -68,6 +99,8 @@
       subtitleVisible = true;
       // Start typewriter effect when subtitle becomes visible
       setTimeout(() => typewriterEffect(), 1000);
+      // Start AI status sequence when subtitle becomes visible
+      setTimeout(() => startAIStatusSequence(), 1500);
     }, 600);
     setTimeout(() => cardsVisible = true, 900);
     setTimeout(() => tutorialsVisible = true, 1200);
@@ -130,16 +163,16 @@
         <!-- Interactive AI Status Panel -->
         <div class="ai-status-panel" class:visible={subtitleVisible}>
           <div class="status-item">
-            <div class="status-dot active"></div>
-            <span>AI Models: Online</span>
+            <div class="status-dot" class:starting={aiModelsStatus === 'starting'} class:updating={aiModelsStatus === 'updating'} class:active={aiModelsStatus === 'active'}></div>
+            <span>AI Models: {aiModelsStatus === 'starting' ? 'Starting...' : aiModelsStatus === 'updating' ? 'Updating...' : 'Online'}</span>
           </div>
           <div class="status-item">
-            <div class="status-dot active"></div>
-            <span>Creative Engine: Ready</span>
+            <div class="status-dot" class:starting={creativeEngineStatus === 'starting'} class:updating={creativeEngineStatus === 'updating'} class:active={creativeEngineStatus === 'active'}></div>
+            <span>Creative Engine: {creativeEngineStatus === 'starting' ? 'Starting...' : creativeEngineStatus === 'updating' ? 'Initializing...' : 'Ready'}</span>
           </div>
           <div class="status-item">
-            <div class="status-dot processing"></div>
-            <span>Innovation Mode: Active</span>
+            <div class="status-dot" class:starting={innovationModeStatus === 'starting'} class:updating={innovationModeStatus === 'updating'} class:active={innovationModeStatus === 'active'}></div>
+            <span>Innovation Mode: {innovationModeStatus === 'starting' ? 'Loading...' : innovationModeStatus === 'updating' ? 'Activating...' : 'Active'}</span>
           </div>
         </div>
       </div>
@@ -627,6 +660,19 @@
     height: 8px;
     border-radius: 50%;
     position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .status-dot.starting {
+    background: #6b7280;
+    box-shadow: 0 0 5px rgba(107, 114, 128, 0.3);
+    animation: statusStarting 1s ease-in-out infinite;
+  }
+
+  .status-dot.updating {
+    background: #f59e0b;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+    animation: statusUpdating 0.8s ease-in-out infinite;
   }
 
   .status-dot.active {
@@ -635,20 +681,19 @@
     animation: statusPulse 2s ease-in-out infinite;
   }
 
-  .status-dot.processing {
-    background: #FCEA2B;
-    box-shadow: 0 0 10px rgba(252, 234, 43, 0.5);
-    animation: statusProcessing 1.5s ease-in-out infinite;
+  @keyframes statusStarting {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+  }
+
+  @keyframes statusUpdating {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.3); }
   }
 
   @keyframes statusPulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.6; transform: scale(1.2); }
-  }
-
-  @keyframes statusProcessing {
-    0%, 100% { opacity: 0.5; }
-    50% { opacity: 1; }
   }
 
 
