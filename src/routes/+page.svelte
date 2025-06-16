@@ -98,14 +98,11 @@
             <div class="node-pulse"></div>
           </div>
         {/each}
-        {#each Array(12) as _, i}
-          <div class="neural-connection" style="--delay: {i * 0.2}s; --rotation: {Math.random() * 360}deg; --length: {60 + Math.random() * 40}px;"></div>
-        {/each}
+
       </div>
 
       <!-- Hologram Frame -->
       <div class="hologram-frame">
-        <div class="scan-line"></div>
         <div class="data-stream">
           <span>AI_INITIALIZING...</span>
           <span>NEURAL_NETWORK_ACTIVE</span>
@@ -145,13 +142,6 @@
             <span>Innovation Mode: Active</span>
           </div>
         </div>
-      </div>
-
-      <!-- Ambient Light Effects -->
-      <div class="ambient-lights">
-        <div class="light-orb" style="--delay: 0s; --x: 20%; --y: 30%;"></div>
-        <div class="light-orb" style="--delay: 1s; --x: 80%; --y: 70%;"></div>
-        <div class="light-orb" style="--delay: 2s; --x: 50%; --y: 20%;"></div>
       </div>
     </div>
     
@@ -375,7 +365,7 @@
     position: relative;
     margin-bottom: 4rem;
     padding: 4rem 0;
-    min-height: 60vh;
+    min-height: 40vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -424,17 +414,6 @@
     animation: nodePulse 2s ease-in-out infinite var(--delay, 0s);
   }
 
-  .neural-connection {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: var(--length, 60px);
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(252, 234, 43, 0.4), transparent);
-    transform-origin: left center;
-    transform: translate(-50%, -50%) rotate(var(--rotation, 0deg));
-    animation: connectionFlow 4s ease-in-out infinite var(--delay, 0s);
-  }
 
   @keyframes nodeGlow {
     0%, 100% { opacity: 0.4; transform: scale(1); }
@@ -455,14 +434,11 @@
   .hologram-frame {
     position: relative;
     z-index: 2;
-    border: 2px solid rgba(252, 234, 43, 0.3);
-    border-radius: 20px;
+    /* border: 2px solid rgba(252, 234, 43, 0.3);
+    border-radius: 20px; */
     padding: 3rem 2rem;
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(15px);
-    box-shadow: 
-      0 0 30px rgba(252, 234, 43, 0.1),
-      inset 0 0 30px rgba(252, 234, 43, 0.05);
+    /* background: rgba(0, 0, 0, 0.3); */
+    /* backdrop-filter: blur(15px); */
     animation: hologramFlicker 8s ease-in-out infinite;
     max-width: 900px;
     width: 100%;
@@ -472,31 +448,13 @@
   @keyframes hologramFlicker {
     0%, 100% { 
       border-color: rgba(252, 234, 43, 0.3);
-      box-shadow: 0 0 30px rgba(252, 234, 43, 0.1), inset 0 0 30px rgba(252, 234, 43, 0.05);
     }
     25%, 75% { 
       border-color: rgba(252, 234, 43, 0.5);
-      box-shadow: 0 0 40px rgba(252, 234, 43, 0.2), inset 0 0 40px rgba(252, 234, 43, 0.1);
     }
     50% { 
       border-color: rgba(252, 234, 43, 0.7);
-      box-shadow: 0 0 50px rgba(252, 234, 43, 0.3), inset 0 0 50px rgba(252, 234, 43, 0.15);
     }
-  }
-
-  .scan-line {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #FCEA2B, transparent);
-    animation: scanMove 3s linear infinite;
-  }
-
-  @keyframes scanMove {
-    0% { transform: translateY(0); opacity: 1; }
-    100% { transform: translateY(400px); opacity: 0; }
   }
 
   .data-stream {
@@ -693,28 +651,6 @@
     50% { opacity: 1; }
   }
 
-  /* Ambient Light Effects */
-  .ambient-lights {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .light-orb {
-    position: absolute;
-    left: var(--x, 50%);
-    top: var(--y, 50%);
-    width: 150px;
-    height: 150px;
-    background: radial-gradient(circle, rgba(252, 234, 43, 0.1) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: orbFloat 6s ease-in-out infinite var(--delay, 0s);
-    filter: blur(20px);
-  }
 
   @keyframes orbFloat {
     0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
@@ -830,29 +766,6 @@
     font-size: 1.1rem;
     color: #a0a0a0;
     margin-bottom: 0;
-  }
-
-  .features-decoration {
-    margin-top: 1.5rem;
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-  }
-
-  .features-decoration .floating-icon {
-    font-size: 1.8rem;
-    opacity: 0.7;
-    animation: floatSoft 4s ease-in-out infinite;
-    transition: all 0.3s ease;
-  }
-
-  .features-decoration .floating-icon:nth-child(1) { animation-delay: 0s; }
-  .features-decoration .floating-icon:nth-child(2) { animation-delay: -1.3s; }
-  .features-decoration .floating-icon:nth-child(3) { animation-delay: -2.6s; }
-
-  .features-decoration .floating-icon:hover {
-    opacity: 1;
-    transform: scale(1.2);
   }
   
   /* Animated Cards */
@@ -985,28 +898,6 @@
     margin-bottom: 0;
   }
 
-  .header-decoration {
-    margin-top: 1.5rem;
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-  }
-
-  .floating-icon {
-    font-size: 1.8rem;
-    opacity: 0.7;
-    animation: floatSoft 4s ease-in-out infinite;
-    transition: all 0.3s ease;
-  }
-
-  .floating-icon:nth-child(1) { animation-delay: 0s; }
-  .floating-icon:nth-child(2) { animation-delay: -1.3s; }
-  .floating-icon:nth-child(3) { animation-delay: -2.6s; }
-
-  .floating-icon:hover {
-    opacity: 1;
-    transform: scale(1.2);
-  }
 
   @keyframes floatSoft {
     0%, 100% { transform: translateY(0px) rotate(0deg); }
@@ -1269,28 +1160,6 @@
     margin-bottom: 0;
   }
 
-  .tutorials-decoration {
-    margin-top: 1.5rem;
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-  }
-
-  .tutorials-decoration .floating-icon {
-    font-size: 1.8rem;
-    opacity: 0.7;
-    animation: floatSoft 4s ease-in-out infinite;
-    transition: all 0.3s ease;
-  }
-
-  .tutorials-decoration .floating-icon:nth-child(1) { animation-delay: 0s; }
-  .tutorials-decoration .floating-icon:nth-child(2) { animation-delay: -1.3s; }
-  .tutorials-decoration .floating-icon:nth-child(3) { animation-delay: -2.6s; }
-
-  .tutorials-decoration .floating-icon:hover {
-    opacity: 1;
-    transform: scale(1.2);
-  }
 
   .teaser-actions {
     text-align: center;
@@ -1445,11 +1314,6 @@
       left: -2px;
     }
 
-    .light-orb {
-      width: 100px;
-      height: 100px;
-    }
-
     .community-header h2,
     .tutorials-header h2,
     .features-header h2 {
@@ -1459,12 +1323,6 @@
     .community-features {
       grid-template-columns: 1fr;
       gap: 1.5rem;
-    }
-
-    .header-decoration,
-    .tutorials-decoration,
-    .features-decoration {
-      display: none;
     }
 
     .feature-card {
