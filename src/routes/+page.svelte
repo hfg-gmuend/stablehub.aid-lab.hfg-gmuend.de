@@ -5,6 +5,10 @@
   import { base, assets } from '$app/paths';
   import { onMount } from 'svelte';
 
+  // Homepage specific states
+  let sidebarCollapsed = false;
+  let showCollapseButton = true; // Immer verfügbar für manuelles Einklappen
+
   // Animation states
   let mounted = false;
   let titleVisible = false;
@@ -91,7 +95,14 @@
     }, 6500);
   }
 
+  // Sidebar collapse functionality
+  function toggleSidebar() {
+    sidebarCollapsed = !sidebarCollapsed;
+  }
+
   onMount(() => {
+    // Sidebar bleibt standardmäßig ausgeklappt - nur manuelles Einklappen möglich
+    
     // Staggered animation sequence
     setTimeout(() => mounted = true, 100);
     setTimeout(() => titleVisible = true, 300);
@@ -112,9 +123,30 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </svelte:head>
 
-<div class="app-container" class:mounted>
-  <MinimalSidebar />
-  <main>
+<div class="app-container" class:mounted class:sidebar-collapsed={sidebarCollapsed}>
+  {#if !sidebarCollapsed}
+    <MinimalSidebar />
+  {/if}
+  
+  <!-- Sidebar Expand Button -->
+  {#if sidebarCollapsed}
+    <button class="sidebar-expand-btn" on:click={toggleSidebar}>
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  {/if}
+
+  <!-- Sidebar Collapse Button -->
+  {#if showCollapseButton && !sidebarCollapsed}
+    <button class="sidebar-collapse-btn" on:click={toggleSidebar}>
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11 19L4 12L11 5M19 19L12 12L19 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  {/if}
+
+  <main class:expanded={sidebarCollapsed}>
     <!-- Floating particles background -->
     <div class="particles">
       {#each Array(6) as _, i}
@@ -214,66 +246,132 @@
         <p class="community-subtitle">Discover, share, and get inspired by the HfG AI community</p>
       </div>
       
-      <div class="community-features">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <div class="icon-background">
+      <!-- Main Community Flow -->
+      <div class="community-flow">
+        <!-- Step 1: Create -->
+        <div class="flow-step">
+          <div class="step-number">01</div>
+          <div class="step-content">
+            <div class="step-icon">
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
                 <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
                 <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
               </svg>
             </div>
+            <h3>Create & Share</h3>
+            <p>Upload your AI masterpieces to the gallery</p>
           </div>
-          <h3>Share & Showcase</h3>
-          <p>Upload your AI-generated masterpieces to our public gallery and share your creativity with fellow HfG students.</p>
-          <div class="feature-preview">Gallery integration</div>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">
-            <div class="icon-background">
+        <!-- Flow Arrow -->
+        <div class="flow-arrow">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <!-- Step 2: Discover -->
+        <div class="flow-step">
+          <div class="step-number">02</div>
+          <div class="step-content">
+            <div class="step-icon">
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 11H15M9 15H15M17 21L12 16L7 21V5C7 3.89543 7.89543 3 9 3H15C16.1046 3 17 3.89543 17 5V21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 16H6C4.89543 16 4 15.1046 4 14V6C4 4.89543 4.89543 4 6 4H14C15.1046 4 16 4.89543 16 6V8M10 12H18C19.1046 12 20 12.8954 20 14V18C20 19.1046 19.1046 20 18 20H10C8.89543 20 8 19.1046 8 18V14C8 12.8954 8.89543 12 10 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
+            <h3>Copy & Learn</h3>
+            <p>Get inspired and copy prompts instantly</p>
           </div>
-          <h3>Copy & Learn</h3>
-          <p>Get inspired by others' work! Copy prompts directly from any image in the gallery to learn new techniques.</p>
-          <div class="feature-preview">Prompt copying available</div>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">
-            <div class="icon-background">
+        <!-- Flow Arrow -->
+        <div class="flow-arrow">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <!-- Step 3: Connect -->
+        <div class="flow-step">
+          <div class="step-number">03</div>
+          <div class="step-content">
+            <div class="step-icon heart-icon">
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.09C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5C22 12.28 18.6 15.36 13.45 20.04L12 21.35Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
               </svg>
             </div>
+            <h3>Like & Connect</h3>
+            <p>Show appreciation and connect with creators</p>
+            <div class="coming-soon-badge">Coming Soon</div>
           </div>
-          <h3>Like & Connect</h3>
-          <p>Show appreciation for amazing artwork by liking your favorites and connecting with talented creators.</p>
-          <div class="feature-preview">Social features</div>
-          <div class="coming-soon">Coming Soon!</div>
-        </div>
-
-        <div class="feature-card highlight">
-          <div class="feature-icon">
-            <div class="icon-background special">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-              </svg>
-            </div>
-          </div>
-          <h3>Monthly Winner</h3>
-          <p>Every month, the most outstanding creation will be selected as our featured artwork and displayed at the HfG campus!</p>
-          <div class="feature-preview">🏆 Featured at HfG</div>
         </div>
       </div>
 
-      <div class="community-cta">
-        <a href="{base}/gallery" class="cta-button">
-          Explore Gallery
+      <!-- Featured Monthly Winner -->
+      <div class="monthly-spotlight">
+        <div class="spotlight-header">
+          <div class="trophy-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="spotlight-text">
+            <h3>Monthly Spotlight</h3>
+            <p>Win 50€ print credit & get featured at HfG Campus</p>
+          </div>
+          <div class="winner-badge">
+            <span>🏆 This Month</span>
+          </div>
+        </div>
+        
+        <div class="spotlight-content">
+          <div class="spotlight-main">
+            <div class="spotlight-image">
+              <div class="image-placeholder">
+                <span>Your creation here</span>
+                <div class="glow-effect"></div>
+              </div>
+            </div>
+            <div class="spotlight-info">
+              <h4>Creative Excellence Award</h4>
+              <p>Submit your best AI artwork and compete for recognition, prizes, and campus exhibition.</p>
+              
+              <div class="spotlight-features">
+                <div class="feature-item">
+                  <div class="feature-icon">💰</div>
+                  <span>50€ Print Credit</span>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🖼️</div>
+                  <span>Campus Exhibition</span>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">⭐</div>
+                  <span>Portfolio Feature</span>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🎯</div>
+                  <span>Creative Mentoring</span>
+                </div>
+              </div>
+
+              <div class="submission-countdown">
+                <div class="countdown-label">Submissions close in:</div>
+                <div class="countdown-timer">12 days</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Simple CTA -->
+      <div class="community-cta-simple">
+        <a href="{base}/gallery" class="cta-link">
+          <span>Explore Gallery</span>
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </a>
       </div>
     </section>
@@ -283,10 +381,6 @@
       <div class="tutorials-header">
         <h2>New here? Start with our tutorials</h2>
         <p class="tutorials-subtitle">Master AI image generation with our step-by-step guides</p>
-      </div>
-      
-      <div class="teaser-actions">
-        <a href="{base}/guided-tutorial" class="view-all-link">View all tutorials</a>
       </div>
       
       <div class="tutorial-highlights">
@@ -314,6 +408,16 @@
           linkText="Go deeper"
         />
       </div>
+
+      <!-- Tutorial CTA -->
+      <div class="tutorial-cta-simple">
+        <a href="{base}/guided-tutorial" class="cta-link">
+          <span>View all tutorials</span>
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
     </section>
   </main>
 </div>
@@ -332,10 +436,15 @@
     min-height: 100vh;
     opacity: 0;
     transition: opacity 0.8s ease-out;
+    position: relative;
   }
 
   .app-container.mounted {
     opacity: 1;
+  }
+
+  .app-container.sidebar-collapsed {
+    display: block;
   }
   
   main {
@@ -347,6 +456,55 @@
       radial-gradient(circle at 75% 75%, rgba(40, 40, 40, 0.15) 0%, transparent 50%);
     position: relative;
     overflow: hidden;
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  main.expanded {
+    padding: 2rem 8rem;
+    max-width: none;
+  }
+
+  /* Sidebar Control Buttons */
+  .sidebar-expand-btn,
+  .sidebar-collapse-btn {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    z-index: 1001;
+    width: 50px;
+    height: 50px;
+    background: rgba(26, 26, 26, 0.9);
+    border: 1px solid rgba(252, 234, 43, 0.3);
+    border-radius: 12px;
+    color: #FCEA2B;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .sidebar-expand-btn:hover,
+  .sidebar-collapse-btn:hover {
+    background: rgba(252, 234, 43, 0.1);
+    border-color: rgba(252, 234, 43, 0.6);
+    transform: scale(1.05);
+  }
+
+  .sidebar-expand-btn svg,
+  .sidebar-collapse-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .sidebar-collapse-btn {
+    left: 300px;
+  }
+
+  .sidebar-collapse-btn svg {
+    width: 20px;
+    height: 20px;
   }
 
   /* Floating Particles Background */
@@ -879,7 +1037,7 @@
   
   /* Community Gallery Section */
   .community-gallery {
-    margin: 6rem 0;
+    margin: 12rem 0;
     opacity: 0;
     transform: translateY(30px);
     transition: all 0.8s ease-out;
@@ -943,203 +1101,364 @@
     margin-bottom: 0;
   }
 
-
-  @keyframes floatSoft {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    25% { transform: translateY(-8px) rotate(2deg); }
-    50% { transform: translateY(-4px) rotate(-1deg); }
-    75% { transform: translateY(-12px) rotate(1deg); }
-  }
-
-  .community-features {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-    margin-bottom: 3rem;
-  }
-
-  .feature-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 2rem;
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-    position: relative;
-    overflow: hidden;
-    backdrop-filter: blur(10px);
-  }
-
-  .feature-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(252, 234, 43, 0.05), transparent);
-    transition: left 0.6s ease;
-  }
-
-  .feature-card:hover::before {
-    left: 100%;
-  }
-
-  .feature-card:hover {
-    transform: translateY(-6px);
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(252, 234, 43, 0.3);
-    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1);
-  }
-
-  .feature-card.highlight {
-    border-color: rgba(252, 234, 43, 0.3);
-    background: rgba(252, 234, 43, 0.02);
-  }
-
-  .feature-card.highlight:hover {
-    border-color: rgba(252, 234, 43, 0.5);
-    box-shadow: 0 16px 32px rgba(252, 234, 43, 0.1);
-  }
-
-  .feature-icon {
-    margin-bottom: 1.5rem;
-  }
-
-  .icon-background {
-    width: 60px;
-    height: 60px;
-    border-radius: 12px;
-    background: rgba(252, 234, 43, 0.15);
+  /* Community Flow Design */
+  .community-flow {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: 4rem 0;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+
+  .flow-step {
+    position: relative;
+    text-align: center;
+    flex: 1;
+    min-width: 200px;
+    max-width: 250px;
+  }
+
+  .step-number {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 32px;
+    background: rgba(252, 234, 43, 0.1);
+    border: 2px solid rgba(252, 234, 43, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
     color: #FCEA2B;
+    z-index: 2;
+  }
+
+  .step-content {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 2rem 1.5rem 1.5rem;
     transition: all 0.3s ease;
     position: relative;
   }
 
-  .feature-card:hover .icon-background {
-    background: rgba(252, 234, 43, 0.25);
-    transform: scale(1.1) rotate(5deg);
+  .step-content:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(252, 234, 43, 0.2);
+    transform: translateY(-4px);
   }
 
-  .icon-background.special {
-    background: rgba(255, 215, 0, 0.15);
-    color: #ffd700;
-  }
-
-  .feature-card:hover .icon-background.special {
-    background: rgba(255, 215, 0, 0.25);
-  }
-
-  .icon-background svg {
-    width: 28px;
-    height: 28px;
+  .step-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1rem;
+    color: #FCEA2B;
     transition: all 0.3s ease;
   }
 
-  .feature-card:hover .icon-background svg {
+  .step-content:hover .step-icon {
     transform: scale(1.1);
+    color: #FFE566;
   }
 
-  .feature-card h3 {
+  .step-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .heart-icon {
+    position: relative;
+  }
+
+  .step-content h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #f0f0f0;
+  }
+
+  .step-content p {
+    color: #a0a0a0;
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .coming-soon-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    color: #ff6b6b;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .flow-arrow {
+    color: rgba(252, 234, 43, 0.4);
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+  }
+
+  .flow-arrow svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Monthly Spotlight */
+  .monthly-spotlight {
+    margin: 4rem auto;
+    max-width: 80%;
+    background: linear-gradient(135deg, rgba(252, 234, 43, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    border: 1px solid rgba(252, 234, 43, 0.1);
+    border-radius: 20px;
+    padding: 2rem;
+    position: relative;
+  }
+
+  .spotlight-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .trophy-icon {
+    width: 40px;
+    height: 40px;
+    color: #ffd700;
+    flex-shrink: 0;
+  }
+
+  .trophy-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .spotlight-text {
+    flex: 1;
+  }
+
+  .spotlight-text h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: #f0f0f0;
+  }
+
+  .spotlight-text p {
+    color: #a0a0a0;
+    margin: 0;
+    font-size: 0.95rem;
+  }
+
+  .winner-badge {
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, rgba(252, 234, 43, 0.1) 0%, rgba(255, 215, 0, 0.1) 100%);
+    border: 1px solid rgba(252, 234, 43, 0.3);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ffd700;
+    white-space: nowrap;
+  }
+
+  .spotlight-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .spotlight-main {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .spotlight-image {
+    aspect-ratio: 4/3;
+    position: relative;
+  }
+
+  .image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px dashed rgba(252, 234, 43, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-style: italic;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .image-placeholder:hover {
+    border-color: rgba(252, 234, 43, 0.4);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .glow-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(252, 234, 43, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: glowPulse 3s ease-in-out infinite;
+  }
+
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.2); }
+  }
+
+  .spotlight-info h4 {
     font-size: 1.3rem;
     font-weight: 600;
     margin-bottom: 1rem;
     color: #f0f0f0;
-    transition: color 0.3s ease;
+    background: linear-gradient(135deg, #f0f0f0 0%, #FCEA2B 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
-  .feature-card:hover h3 {
-    color: #FCEA2B;
-  }
-
-  .feature-card p {
+  .spotlight-info p {
     color: #a0a0a0;
     line-height: 1.6;
-    margin-bottom: 1.2rem;
-    font-size: 0.95rem;
-    transition: color 0.3s ease;
+    margin-bottom: 1.5rem;
   }
 
-  .feature-card:hover p {
-    color: #b8b8b8;
+  .spotlight-features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
   }
 
-  .feature-preview {
-    height: 40px;
+  .feature-item {
     display: flex;
     align-items: center;
-    justify-content: center;
-    color: #666;
-    font-size: 0.9rem;
-    font-weight: 500;
+    gap: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
     transition: all 0.3s ease;
   }
 
-  .feature-card:hover .feature-preview {
-    color: #FCEA2B;
+  .feature-item:hover {
+    background: rgba(252, 234, 43, 0.05);
+    border-color: rgba(252, 234, 43, 0.2);
     transform: translateY(-2px);
   }
 
-  .coming-soon {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: rgba(252, 234, 43, 0.15);
-    color: #FCEA2B;
-    padding: 6px 10px;
+  .feature-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .feature-item span {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #d0d0d0;
+  }
+
+  .submission-countdown {
+    background: rgba(252, 234, 43, 0.05);
+    border: 1px solid rgba(252, 234, 43, 0.15);
     border-radius: 12px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    border: 1px solid rgba(252, 234, 43, 0.3);
-    animation: comingSoonPulse 2s ease-in-out infinite;
-  }
-
-  @keyframes comingSoonPulse {
-    0%, 100% { opacity: 0.8; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.05); }
-  }
-
-  .community-cta {
+    padding: 1rem;
     text-align: center;
   }
 
-  .cta-button {
-    display: inline-block;
+  .countdown-label {
+    font-size: 0.85rem;
+    color: #a0a0a0;
+    margin-bottom: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .countdown-timer {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #FCEA2B;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* Simple CTA */
+  .community-cta-simple {
+    text-align: center;
+    margin-top: 3rem;
+  }
+
+  .cta-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
     padding: 1rem 2rem;
-    background: rgba(252, 234, 43, 0.1);
+    background: rgba(252, 234, 43, 0.08);
     color: #FCEA2B;
     text-decoration: none;
-    border: 2px solid rgba(252, 234, 43, 0.3);
-    border-radius: 30px;
+    border: 1px solid rgba(252, 234, 43, 0.2);
+    border-radius: 12px;
     font-weight: 600;
     font-size: 1.1rem;
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
   }
 
-  .cta-button::before {
+  .cta-link::before {
     content: '';
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(252, 234, 43, 0.2), transparent);
-    transition: left 0.6s ease;
+    background: linear-gradient(90deg, transparent, rgba(252, 234, 43, 0.1), transparent);
+    transition: left 0.5s ease;
   }
 
-  .cta-button:hover::before {
+  .cta-link:hover::before {
     left: 100%;
   }
 
-  .cta-button:hover {
-    background: rgba(252, 234, 43, 0.2);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 24px rgba(252, 234, 43, 0.2);
-    border-color: rgba(252, 234, 43, 0.6);
+  .cta-link:hover {
+    background: rgba(252, 234, 43, 0.12);
+    border-color: rgba(252, 234, 43, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .cta-link svg {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
+  }
+
+  .cta-link:hover svg {
+    transform: translateX(4px);
   }
 
   /* Enhanced Tutorial Section Animations */
@@ -1205,65 +1524,17 @@
     margin-bottom: 0;
   }
 
-
-  .teaser-actions {
-    text-align: center;
-    margin-bottom: 3rem;
-  }
-  
-  .view-all-link {
-    font-family: 'IBM Plex Mono', monospace;
-    color: #FCEA2B;
-    text-decoration: none;
-    font-size: 1.1rem;
-    font-weight: 600;
-    display: inline-block;
-    padding: 1rem 2rem;
-    background: rgba(252, 234, 43, 0.1);
-    border: 2px solid rgba(252, 234, 43, 0.3);
-    border-radius: 30px;
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .view-all-link::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(252, 234, 43, 0.2), transparent);
-    transition: left 0.6s ease;
-  }
-
-  .view-all-link:hover::before {
-    left: 100%;
-  }
-
-  .view-all-link::after {
-    content: '→';
-    margin-left: 8px;
-    transition: transform 0.3s ease;
-  }
-  
-  .view-all-link:hover {
-    background: rgba(252, 234, 43, 0.2);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 24px rgba(252, 234, 43, 0.2);
-    border-color: rgba(252, 234, 43, 0.6);
-  }
-
-  .view-all-link:hover::after {
-    transform: translateX(4px);
-  }
-  
   .tutorial-highlights {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
     margin-top: 1rem;
+  }
+
+  /* Tutorial CTA - Same as Community CTA */
+  .tutorial-cta-simple {
+    text-align: center;
+    margin-top: 3rem;
   }
 
   /* Enhanced Tutorial Card Animations */
@@ -1308,6 +1579,27 @@
 
   /* Responsive Design */
   @media (max-width: 768px) {
+    main.expanded {
+      padding: 2rem;
+    }
+
+    .sidebar-expand-btn,
+    .sidebar-collapse-btn {
+      top: 1rem;
+      left: 1rem;
+      width: 45px;
+      height: 45px;
+    }
+
+    .sidebar-collapse-btn {
+      left: 260px;
+    }
+
+    .sidebar-collapse-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
     .hero-container {
       padding: 2rem 0;
       min-height: 50vh;
@@ -1363,6 +1655,57 @@
     .tutorials-header h2,
     .features-header h2 {
       font-size: 2rem;
+    }
+
+    .community-flow {
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .flow-arrow {
+      transform: rotate(90deg);
+      width: 20px;
+      height: 20px;
+    }
+
+    .flow-step {
+      max-width: 100%;
+      min-width: auto;
+    }
+
+    .spotlight-content {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      text-align: center;
+    }
+
+    .spotlight-main {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      text-align: center;
+    }
+
+    .spotlight-header {
+      flex-direction: column;
+      text-align: center;
+      gap: 0.5rem;
+    }
+
+    .winner-badge {
+      align-self: center;
+    }
+
+    .spotlight-features {
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+    }
+
+    .feature-item {
+      justify-content: center;
+    }
+
+    .step-content {
+      padding: 1.5rem 1rem 1rem;
     }
 
     .community-features {

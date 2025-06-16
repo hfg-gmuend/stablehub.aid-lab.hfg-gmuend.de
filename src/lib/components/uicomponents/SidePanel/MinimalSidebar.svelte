@@ -53,6 +53,12 @@
   // Aktuelle Route für Hervorhebung
   $: currentPath = $page.url.pathname;
   
+  // Home-Bereich Daten
+  const homeItems: NavItem[] = [
+    { name: 'Home', path: '/' }
+  ];
+  const isHomeActive: ActiveCheckFunction = (itemPath, currentPath) => currentPath === itemPath;
+  
   // Navigation für die Modi (Routenpfade bleiben unverändert)
   const modes: NavItem[] = [
     { name: 'Text To Image', path: '/text-to-image' },
@@ -105,9 +111,17 @@
   
   <div class="navigation-wrapper" on:click={handleNavigationClick}>
     <NavigationSection 
+      title="Start" 
+      items={homeItems} 
+      {currentPath} 
+      activeCheckFn={isHomeActive}
+    />
+    
+    <NavigationSection 
       title="Generation Tools" 
       items={modes} 
       {currentPath} 
+      isBorderTop={true}
     />
     
     <NavigationSection 
@@ -210,7 +224,24 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    /* Kein overflow für Desktop - UidSwitcher kann überfließen */
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #FCEA2B #333;
+  }
+
+  /* Custom scrollbar for WebKit browsers */
+  .navigation-wrapper::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .navigation-wrapper::-webkit-scrollbar-track {
+    background: #333;
+  }
+
+  .navigation-wrapper::-webkit-scrollbar-thumb {
+    background-color: #FCEA2B;
+    border-radius: 3px;
   }
 
   .sidebar-footer {
@@ -249,20 +280,6 @@
       padding-bottom: 1rem; /* Extra padding for better scroll experience */
       scrollbar-width: thin;
       scrollbar-color: #FCEA2B #333;
-    }
-
-    /* Custom scrollbar for WebKit browsers */
-    .navigation-wrapper::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .navigation-wrapper::-webkit-scrollbar-track {
-      background: #333;
-    }
-
-    .navigation-wrapper::-webkit-scrollbar-thumb {
-      background-color: #FCEA2B;
-      border-radius: 3px;
     }
 
     .mobile-overlay {
