@@ -10,6 +10,19 @@
   // Reaktive Werte
   $: currentUid = $user.userid || 'default';
   
+  // Sanitize User ID - nur erlaubte Zeichen
+  function sanitizeUid(input: string): string {
+    // Nur alphanumerische Zeichen, Bindestriche und Unterstriche erlauben
+    return input.replace(/[^a-zA-Z0-9\-_]/g, '').substring(0, 50); // Max 50 Zeichen
+  }
+  
+  // Validiere User ID
+  function validateUid(uid: string): boolean {
+    // Prüfe auf erlaubte Zeichen und Länge
+    const validPattern = /^[a-zA-Z0-9\-_]{0,50}$/;
+    return validPattern.test(uid);
+  }
+  
   function toggleDropdown() {
     isOpen = !isOpen;
     if (isOpen) {
@@ -23,7 +36,14 @@
   }
   
   function handleUidChange() {
-    const targetUid = newUid.trim() || 'default';
+    const sanitizedUid = sanitizeUid(newUid.trim());
+    const targetUid = sanitizedUid || 'default';
+    
+    // Zusätzliche Validierung
+    if (sanitizedUid && !validateUid(sanitizedUid)) {
+      console.warn('Invalid User ID format');
+      return;
+    }
     
     if (targetUid !== currentUid) {
       user.setUserId(targetUid);
@@ -33,9 +53,24 @@
     closeDropdown();
   }
   
+  // Input Handler für Live-Sanitization
+  function handleInput(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const sanitized = sanitizeUid(target.value);
+    if (target.value !== sanitized) {
+      target.value = sanitized;
+      newUid = sanitized;
+    }
+  }
+  
   function generateRandomUid() {
-    const randomUid = 'user-' + Math.random().toString(36).substr(2, 9);
-    newUid = randomUid;
+    // Sichere Generierung ohne problematische Zeichen
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = 'user-';
+    for (let i = 0; i < 9; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    newUid = result;
   }
   
   // Schließe Dropdown bei Klick außerhalb
@@ -72,7 +107,10 @@
             id="uid-input"
             type="text" 
             bind:value={newUid}
-            placeholder="Enter User ID or leave empty for default"
+            placeholder="Only letters, numbers, - and _ allowed"
+            maxlength="50"
+            pattern="[a-zA-Z0-9\-_]*"
+            on:input={handleInput}
             on:keydown={(e) => e.key === 'Enter' && handleUidChange()}
           />
           <button 
