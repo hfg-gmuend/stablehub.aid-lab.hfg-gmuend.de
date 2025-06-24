@@ -1,5 +1,5 @@
 // Debug-Script um zu verstehen was in userData gespeichert wird
-const API_BASE_URL = 'https://aid-playground.hfg-gmuend.de/api';
+const API_BASE_URL = 'https://playground.transferscope.org/api';
 
 async function debugUserData(uid = 'default') {
   try {

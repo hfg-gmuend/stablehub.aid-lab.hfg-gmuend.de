@@ -21,7 +21,7 @@ if (typeof $user !== 'undefined' && $user.userid) {
 function testBlobUrlDetection() {
   const testUrls = [
     'blob:http://localhost:5181/abc-123-def',
-    'https://aid-playground.hfg-gmuend.de/api/images/testuser/image.jpg',
+    'https://playground.transferscope.org/api/images/testuser/image.jpg',
     'data:image/jpeg;base64,/9j/4AAQSkZJ...'
   ];
   

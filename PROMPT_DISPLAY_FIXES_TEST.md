@@ -108,7 +108,7 @@ console.log($serverImages);
 $serverImages.loadUserImagesByType("text-to-image", "testuser");
 
 // Test Server-Daten direkt
-fetch('https://aid-playground.hfg-gmuend.de/api/userdata/testuser')
+fetch('https://playground.transferscope.org/api/userdata/testuser')
   .then(r => r.json())
   .then(data => console.log('Server data:', data));
 ```

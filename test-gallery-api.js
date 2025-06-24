@@ -1,5 +1,5 @@
 // Test script for testing Gallery API endpoints
-const API_BASE_URL = 'https://aid-playground.hfg-gmuend.de/api';
+const API_BASE_URL = 'https://playground.transferscope.org/api';
 
 async function testGalleryAPI() {
   console.log('Testing Gallery API...');
@@ -23,7 +23,7 @@ async function testGalleryAPI() {
     console.log('\n=== Testing POST /gallery ===');
     const testEntry = {
       prompt: "Test favorite from API test",
-      imageUrl: "https://aid-playground.hfg-gmuend.de/api/images/testuser/test-image.jpg",
+      imageUrl: "https://playground.transferscope.org/api/images/testuser/test-image.jpg",
       type: "text-to-image",
       styles: [],
       userid: "test-api-user",

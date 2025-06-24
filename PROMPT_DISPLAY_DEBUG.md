@@ -16,7 +16,7 @@ Das `refreshAfterGenerationByType` wird zu früh aufgerufen, bevor die Prompt-Da
 ### 1. In Browser DevTools Console:
 ```javascript
 // Prüfe aktuelle Prompt-Daten auf dem Server
-fetch('https://aid-playground.hfg-gmuend.de/api/userdata/testuser')
+fetch('https://playground.transferscope.org/api/userdata/testuser')
   .then(r => r.json())
   .then(data => {
     console.log('User prompts:', data.prompts);
@@ -24,7 +24,7 @@ fetch('https://aid-playground.hfg-gmuend.de/api/userdata/testuser')
   });
 
 // Prüfe Server-Bilder
-fetch('https://aid-playground.hfg-gmuend.de/api/images/testuser')
+fetch('https://playground.transferscope.org/api/images/testuser')
   .then(r => r.json())
   .then(images => console.log('Server images:', images));
 
@@ -95,7 +95,7 @@ refreshAfterGenerationByType: async (type, uid = null) => {
 ### API Direkt testen:
 ```bash
 # Prüfe ob Prompt-Daten gespeichert werden
-curl "https://aid-playground.hfg-gmuend.de/api/userdata/testuser" | jq .
+curl "https://playground.transferscope.org/api/userdata/testuser" | jq .
 ```
 
 ### Store State Monitoring:
