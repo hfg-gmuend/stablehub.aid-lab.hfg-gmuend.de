@@ -124,7 +124,7 @@
   let lastLoadedUid: string | null = null;
   
   // API URL Basis (für Anzeige)
-  const apiBaseUrl: string = "https://aid-playground.hfg-gmuend.de/api/txt2img";
+  const apiBaseUrl: string = "https://playground.transferscope.org/api/txt2img";
   
   // Funktion zum Generieren des Bildes
   async function generateImage(): Promise<void> {

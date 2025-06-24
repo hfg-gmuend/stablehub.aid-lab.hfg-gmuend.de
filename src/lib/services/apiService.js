@@ -1,7 +1,7 @@
 import { user } from '$lib/stores/user.js';
 import { get } from 'svelte/store';
 
-const API_BASE_URL = 'https://aid-playground.hfg-gmuend.de/api';
+const API_BASE_URL = 'https://playground.transferscope.org/api';
 
 /**
  * API Service für die Kommunikation mit dem Backend

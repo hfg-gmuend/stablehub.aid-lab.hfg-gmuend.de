@@ -55,7 +55,7 @@ const createServerImagesStore = () => {
             let timestamp = new Date();
             
             if (typeof imagePath === 'string') {
-              imageUrls = [`https://aid-playground.hfg-gmuend.de/api/${imagePath}`];
+              imageUrls = [`https://playground.transferscope.org/api/${imagePath}`];
               const pathParts = imagePath.split('/');
               const fileName = pathParts[pathParts.length - 1];
               imageId = fileName ? fileName.replace('.jpg', '').replace('.png', '') : `generated-${Date.now()}-${index}`;

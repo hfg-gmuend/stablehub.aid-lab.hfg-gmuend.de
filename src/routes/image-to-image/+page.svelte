@@ -416,7 +416,7 @@
           <h3>API Request</h3>
           <div class="url-box">
             <span class="method">POST</span> 
-            {`https://aid-playground.hfg-gmuend.de/api/combine?cfg=${cfg}&steps=${steps}&seed=${seed}&uid=${$user.userid || 'default'}${prompt ? `&prompt=${encodeURIComponent(prompt)}` : ''}${negativePrompt ? `&negative_prompt=${encodeURIComponent(negativePrompt)}` : ''}`}
+            {`https://playground.transferscope.org/api/combine?cfg=${cfg}&steps=${steps}&seed=${seed}&uid=${$user.userid || 'default'}${prompt ? `&prompt=${encodeURIComponent(prompt)}` : ''}${negativePrompt ? `&negative_prompt=${encodeURIComponent(negativePrompt)}` : ''}`}
             <div class="post-data">
               <span class="post-label">Form Data:</span>
               <span class="post-field">image1: {image1 ? image1.name : 'No image selected'}</span>

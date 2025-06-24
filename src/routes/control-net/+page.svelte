@@ -88,7 +88,7 @@
   });
 
   // API URL Basis
-  const apiBaseUrl: string = "https://aid-playground.hfg-gmuend.de/api/controlnet";
+  const apiBaseUrl: string = "https://playground.transferscope.org/api/controlnet";
 
   // --- Copilot State ---
   let isStyleCopilotOpen = false; // State for modal visibility
