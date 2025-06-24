@@ -21,14 +21,36 @@
       error = null;
       const rawGalleryItems = await serverImages.loadGallery();
       
-      // Filtere ungültige blob-URLs heraus
-      galleryItems = rawGalleryItems.filter(item => {
-        const isValidUrl = item.imageUrl && !item.imageUrl.startsWith('blob:');
-        if (!isValidUrl) {
-          console.warn('[Gallery] Filtering out invalid image URL:', item.imageUrl);
-        }
-        return isValidUrl;
-      });
+      // Filtere nur wirklich ungültige URLs heraus und erstelle eindeutige Keys
+      galleryItems = rawGalleryItems
+        .filter(item => {
+          // Erlaube HTTP/HTTPS URLs und Blob URLs
+          const isValidUrl = item.imageUrl && 
+            typeof item.imageUrl === 'string' &&
+            (item.imageUrl.startsWith('http://') || 
+             item.imageUrl.startsWith('https://') || 
+             item.imageUrl.startsWith('blob:'));
+          
+          // Zusätzliche Validierung für Blob URLs - nur aktuelle Origin erlauben
+          if (item.imageUrl && item.imageUrl.startsWith('blob:')) {
+            const currentOrigin = window.location.origin;
+            const isCurrentOrigin = item.imageUrl.startsWith(`blob:${currentOrigin}`);
+            
+            if (!isCurrentOrigin) {
+              console.warn('[Gallery] Filtering out cross-origin blob URL:', item.imageUrl);
+              return false;
+            }
+          }
+          
+          if (!isValidUrl) {
+            console.warn('[Gallery] Filtering out invalid image URL:', item.imageUrl);
+          }
+          return isValidUrl;
+        })
+        .map((item, index) => ({
+          ...item,
+          uniqueKey: `${item.imageUrl}-${index}` // Eindeutiger Key für Svelte each
+        }));
       
       console.log("Gallery loaded:", galleryItems.length, "valid items (from", rawGalleryItems.length, "total)");
     } catch (err) {
@@ -153,7 +175,7 @@
         </div>
       {:else}
         <div class="image-grid">
-          {#each galleryItems as galleryItem (galleryItem.imageUrl)}
+          {#each galleryItems as galleryItem (galleryItem.uniqueKey)}
             <div class="gallery-item">
               <img 
                 src={galleryItem.imageUrl} 
