@@ -16,6 +16,12 @@
   /** @type {Set<string>} */
   let deletingImages = new Set();
   
+  // Overlay-State für Bildanzeige
+  let showImageOverlay = false;
+  let currentImageIndex = 0;
+  /** @type {any} */
+  let currentImage = null;
+  
   // Reaktive Variable für aktuelle UID
   $: currentUid = $user.userid || 'default';
   
@@ -217,11 +223,60 @@
     target.onerror = null;
     target.style.display = 'none'; // Verstecke das Bild wenn es nicht geladen werden kann
   }
+  
+  // Overlay-Funktionen
+  /** @param {any} galleryItem @param {number} index */
+  function openImageOverlay(galleryItem, index) {
+    currentImage = galleryItem;
+    currentImageIndex = index;
+    showImageOverlay = true;
+    document.body.style.overflow = 'hidden'; // Verhindere Scrollen im Hintergrund
+  }
+  
+  function closeImageOverlay() {
+    showImageOverlay = false;
+    currentImage = null;
+    document.body.style.overflow = 'auto';
+  }
+  
+  function nextImage() {
+    if (currentImageIndex < galleryItems.length - 1) {
+      currentImageIndex++;
+      currentImage = galleryItems[currentImageIndex];
+    }
+  }
+  
+  function prevImage() {
+    if (currentImageIndex > 0) {
+      currentImageIndex--;
+      currentImage = galleryItems[currentImageIndex];
+    }
+  }
+  
+  // Keyboard Navigation
+  /** @param {KeyboardEvent} event */
+  function handleKeydown(event) {
+    if (!showImageOverlay) return;
+    
+    switch(event.key) {
+      case 'Escape':
+        closeImageOverlay();
+        break;
+      case 'ArrowLeft':
+        prevImage();
+        break;
+      case 'ArrowRight':
+        nextImage();
+        break;
+    }
+  }
 </script>
 
 <svelte:head>
   <title>Image Gallery | Stablehub</title>
 </svelte:head>
+
+<svelte:window on:keydown={handleKeydown} />
 
 <div class="app-container">
   <MinimalSidebar />
@@ -234,10 +289,23 @@
         </div>
         <div class="gallery-controls">
           <button on:click={loadGallery} class="control-button" title="Refresh Gallery">
-            🔄 Refresh
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+              <path d="M21 3v5h-5"/>
+              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+              <path d="M3 21v-5h5"/>
+            </svg>
+            Refresh
           </button>
           <button on:click={cleanGalleryData} class="control-button" title="Clean Invalid Images">
-            🧹 Clean
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18"/>
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+              <path d="M10 11v6"/>
+              <path d="M14 11v6"/>
+            </svg>
+            Clean
           </button>
         </div>
       </div>
@@ -258,7 +326,7 @@
         </div>
       {:else}
         <div class="image-grid">
-          {#each galleryItems as galleryItem (galleryItem.uniqueKey)}
+          {#each galleryItems as galleryItem, index (galleryItem.uniqueKey)}
             <div class="gallery-item" class:deleting={deletingImages.has(galleryItem.uniqueKey)}>
               {#if deletingImages.has(galleryItem.uniqueKey)}
                 <!-- Loading Placeholder während des Löschens -->
@@ -272,6 +340,7 @@
                   alt="Favorite image" 
                   class="gallery-image"
                   on:error={handleImageError}
+                  on:click={() => openImageOverlay(galleryItem, index)}
                 />
               {/if}
               
@@ -318,6 +387,108 @@
     </div>
   </main>
 </div>
+
+<!-- Image Overlay -->
+{#if showImageOverlay && currentImage}
+  <div class="image-overlay" on:click={closeImageOverlay}>
+    <div class="overlay-background"></div>
+    
+    <!-- Overlay Layout Container -->
+    <div class="overlay-layout">
+      <!-- Left Navigation Button -->
+      {#if currentImageIndex > 0}
+        <button class="nav-button nav-prev" on:click|stopPropagation={prevImage}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+      {:else}
+        <div class="nav-spacer"></div>
+      {/if}
+      
+      <!-- Main Content -->
+      <div class="overlay-content" on:click|stopPropagation>
+        <div class="overlay-image-container">
+          <img 
+            src={currentImage.imageUrl} 
+            alt="Enlarged view" 
+            class="overlay-image"
+          />
+        </div>
+        
+        <!-- Image Info -->
+        <div class="overlay-info">
+          <div class="overlay-header">
+            <div class="overlay-user-info">
+              <span class="overlay-user-id">{currentImage.userid}</span>
+              <span class="overlay-image-type">{currentImage.type || 'text-to-image'}</span>
+            </div>
+            <div class="overlay-counter">
+              {currentImageIndex + 1} / {galleryItems.length}
+            </div>
+          </div>
+          
+          {#if currentImage.prompt}
+            <div class="overlay-prompt">
+              <div class="prompt-label">Prompt:</div>
+              <div class="prompt-text">{currentImage.prompt}</div>
+            </div>
+          {/if}
+          
+          <!-- Action Buttons -->
+          <div class="overlay-actions">
+            <button 
+              class="overlay-action-button copy-btn" 
+              on:click={() => copyPromptToClipboard(currentImage.prompt)}
+              title="Copy Prompt"
+            >
+              <img src="/icon/penIcon.svg" alt="Copy" />
+              Copy Prompt
+            </button>
+            <button 
+              class="overlay-action-button download-btn" 
+              on:click={() => downloadImage(currentImage.imageUrl, currentImage.prompt)}
+              title="Download Image"
+            >
+              <img src="/icon/downloadIcon.svg" alt="Download" />
+              Download
+            </button>
+            {#if currentImage.userid === currentUid}
+              <button 
+                class="overlay-action-button remove-btn" 
+                on:click={() => removeFavorite(currentImage)}
+                title="Remove from Favorites"
+              >
+                <img src="/icon/delete.svg" alt="Remove" />
+                Remove
+              </button>
+            {/if}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Navigation Button -->
+      {#if currentImageIndex < galleryItems.length - 1}
+        <button class="nav-button nav-next" on:click|stopPropagation={nextImage}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
+      {:else}
+        <div class="nav-spacer"></div>
+      {/if}
+    </div>
+    
+    <!-- Close Button -->
+    <div class="overlay-close-container">
+      <button class="close-button" on:click={closeImageOverlay}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+{/if}
 
 <style>
   .app-container {
@@ -402,20 +573,37 @@
   }
   
   .control-button {
-    padding: 0.5rem 1rem;
-    background-color: #2a2a2a;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(30, 30, 30, 0.8);
     color: #e0e0e0;
-    border: 1px solid #444444;
-    border-radius: 6px;
+    border: 1px solid rgba(68, 68, 68, 0.6);
+    border-radius: 8px;
     cursor: pointer;
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.8rem;
-    transition: all 0.2s ease;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
   
   .control-button:hover {
-    background-color: #3a3a3a;
+    background: rgba(252, 234, 43, 0.15);
     border-color: #FCEA2B;
+    color: #FCEA2B;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(252, 234, 43, 0.2);
+  }
+  
+  .control-button svg {
+    transition: transform 0.3s ease;
+  }
+  
+  .control-button:hover svg {
+    transform: scale(1.1);
   }
   
   /* Loading State */
@@ -568,6 +756,12 @@
     object-fit: cover;
     display: block;
     border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .gallery-image:hover {
+    transform: scale(1.02);
   }
   
   .user-badge {
@@ -675,6 +869,443 @@
     .action-button {
       width: 36px;
       height: 36px;
+    }
+  }
+  
+  /* === IMAGE OVERLAY STYLES === */
+  .image-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: overlayFadeIn 0.3s ease-out;
+  }
+  
+  .overlay-layout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    width: 100%;
+    height: 100%;
+    max-width: 100vw;
+    z-index: 1001;
+    position: relative;
+  }
+  
+  .overlay-close-container {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    z-index: 1003;
+  }
+  
+  .nav-spacer {
+    width: 60px;
+    flex-shrink: 0;
+  }
+  
+  @keyframes overlayFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  .overlay-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  
+  .overlay-content {
+    position: relative;
+    z-index: 1001;
+    max-width: 80vw;
+    max-height: 95vh;
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    background: rgba(24, 24, 24, 0.95);
+    border-radius: 16px;
+    border: 1px solid rgba(252, 234, 43, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    overflow-y: auto;
+    overflow-x: hidden;
+    animation: overlaySlideIn 0.4s ease-out;
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+  
+  /* Custom Scrollbar für das Overlay */
+  .overlay-content::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .overlay-content::-webkit-scrollbar-track {
+    background: rgba(30, 30, 30, 0.8);
+    border-radius: 4px;
+  }
+  
+  .overlay-content::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #FCEA2B, #FFE566);
+    border-radius: 4px;
+    transition: background 0.2s ease;
+  }
+  
+  .overlay-content::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #FFE566, #FCEA2B);
+  }
+  
+  /* Firefox Scrollbar */
+  .overlay-content {
+    scrollbar-width: thin;
+    scrollbar-color: #FCEA2B rgba(30, 30, 30, 0.8);
+  }
+  
+  @keyframes overlaySlideIn {
+    from {
+      transform: scale(0.9) translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .overlay-image-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    width: 100%;
+    height: 70vh;
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+  
+  .overlay-image {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    object-position: center;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    display: block;
+  }
+  
+  .overlay-info {
+    padding: 1.5rem;
+    background: rgba(18, 18, 18, 0.9);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(68, 68, 68, 0.5);
+    max-width: 100%;
+    min-width: 600px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+  
+  .overlay-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .overlay-user-info {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  
+  .overlay-user-id {
+    background: linear-gradient(135deg, #FCEA2B, #FFE566);
+    color: #121212;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+  
+  .overlay-image-type {
+    background: rgba(46, 46, 46, 0.8);
+    color: #e0e0e0;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    border: 1px solid rgba(68, 68, 68, 0.5);
+  }
+  
+  .overlay-counter {
+    background: rgba(30, 30, 30, 0.8);
+    color: #FCEA2B;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(252, 234, 43, 0.3);
+  }
+  
+  .overlay-prompt {
+    margin-bottom: 1.5rem;
+  }
+  
+  .prompt-label {
+    color: #FCEA2B;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .prompt-text {
+    color: #e0e0e0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    padding: 1rem;
+    background: rgba(30, 30, 30, 0.6);
+    border-radius: 8px;
+    border-left: 3px solid #FCEA2B;
+    font-family: system-ui, -apple-system, sans-serif;
+    max-width: 600px;
+    width: 100%;
+    box-sizing: border-box;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    hyphens: auto;
+    overflow: hidden;
+  }
+  
+  .overlay-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  
+  .overlay-action-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .copy-btn {
+    background: linear-gradient(135deg, #FCEA2B, #FFE566);
+    color: #121212;
+    border: 1px solid rgba(252, 234, 43, 0.6);
+  }
+  
+  .copy-btn:hover {
+    background: linear-gradient(135deg, #FFE566, #FFED80);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(252, 234, 43, 0.4);
+  }
+  
+  .download-btn {
+    background: rgba(252, 234, 43, 0.15);
+    color: #FCEA2B;
+    border: 1px solid rgba(252, 234, 43, 0.5);
+  }
+  
+  .download-btn:hover {
+    background: rgba(252, 234, 43, 0.25);
+    color: #FFE566;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(252, 234, 43, 0.3);
+  }
+  
+  .remove-btn {
+    background: rgba(180, 180, 180, 0.15);
+    color: #b4b4b4;
+    border: 1px solid rgba(180, 180, 180, 0.4);
+  }
+  
+  .remove-btn:hover {
+    background: rgba(200, 200, 200, 0.25);
+    color: #d4d4d4;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(180, 180, 180, 0.2);
+  }
+  
+  .overlay-action-button img {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .copy-btn img {
+    filter: brightness(0) saturate(100%) invert(8%) sepia(8%) saturate(1265%) hue-rotate(314deg) brightness(95%) contrast(92%);
+  }
+  
+  .download-btn img {
+    filter: brightness(0) saturate(100%) invert(85%) sepia(100%) saturate(348%) hue-rotate(4deg) brightness(105%) contrast(96%);
+  }
+  
+  .remove-btn img {
+    filter: brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(1%) hue-rotate(149deg) brightness(87%) contrast(86%);
+  }
+  
+  /* Navigation Buttons */
+  .nav-button {
+    position: relative;
+    z-index: 1002;
+    background: rgba(30, 30, 30, 0.9);
+    border: 2px solid rgba(252, 234, 43, 0.5);
+    color: #FCEA2B;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    flex-shrink: 0;
+  }
+  
+  .nav-button:hover {
+    background: rgba(252, 234, 43, 0.9);
+    color: #121212;
+    transform: scale(1.1);
+    box-shadow: 0 4px 20px rgba(252, 234, 43, 0.4);
+  }
+  
+  .close-button {
+    background: rgba(60, 60, 60, 0.9);
+    border: 1px solid rgba(120, 120, 120, 0.6);
+    color: #d4d4d4;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+  
+  .close-button:hover {
+    background: rgba(80, 80, 80, 0.95);
+    color: #ffffff;
+    transform: scale(1.1);
+    box-shadow: 0 4px 20px rgba(120, 120, 120, 0.3);
+  }
+  
+  /* Mobile Responsive Overlay */
+  @media (max-width: 768px) {
+    .overlay-layout {
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
+    }
+    
+    .nav-spacer {
+      width: auto;
+      height: 50px;
+    }
+    
+    .overlay-content {
+      max-width: 95vw;
+      max-height: 80vh;
+      order: 2;
+    }
+    
+    .nav-button {
+      width: 50px;
+      height: 50px;
+      order: 1;
+    }
+    
+    .nav-next {
+      order: 3;
+    }
+    
+    .overlay-image-container {
+      height: 50vh;
+      padding: 1rem;
+    }
+    
+    .overlay-info {
+      padding: 1rem;
+      min-width: auto;
+    }
+    
+    .overlay-header {
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: stretch;
+    }
+    
+    .overlay-user-info {
+      justify-content: center;
+    }
+    
+    .overlay-actions {
+      justify-content: center;
+    }
+    
+    .overlay-action-button {
+      flex: 1;
+      justify-content: center;
+      min-width: auto;
+    }
+    
+    .overlay-close-container {
+      top: 1rem;
+      right: 1rem;
+    }
+    
+    .close-button {
+      width: 45px;
+      height: 45px;
+    }
+    
+    .prompt-text {
+      font-size: 0.85rem;
+      padding: 0.75rem;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .overlay-info {
+      min-width: auto;
+    }
+    
+    .overlay-content {
+      max-width: 98vw;
     }
   }
 </style>
