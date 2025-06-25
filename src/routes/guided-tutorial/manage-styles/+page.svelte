@@ -58,7 +58,7 @@
 </script>
 
 <svelte:head>
-  <title>Manage Styles | Guided Tutorial | HfG Ai-Hub</title>
+  <title>Manage Styles | Guided Tutorial | Stablehub</title>
 </svelte:head>
 
 <div class="tutorial-container">

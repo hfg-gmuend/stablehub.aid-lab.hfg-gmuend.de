@@ -59,7 +59,7 @@
 
 
 <svelte:head>
-  <title>What is Stable Diffusion? | Guided Tutorial | HfG Ai-Hub</title>
+  <title>What is Stable Diffusion? | Guided Tutorial | Stablehub</title>
 </svelte:head>
 
 <div class="tutorial-container">
@@ -124,7 +124,7 @@
       
       <div class="info-box">
         <h4>Did you know?</h4>
-        <p>The HfG Ai-Hub uses Stable Diffusion in the backend, offering you the benefits of local operation without the installation effort!</p>
+        <p>Stablehub uses Stable Diffusion in the backend, offering you the benefits of local operation without the installation effort!</p>
       </div>
     </section>
 

@@ -820,7 +820,7 @@
     width: 40px;
     height: 40px;
     border: 4px solid #333333;
-    border-top: 4px solid #FCEA2B; /* Geändert von #3498db zu #FCEA2B für das HfG-Gelb */
+    border-top: 4px solid #FCEA2B; /* Geändert von #3498db zu #FCEA2B für das Stablehub-Gelb */
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 1rem;

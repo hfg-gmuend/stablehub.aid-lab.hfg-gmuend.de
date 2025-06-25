@@ -43,7 +43,7 @@
 </script>
 
 <svelte:head>
-  <title>Understanding AI Models | Guided Tutorial | HfG Ai-Hub</title>
+  <title>Understanding AI Models | Guided Tutorial | Stablehub</title>
 </svelte:head>
 
 <div class="tutorial-container">

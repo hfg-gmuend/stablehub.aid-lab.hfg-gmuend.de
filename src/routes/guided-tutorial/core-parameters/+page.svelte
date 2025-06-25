@@ -17,7 +17,7 @@
 </script>
 
 <svelte:head>
-  <title>Core Parameters | Guided Tutorial | HfG Ai-Hub</title>
+  <title>Core Parameters | Guided Tutorial | Stablehub</title>
 </svelte:head>
 
 <div class="tutorial-container">

@@ -120,7 +120,7 @@
 </script>
 
 <svelte:head>
-  <title>Resources & Deep-Dive | Guided Tutorial | HfG Ai-Hub</title>
+  <title>Resources & Deep-Dive | Guided Tutorial | Stablehub</title>
 </svelte:head>
 
 <div class="tutorial-container">

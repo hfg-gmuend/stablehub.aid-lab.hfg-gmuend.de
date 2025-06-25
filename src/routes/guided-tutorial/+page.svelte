@@ -70,7 +70,7 @@
 </script>
 
 <svelte:head>
-  <title>Guided Tutorials | HfG Ai-Hub</title>
+  <title>Guided Tutorials | Stablehub</title>
 </svelte:head>
 
 <div class="tutorial-container">

@@ -178,8 +178,8 @@
         <h1 class="main-title" class:visible={titleVisible}>
           <span class="title-word" style="--delay: 0s">Welcome</span>
           <span class="title-word" style="--delay: 0.1s">to</span>
-          <span class="title-word highlight" style="--delay: 0.2s">HfG</span>
-          <span class="title-word highlight" style="--delay: 0.3s">AI-Hub</span>
+          <span class="title-word highlight" style="--delay: 0.2s">Stable</span>
+          <span class="title-word highlight" style="--delay: 0.3s">Hub</span>
         </h1>
 
         <!-- Enhanced Subtitle with Dynamic Typing Effect -->
@@ -243,7 +243,7 @@
     <section class="community-gallery" class:visible={tutorialsVisible}>
       <div class="community-header">
         <h2>Join Our Creative Community</h2>
-        <p class="community-subtitle">Discover, share, and get inspired by the HfG AI community</p>
+        <p class="community-subtitle">Discover, share, and get inspired by the Stablehub AI community</p>
       </div>
       
       <!-- Main Community Flow -->
@@ -318,7 +318,7 @@
           </div>
           <div class="spotlight-text">
             <h3>Monthly Spotlight</h3>
-            <p>Win 50€ print credit & get featured at HfG Campus</p>
+            <p>Win 50€ print credit & get featured at Stablehub Campus</p>
           </div>
           <div class="winner-badge">
             <span>🏆 This Month</span>

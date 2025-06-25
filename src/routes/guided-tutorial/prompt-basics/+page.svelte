@@ -38,7 +38,7 @@
 </script>
 
 <svelte:head>
-  <title>Prompt Basics | Guided Tutorial | HfG Ai-Hub</title>
+  <title>Prompt Basics | Guided Tutorial | Stablehub</title>
 </svelte:head>
 
 <div class="tutorial-container">

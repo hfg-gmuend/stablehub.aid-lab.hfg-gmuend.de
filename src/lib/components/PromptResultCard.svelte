@@ -170,7 +170,7 @@
 
 <div class="prompt-result-card">
   <div class="card-header">
-    <img src="{assets}/icon/icon.svg" alt="AI Hub Icon" class="ai-icon" />
+    <img src="{assets}/icon/icon.svg" alt="Stablehub Icon" class="ai-icon" />
     <h3 class="prompt-text">{prompt}</h3>
   </div>
   
