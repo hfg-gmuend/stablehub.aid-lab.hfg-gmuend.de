@@ -1705,14 +1705,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 3rem;
+    padding: 4rem;
     border-radius: 20px;
     background: #FFFFFF;
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(15px);
-    height: 160px;
-    width: 240px;
+    height: 250px;
+    width: 380px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   }
 
@@ -1724,8 +1724,8 @@
   }
 
   .partner-logo img {
-    max-height: 110px;
-    max-width: 180px;
+    max-height: 180px;
+    max-width: 300px;
     width: auto;
     height: auto;
     object-fit: contain;
