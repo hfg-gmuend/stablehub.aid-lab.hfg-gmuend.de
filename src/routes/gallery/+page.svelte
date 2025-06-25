@@ -3,6 +3,7 @@
   import { serverImages } from '$lib/stores/serverImages.js';
   import { user } from '$lib/stores/user.js';
   import { onMount } from 'svelte';
+  import { toast } from '$lib/stores/toastStore.js';
   
   // Zustand für die Gallery
   /** @type {any[]} */
@@ -10,6 +11,10 @@
   let loading = true;
   /** @type {string | null} */
   let error = null;
+  
+  // Set für Bilder, die gerade gelöscht werden
+  /** @type {Set<string>} */
+  let deletingImages = new Set();
   
   // Reaktive Variable für aktuelle UID
   $: currentUid = $user.userid || 'default';
@@ -24,22 +29,16 @@
       // Filtere nur wirklich ungültige URLs heraus und erstelle eindeutige Keys
       galleryItems = rawGalleryItems
         .filter(item => {
-          // Erlaube HTTP/HTTPS URLs und Blob URLs
+          // Strikt nur HTTP/HTTPS URLs erlauben - keine Blob URLs mehr!
           const isValidUrl = item.imageUrl && 
             typeof item.imageUrl === 'string' &&
             (item.imageUrl.startsWith('http://') || 
-             item.imageUrl.startsWith('https://') || 
-             item.imageUrl.startsWith('blob:'));
+             item.imageUrl.startsWith('https://'));
           
-          // Zusätzliche Validierung für Blob URLs - nur aktuelle Origin erlauben
+          // Blob URLs komplett ausschließen
           if (item.imageUrl && item.imageUrl.startsWith('blob:')) {
-            const currentOrigin = window.location.origin;
-            const isCurrentOrigin = item.imageUrl.startsWith(`blob:${currentOrigin}`);
-            
-            if (!isCurrentOrigin) {
-              console.warn('[Gallery] Filtering out cross-origin blob URL:', item.imageUrl);
-              return false;
-            }
+            console.warn('[Gallery] Filtering out blob URL (not allowed):', item.imageUrl);
+            return false;
           }
           
           if (!isValidUrl) {
@@ -53,6 +52,9 @@
         }));
       
       console.log("Gallery loaded:", galleryItems.length, "valid items (from", rawGalleryItems.length, "total)");
+      
+      // Zusätzliche Bereinigung nach dem Laden
+      cleanGalleryData();
     } catch (err) {
       console.error('Error loading gallery:', err);
       error = err instanceof Error ? err.message : 'Unknown error';
@@ -65,6 +67,29 @@
   onMount(async () => {
     await loadGallery();
   });
+  
+  // Funktion zum Bereinigen der Galerie-Daten
+  function cleanGalleryData() {
+    const originalLength = galleryItems.length;
+    galleryItems = galleryItems.filter(item => {
+      // Entferne alle Bilder mit Blob URLs
+      if (item.imageUrl && item.imageUrl.startsWith('blob:')) {
+        console.warn('[Gallery] Removing blob URL from gallery:', item.imageUrl);
+        return false;
+      }
+      // Entferne alle Bilder ohne gültige imageUrl
+      if (!item.imageUrl || !item.imageUrl.startsWith('http')) {
+        console.warn('[Gallery] Removing invalid image URL:', item.imageUrl);
+        return false;
+      }
+      return true;
+    });
+    
+    if (originalLength !== galleryItems.length) {
+      console.log(`[Gallery] Cleaned ${originalLength - galleryItems.length} invalid images from gallery`);
+      toast.info(`Removed ${originalLength - galleryItems.length} invalid images from gallery`);
+    }
+  }
   
   // Reaktion auf UID-Änderungen
   $: {
@@ -79,10 +104,11 @@
   async function copyPromptToClipboard(prompt) {
     try {
       await navigator.clipboard.writeText(prompt);
-      // Kurze Rückmeldung anzeigen
-      alert("Prompt copied to clipboard!");
+      // Toast-Notification statt Alert
+      toast.success('Prompt copied to clipboard!');
     } catch (err) {
       console.error('Error copying: ', err);
+      toast.error('Failed to copy prompt');
     }
   }
   
@@ -91,9 +117,13 @@
   async function removeFavorite(galleryItem) {
     // Prüfe ob es ein Bild des aktuellen Benutzers ist
     if (galleryItem.userid !== currentUid) {
-      alert('You can only remove your own favorites!');
+      toast.error('You can only remove your own favorites!');
       return;
     }
+    
+    // Sofortiges Ausblenden: Bild zum deletingImages Set hinzufügen
+    deletingImages.add(galleryItem.uniqueKey);
+    deletingImages = deletingImages; // Trigger Reactivity
     
     try {
       // Entferne uniqueKey vor dem Senden an den Server - Server erwartet originales Format
@@ -103,11 +133,23 @@
       console.log('Sending to server (without uniqueKey):', imageData);
       
       await serverImages.removeFromFavorites(imageData);
+      
+      // Erfolgreiche Toast-Notification
+      toast.success('Deleted from HfG Gallery');
+      
       // Galerie neu laden
       await loadGallery();
     } catch (err) {
       console.error('Error removing favorite:', err);
-      alert('Error removing favorite: ' + (err instanceof Error ? err.message : 'Unknown error'));
+      toast.error('Error removing favorite: ' + (err instanceof Error ? err.message : 'Unknown error'));
+      
+      // Bei Fehler: Bild wieder anzeigen
+      deletingImages.delete(galleryItem.uniqueKey);
+      deletingImages = deletingImages; // Trigger Reactivity
+    } finally {
+      // Nach erfolgreichem Löschen oder Fehler: aus deletingImages entfernen
+      deletingImages.delete(galleryItem.uniqueKey);
+      deletingImages = deletingImages; // Trigger Reactivity
     }
   }
 
@@ -138,9 +180,12 @@
       // Cleanup
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+      
+      // Erfolgreiche Toast-Notification
+      toast.success('Image downloaded successfully!');
     } catch (err) {
       console.error('Error downloading image:', err);
-      alert('Error downloading image: ' + (err instanceof Error ? err.message : 'Unknown error'));
+      toast.error('Error downloading image: ' + (err instanceof Error ? err.message : 'Unknown error'));
     }
   }
   
@@ -149,6 +194,26 @@
   function handleImageError(event) {
     console.error("Error loading image:", event);
     const target = /** @type {HTMLImageElement} */ (event.target);
+    
+    // Log the problematic URL to debug
+    console.error('Failed to load image URL:', target.src);
+    
+    // Remove the problematic image from gallery if it's a blob URL
+    if (target.src.startsWith('blob:')) {
+      console.warn('Removing blob URL image from gallery:', target.src);
+      
+      // Remove from galleryItems array
+      galleryItems = galleryItems.filter(item => {
+        if (item.imageUrl && item.imageUrl.startsWith('blob:')) {
+          console.warn('Filtering out blob URL:', item.imageUrl);
+          return false;
+        }
+        return true;
+      });
+      
+      toast.error('Removed invalid image from gallery');
+    }
+    
     target.onerror = null;
     target.style.display = 'none'; // Verstecke das Bild wenn es nicht geladen werden kann
   }
@@ -162,8 +227,20 @@
   <MinimalSidebar />
   <main>
     <div class="gallery-container">
-      <h1>Community Gallery</h1>
-      <p class="gallery-description">Discover favorite images from all users. Click to copy prompts and download images you like!</p>
+      <div class="gallery-header">
+        <div>
+          <h1>Community Gallery</h1>
+          <p class="gallery-description">Discover favorite images from all users. Click to copy prompts and download images you like!</p>
+        </div>
+        <div class="gallery-controls">
+          <button on:click={loadGallery} class="control-button" title="Refresh Gallery">
+            🔄 Refresh
+          </button>
+          <button on:click={cleanGalleryData} class="control-button" title="Clean Invalid Images">
+            🧹 Clean
+          </button>
+        </div>
+      </div>
       
       {#if loading}
         <div class="loading-state">
@@ -182,13 +259,21 @@
       {:else}
         <div class="image-grid">
           {#each galleryItems as galleryItem (galleryItem.uniqueKey)}
-            <div class="gallery-item">
-              <img 
-                src={galleryItem.imageUrl} 
-                alt="Favorite image" 
-                class="gallery-image"
-                on:error={handleImageError}
-              />
+            <div class="gallery-item" class:deleting={deletingImages.has(galleryItem.uniqueKey)}>
+              {#if deletingImages.has(galleryItem.uniqueKey)}
+                <!-- Loading Placeholder während des Löschens -->
+                <div class="delete-placeholder">
+                  <div class="delete-spinner"></div>
+                  <p>Deleting...</p>
+                </div>
+              {:else}
+                <img 
+                  src={galleryItem.imageUrl} 
+                  alt="Favorite image" 
+                  class="gallery-image"
+                  on:error={handleImageError}
+                />
+              {/if}
               
               <!-- User Info Badge - bleibt immer sichtbar -->
               <div class="user-badge">
@@ -198,15 +283,30 @@
               
               <!-- Action-Buttons - nur diese erscheinen beim Hover -->
               <div class="gallery-actions">
-                <button class="action-button copy-button" on:click={() => copyPromptToClipboard(galleryItem.prompt)} title="Copy Prompt">
+                <button 
+                  class="action-button copy-button" 
+                  on:click={() => copyPromptToClipboard(galleryItem.prompt)} 
+                  title="Copy Prompt"
+                  disabled={deletingImages.has(galleryItem.uniqueKey)}
+                >
                   <img src="/icon/penIcon.svg" alt="Copy" />
                 </button>
-                <button class="action-button download-button" on:click={() => downloadImage(galleryItem.imageUrl, galleryItem.prompt)} title="Download Image">
+                <button 
+                  class="action-button download-button" 
+                  on:click={() => downloadImage(galleryItem.imageUrl, galleryItem.prompt)} 
+                  title="Download Image"
+                  disabled={deletingImages.has(galleryItem.uniqueKey)}
+                >
                   <img src="/icon/downloadIcon.svg" alt="Download" />
                 </button>
                 <!-- Nur eigene Bilder löschen -->
                 {#if galleryItem.userid === currentUid}
-                  <button class="action-button remove-button" on:click={() => removeFavorite(galleryItem)} title="Remove from Favorites">
+                  <button 
+                    class="action-button remove-button" 
+                    on:click={() => removeFavorite(galleryItem)} 
+                    title="Remove from Favorites"
+                    disabled={deletingImages.has(galleryItem.uniqueKey)}
+                  >
                     <img src="/icon/delete.svg" alt="Remove" />
                   </button>
                 {/if}
@@ -249,6 +349,15 @@
       padding: 0; /* Remove extra padding on mobile */
     }
     
+    .gallery-header {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .gallery-controls {
+      justify-content: center;
+    }
+    
     .image-grid {
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
       gap: 1rem !important;
@@ -275,6 +384,38 @@
     background-color: #181818;
     border-radius: 8px;
     overflow-y: auto;
+  }
+  
+  .gallery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .gallery-controls {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  
+  .control-button {
+    padding: 0.5rem 1rem;
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #444444;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+  }
+  
+  .control-button:hover {
+    background-color: #3a3a3a;
+    border-color: #FCEA2B;
   }
   
   /* Loading State */
@@ -377,13 +518,48 @@
     overflow: hidden;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
     background-color: #1e1e1e;
   }
   
   .gallery-item:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+  
+  /* Deleting State */
+  .gallery-item.deleting {
+    opacity: 0.7;
+    transform: scale(0.95);
+    pointer-events: none;
+  }
+  
+  /* Delete Placeholder */
+  .delete-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: #2a2a2a;
+    color: #888888;
+  }
+  
+  .delete-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #333333;
+    border-top: 3px solid #FCEA2B;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 0.5rem;
+  }
+  
+  .delete-placeholder p {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    margin: 0;
   }
   
   .gallery-image {
@@ -459,15 +635,25 @@
     background-color: rgba(30, 30, 30, 0.85);
   }
   
-  .action-button:hover {
+  .action-button:hover:not(:disabled) {
     background-color: rgba(40, 40, 40, 0.95);
     transform: scale(1.05);
+  }
+  
+  .action-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
   }
   
   .action-button img {
     width: 18px;
     height: 18px;
     filter: brightness(0) invert(1); /* Macht alle SVGs weiß */
+  }
+  
+  .action-button:disabled img {
+    filter: brightness(0) invert(1) opacity(0.5);
   }
   
   /* Mobile: Buttons immer sichtbar auf Touch-Geräten */

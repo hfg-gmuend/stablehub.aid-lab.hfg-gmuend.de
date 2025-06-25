@@ -5,13 +5,12 @@
   import { styles } from "$lib/config/styles.js";
   import { assets } from '$app/paths';
   import { onMount } from 'svelte';
+  import { toast } from '$lib/stores/toastStore.js';
   
   /** @type {string} */
   export let prompt = "";
   /** @type {string[]} */
   export let imageUrls = [];
-  /** @type {(prompt: string) => void} */
-  export let onEdit = () => {};
   /** @type {string[]} */
   export let usedStyles = [];
   /** @type {string} */
@@ -34,6 +33,7 @@
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        toast.success('Image downloaded successfully!');
         return;
       }
 
@@ -52,8 +52,12 @@
       
       // Cleanup Blob-URL
       URL.revokeObjectURL(blobUrl);
+      
+      // Success toast
+      toast.success('Image downloaded successfully!');
     } catch (error) {
       console.error('Download failed:', error);
+      toast.error('Download failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
       // Fallback: Öffne in neuem Tab
       window.open(imageUrl, '_blank');
     }
@@ -123,12 +127,12 @@
           serverImageUrl = matchingImage.imageUrl;
           console.log('[PromptResultCard] Found matching server URL:', serverImageUrl);
         } else {
-          alert('Please wait a moment for the image to be uploaded to the server before adding it to favorites.');
+          toast.error('Please wait for the image to be uploaded to the server before adding it to favorites.');
           return;
         }
       } catch (error) {
         console.error('[PromptResultCard] Error finding server URL:', error);
-        alert('Please wait a moment for the image to be uploaded to the server before adding it to favorites.');
+        toast.error('Please wait for the image to be uploaded to the server before adding it to favorites.');
         return;
       }
     }
@@ -150,6 +154,9 @@
           // Aktualisiere nur den lokalen Status ohne neu zu laden
           favoriteStatus[index] = false;
           favoriteStatus = [...favoriteStatus]; // Trigger Svelte reactivity
+          
+          // Success toast
+          toast.success('Removed from HfG Gallery');
         }
       } else {
         // Füge zu Favoriten hinzu
@@ -163,13 +170,25 @@
         favoriteStatus[index] = true;
         favoriteStatus = [...favoriteStatus]; // Trigger Svelte reactivity
         
-        // Zeige Erfolgs-Nachricht
+        // Success toast
+        toast.success('Added to HfG Gallery as Favorite!');
         console.log('[PromptResultCard] Successfully added to favorites!');
       }
       
     } catch (error) {
       console.error('Error toggling favorite:', error);
-      alert('Error updating favorites: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      toast.error('Error updating favorites: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }
+  
+  // Funktion zum Kopieren des Prompts in die Zwischenablage
+  async function copyPromptToClipboard() {
+    try {
+      await navigator.clipboard.writeText(prompt);
+      toast.success('Prompt copied to clipboard!');
+    } catch (error) {
+      console.error('Error copying prompt:', error);
+      toast.error('Failed to copy prompt');
     }
   }
 </script>
@@ -198,11 +217,11 @@
           </div>
           
           <div class="action-buttons">
-            <button class="action-button edit-button" on:click={() => onEdit(prompt)}>
-              <img src="/icon/penIcon.svg" alt="Bearbeiten" />
+            <button class="action-button copy-button" on:click={copyPromptToClipboard} title="Copy Prompt">
+              <img src="/icon/penIcon.svg" alt="Copy Prompt" />
             </button>
-            <button class="action-button download-button" on:click={() => downloadImage(imageUrl)}>
-              <img src="/icon/downloadIcon.svg" alt="Herunterladen" />
+            <button class="action-button download-button" on:click={() => downloadImage(imageUrl)} title="Download Image">
+              <img src="/icon/downloadIcon.svg" alt="Download" />
             </button>
           </div>
         </div>

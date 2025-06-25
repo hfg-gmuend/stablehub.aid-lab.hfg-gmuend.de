@@ -3,6 +3,7 @@
   import { generatedImages } from '$lib/stores/generatedImages.js';
   import { navigating } from '$app/stores';
   import { assets } from '$app/paths';
+  import ToastContainer from '$lib/components/ToastContainer.svelte';
   
   // Fix Typen beim ersten Laden und bei jedem Routing-Wechsel
   onMount(() => {
@@ -26,6 +27,9 @@
 </svelte:head>
 
 <slot></slot>
+
+<!-- Toast Container für globale Notifications -->
+<ToastContainer />
 
 <style>
   :global(body) {
