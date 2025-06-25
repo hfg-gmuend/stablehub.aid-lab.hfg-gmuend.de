@@ -265,7 +265,7 @@
 </script>
 
 <svelte:head>
-  <title>ControlNet | HfG Ai-Hub</title>
+  <title>ControlNet | Stablehub</title>
 </svelte:head>
 
 <div class="app-container">

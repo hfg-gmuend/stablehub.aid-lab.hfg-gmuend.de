@@ -149,7 +149,7 @@
 </script>
 
 <svelte:head>
-  <title>Image Gallery | HfG AI-Hub</title>
+  <title>Image Gallery | Stablehub</title>
 </svelte:head>
 
 <div class="app-container">

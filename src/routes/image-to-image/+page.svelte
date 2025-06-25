@@ -249,7 +249,7 @@
 </script>
 
 <svelte:head>
-  <title>Image To Image | HfG Ai-Hub</title>
+  <title>Image To Image | Stablehub</title>
 </svelte:head>
 
 <div class="app-container">

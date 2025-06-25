@@ -298,7 +298,7 @@
 </script>
 
 <svelte:head>
-  <title>Text To Image | HfG Ai-Hub</title>
+  <title>Text To Image | Stablehub</title>
 </svelte:head>
 
 <div class="app-container">

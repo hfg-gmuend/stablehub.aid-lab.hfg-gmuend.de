@@ -74,7 +74,7 @@
 </script>
 
 <svelte:head>
-  <title>VPN Installation | HfG Ai-Hub</title>
+  <title>VPN Installation | Stablehub</title>
 </svelte:head>
 
 <div class="layout">
