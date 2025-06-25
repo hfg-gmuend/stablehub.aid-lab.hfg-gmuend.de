@@ -96,7 +96,13 @@
     }
     
     try {
-      await serverImages.removeFromFavorites(galleryItem);
+      // Entferne uniqueKey vor dem Senden an den Server - Server erwartet originales Format
+      const { uniqueKey, ...imageData } = galleryItem;
+      
+      console.log('Original galleryItem:', galleryItem);
+      console.log('Sending to server (without uniqueKey):', imageData);
+      
+      await serverImages.removeFromFavorites(imageData);
       // Galerie neu laden
       await loadGallery();
     } catch (err) {

@@ -290,9 +290,21 @@ const createServerImagesStore = () => {
      */
     removeFromFavorites: async (imageData) => {
       try {
-        console.log('[ServerImages] Removing from favorites:', imageData);
+        console.log('[ServerImages] Removing from favorites - Input data:', imageData);
         
-        return await ApiService.removeFromGallery(imageData);
+        // Stelle sicher, dass wir nur die notwendigen Felder senden
+        const cleanImageData = {
+          prompt: imageData.prompt,
+          imageUrl: imageData.imageUrl,
+          type: imageData.type,
+          styles: imageData.styles || [],
+          userid: imageData.userid,
+          timestamp: imageData.timestamp
+        };
+        
+        console.log('[ServerImages] Clean data being sent to server:', cleanImageData);
+        
+        return await ApiService.removeFromGallery(cleanImageData);
       } catch (error) {
         console.error('[ServerImages] Error removing from favorites:', error);
         throw error;

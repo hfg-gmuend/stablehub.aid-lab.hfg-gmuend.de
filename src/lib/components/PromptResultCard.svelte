@@ -140,7 +140,13 @@
         // Entferne aus Favoriten
         const galleryItem = galleryItems.find(item => item.imageUrl === serverImageUrl);
         if (galleryItem) {
-          await serverImages.removeFromFavorites(galleryItem);
+          // Entferne uniqueKey vor dem Senden an den Server - Server erwartet originales Format
+          const { uniqueKey, ...imageData } = galleryItem;
+          
+          console.log('PromptResultCard - Original galleryItem:', galleryItem);
+          console.log('PromptResultCard - Sending to server (without uniqueKey):', imageData);
+          
+          await serverImages.removeFromFavorites(imageData);
           // Aktualisiere nur den lokalen Status ohne neu zu laden
           favoriteStatus[index] = false;
           favoriteStatus = [...favoriteStatus]; // Trigger Svelte reactivity
