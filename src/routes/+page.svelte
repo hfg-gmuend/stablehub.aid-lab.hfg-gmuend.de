@@ -606,8 +606,8 @@
   /* Enhanced Hero Section */
   .hero-container {
     position: relative;
-    margin-bottom: 4rem;
-    padding: 4rem 0;
+    /* margin-bottom: 4rem; */
+    /* padding: 4rem 0; */
     min-height: 40vh;
     display: flex;
     flex-direction: column;
@@ -964,7 +964,7 @@
 
   /* Main Features Section */
   .main-features {
-    margin: 6rem 0;
+    margin: 1rem 0;
     opacity: 0;
     transform: translateY(30px);
     transition: all 0.8s ease-out;
