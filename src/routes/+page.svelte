@@ -5,9 +5,8 @@
   import { base, assets } from '$app/paths';
   import { onMount } from 'svelte';
 
-  // Homepage specific states
+  // Desktop sidebar state (separate from MinimalSidebar mobile logic)
   let sidebarCollapsed = false;
-  let showCollapseButton = true; // Immer verfügbar für manuelles Einklappen
 
   // Animation states
   let mounted = false;
@@ -39,6 +38,11 @@
     'computational design',
     'innovative solutions'
   ];
+
+  // Desktop sidebar toggle function
+  function toggleSidebar() {
+    sidebarCollapsed = !sidebarCollapsed;
+  }
 
   function typewriterEffect() {
     const currentWord = words[currentWordIndex];
@@ -95,17 +99,7 @@
     }, 6500);
   }
 
-  // Sidebar collapse functionality
-  function toggleSidebar() {
-    sidebarCollapsed = !sidebarCollapsed;
-  }
-
   onMount(() => {
-    // Mobile detection - auf Mobile soll Sidebar standardmäßig eingeklappt sein
-    if (window.innerWidth <= 768) {
-      sidebarCollapsed = true;
-    }
-    
     // Staggered animation sequence
     setTimeout(() => mounted = true, 100);
     setTimeout(() => titleVisible = true, 300);
@@ -130,21 +124,18 @@
   {#if !sidebarCollapsed}
     <MinimalSidebar />
   {/if}
-  
-  <!-- Sidebar Expand Button -->
+
+  <!-- Desktop Sidebar Control Buttons -->
   {#if sidebarCollapsed}
-    <button class="sidebar-expand-btn" on:click={toggleSidebar}>
+    <button class="sidebar-expand-btn" on:click={toggleSidebar} aria-label="Expand sidebar">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
-  {/if}
-
-  <!-- Sidebar Collapse Button -->
-  {#if showCollapseButton && !sidebarCollapsed}
-    <button class="sidebar-collapse-btn" on:click={toggleSidebar}>
+  {:else}
+    <button class="sidebar-collapse-btn" on:click={toggleSidebar} aria-label="Collapse sidebar">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M11 19L4 12L11 5M19 19L12 12L19 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M11 7L6 12L11 17M18 7L13 12L18 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
   {/if}
@@ -497,7 +488,7 @@
   .app-container.mounted {
     opacity: 1;
   }
-
+  
   .app-container.sidebar-collapsed {
     display: block;
   }
@@ -519,7 +510,7 @@
     max-width: none;
   }
 
-  /* Sidebar Control Buttons */
+  /* Desktop Sidebar Control Buttons */
   .sidebar-expand-btn,
   .sidebar-collapse-btn {
     position: fixed;
@@ -1851,24 +1842,24 @@
 
   /* Mobile Footer */
   @media (max-width: 768px) {
-    /* Main layout fixes */
-    main {
-      padding: 1rem !important;
-    }
-    
-    main.expanded {
-      padding: 1rem !important;
-    }
-    
-    /* Button visibility fixes */
+    /* Hide desktop sidebar buttons on mobile - let MinimalSidebar handle mobile nav */
+    .sidebar-expand-btn,
     .sidebar-collapse-btn {
       display: none !important;
     }
-    
-    .sidebar-expand-btn {
-      top: 1rem;
-      left: 1rem;
-      z-index: 1000;
+
+    /* Reset sidebar state on mobile */
+    .app-container.sidebar-collapsed {
+      display: flex;
+    }
+
+    main.expanded {
+      padding: 1rem !important;
+    }
+
+    /* Main layout fixes */
+    main {
+      padding: 1rem !important;
     }
     
     /* Hero section mobile fixes */
