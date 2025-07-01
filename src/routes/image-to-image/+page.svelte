@@ -484,16 +484,34 @@
         promptId="main-prompt"
       />
 
-      <!-- Style Copilot Modal -->
-      {#if isStyleCopilotOpen}
-        <StyleCopilot
-          isOpen={isStyleCopilotOpen}
-          on:close={() => isStyleCopilotOpen = false}
-          on:addStyle={addGeneratedStyle}
-        />
-      {/if}
     </div>
   </main>
+  
+  <!-- Mobile Fixed Prompt Panel -->
+  <div class="mobile-fixed-prompt-panel">
+    <PromptPanel
+      bind:promptValue={prompt}
+      generateLabel="Generate"
+      generateLoadingLabel="Generating..."
+      generateIconSrc="{assets}/icon/rightIcon.svg"
+      generateFallbackIconSrc="{assets}/icon/rightIcon.svg"
+      generateLoading={loading}
+      generateDisabled={loading || !image1 || !image2} 
+      on:generate={combineImages}
+      on:copilot={openStyleCopilot} 
+      placeholder="Describe how the images should be combined or modified..."
+      promptId="main-prompt-mobile"
+    />
+  </div>
+
+  <!-- Style Copilot Modal -->
+  {#if isStyleCopilotOpen}
+    <StyleCopilot
+      isOpen={isStyleCopilotOpen}
+      on:close={() => isStyleCopilotOpen = false}
+      on:addStyle={addGeneratedStyle}
+    />
+  {/if}
 </div>
 
 <style>
@@ -558,6 +576,39 @@
     grid-template-rows: 1fr auto;
     gap: 0.75rem;
     height: calc(100vh - 3.5rem);
+  }
+  
+  /* Mobile Fixed Prompt Panel */
+  .mobile-fixed-prompt-panel {
+    display: none; /* Hidden by default on desktop */
+  }
+  
+  @media (max-width: 768px) {
+    .mobile-fixed-prompt-panel {
+      display: block;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 150; /* Higher than sidebar z-index */
+      background-color: #121212;
+      border-top: 1px solid #333;
+      padding: 1rem;
+      box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.3);
+    }
+    
+    main {
+      padding-bottom: 120px; /* Add bottom padding for fixed prompt panel */
+    }
+    
+    .content-wrapper {
+      grid-template-rows: auto auto !important;
+    }
+    
+    /* Hide the desktop prompt panel in content wrapper on mobile */
+    .content-wrapper > :global(.prompt-panel-component) {
+      display: none;
+    }
   }
   
   /* Parameter Panel - modernisiertes Design */
