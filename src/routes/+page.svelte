@@ -101,7 +101,10 @@
   }
 
   onMount(() => {
-    // Sidebar bleibt standardmäßig ausgeklappt - nur manuelles Einklappen möglich
+    // Mobile detection - auf Mobile soll Sidebar standardmäßig eingeklappt sein
+    if (window.innerWidth <= 768) {
+      sidebarCollapsed = true;
+    }
     
     // Staggered animation sequence
     setTimeout(() => mounted = true, 100);
@@ -1848,6 +1851,109 @@
 
   /* Mobile Footer */
   @media (max-width: 768px) {
+    /* Main layout fixes */
+    main {
+      padding: 1rem !important;
+    }
+    
+    main.expanded {
+      padding: 1rem !important;
+    }
+    
+    /* Button visibility fixes */
+    .sidebar-collapse-btn {
+      display: none !important;
+    }
+    
+    .sidebar-expand-btn {
+      top: 1rem;
+      left: 1rem;
+      z-index: 1000;
+    }
+    
+    /* Hero section mobile fixes */
+    .hero-container {
+      min-height: 40vh;
+      padding: 2rem 0;
+    }
+    
+    .main-title {
+      font-size: 2.2rem;
+      line-height: 1.2;
+    }
+    
+    .subtitle {
+      font-size: 1.1rem;
+      line-height: 1.4;
+    }
+    
+    /* AI Status Panel mobile */
+    .ai-status-panel {
+      flex-direction: column;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    
+    /* Cards mobile */
+    .cards-container {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    
+    /* Community flow mobile */
+    .community-flow {
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .flow-arrow {
+      transform: rotate(90deg);
+    }
+    
+    /* Monthly spotlight mobile */
+    .monthly-spotlight {
+      max-width: 100%;
+      margin: 2rem 0;
+      padding: 1.5rem;
+    }
+    
+    .spotlight-main {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    .spotlight-features {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    
+    /* Tutorial highlights mobile */
+    .tutorial-highlights {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    /* Partner logos mobile */
+    .partner-logos {
+      flex-direction: column;
+      gap: 2rem;
+      align-items: center;
+    }
+    
+    .partner-logo {
+      width: 100%;
+      max-width: 300px;
+      height: 180px;
+      padding: 2rem;
+    }
+    
+    .partner-logo img {
+      max-height: 100px;
+      max-width: 200px;
+    }
+    
+    /* Footer mobile */
     .site-footer {
       padding: 2rem 1rem 1rem;
     }
