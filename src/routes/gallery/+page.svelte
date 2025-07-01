@@ -467,6 +467,32 @@
         </div>
       </div>
       
+      <!-- Mobile Navigation (only visible on mobile) -->
+      <div class="mobile-nav-container">
+        <button 
+          class="mobile-nav-button" 
+          class:disabled={currentImageIndex === 0}
+          on:click|stopPropagation={prevImage}
+          disabled={currentImageIndex === 0}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+          Previous
+        </button>
+        <button 
+          class="mobile-nav-button" 
+          class:disabled={currentImageIndex === galleryItems.length - 1}
+          on:click|stopPropagation={nextImage}
+          disabled={currentImageIndex === galleryItems.length - 1}
+        >
+          Next
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
+      </div>
+      
       <!-- Right Navigation Button -->
       {#if currentImageIndex < galleryItems.length - 1}
         <button class="nav-button nav-next" on:click|stopPropagation={nextImage}>
@@ -505,36 +531,63 @@
     flex-direction: column;
   }
 
-  /* Mobile Responsive */
-  @media (max-width: 768px) {
-    .app-container {
-      flex-direction: column;
-    }
-    
-    main {
-      padding: 80px 1rem 1rem; /* Extra top padding for burger menu */
-      min-height: calc(100vh - 80px);
-    }
-    
-    .gallery-container {
-      padding: 0; /* Remove extra padding on mobile */
-    }
-    
-    .gallery-header {
-      flex-direction: column;
-      align-items: stretch;
-    }
-    
-    .gallery-controls {
-      justify-content: center;
-    }
-    
-    .image-grid {
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
-      gap: 1rem !important;
-    }
+  /* Mobile Navigation */
+  .mobile-nav-container {
+    display: none; /* Hidden on desktop */
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(18, 18, 18, 0.9);
+    border-top: 1px solid rgba(68, 68, 68, 0.5);
   }
   
+  .mobile-nav-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(30, 30, 30, 0.9);
+    border: 2px solid rgba(252, 234, 43, 0.5);
+    color: #FCEA2B;
+    border-radius: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    flex: 1;
+    justify-content: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .mobile-nav-button:hover:not(:disabled) {
+    background: rgba(252, 234, 43, 0.9);
+    color: #121212;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(252, 234, 43, 0.4);
+  }
+  
+  .mobile-nav-button:disabled,
+  .mobile-nav-button.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    background: rgba(30, 30, 30, 0.5);
+    border-color: rgba(68, 68, 68, 0.3);
+    color: #666;
+  }
+  
+  .mobile-nav-button:disabled:hover,
+  .mobile-nav-button.disabled:hover {
+    background: rgba(30, 30, 30, 0.5);
+    color: #666;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  /* === GLOBAL STYLES === */
   h1 {
     font-family: 'IBM Plex Mono', monospace;
     color: #ffffff;
@@ -695,8 +748,8 @@
   
   @media (max-width: 600px) {
     .image-grid {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
     }
   }
   
@@ -1232,25 +1285,19 @@
       padding: 1rem;
     }
     
-    .nav-spacer {
-      width: auto;
-      height: 50px;
+    /* Hide desktop navigation on mobile */
+    .nav-button, .nav-spacer {
+      display: none;
     }
     
     .overlay-content {
       max-width: 95vw;
       max-height: 80vh;
-      order: 2;
     }
     
-    .nav-button {
-      width: 50px;
-      height: 50px;
-      order: 1;
-    }
-    
-    .nav-next {
-      order: 3;
+    /* Show mobile navigation on mobile */
+    .mobile-nav-container {
+      display: flex;
     }
     
     .overlay-image-container {

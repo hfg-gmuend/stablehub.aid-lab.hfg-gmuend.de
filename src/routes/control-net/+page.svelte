@@ -284,6 +284,8 @@
           <div class="label-container">
             <label for="controlnet-image">ControlNet Template</label>
             <div class="info-icon" 
+                role="button"
+                tabindex="0"
                 on:mouseenter={() => activeTooltip = 'image'}
                 on:mouseleave={() => activeTooltip = null}>
               i
@@ -296,6 +298,8 @@
           <div 
             class="image-upload-area" 
             class:has-image={imagePreview}
+            role="button"
+            tabindex="0"
             on:dragover={preventDefaults}
             on:dragenter={preventDefaults}
             on:drop={handleImageDrop}
@@ -325,6 +329,8 @@
           <div class="label-container">
             <label for="controlnet-strength">ControlNet Strength</label>
             <div class="info-icon" 
+                role="button"
+                tabindex="0"
                 on:mouseenter={() => activeTooltip = 'controlnetStrength'}
                 on:mouseleave={() => activeTooltip = null}>
               i
@@ -351,6 +357,8 @@
           <div class="label-container">
             <span class="form-label">Application Range</span>
             <div class="info-icon" 
+                role="button"
+                tabindex="0"
                 on:mouseenter={() => activeTooltip = 'percentRange'}
                 on:mouseleave={() => activeTooltip = null}>
               i
@@ -415,6 +423,8 @@
           <div class="label-container">
             <label for="negative-prompt">Negative Prompt</label>
             <div class="info-icon" 
+                role="button"
+                tabindex="0"
                 on:mouseenter={() => activeTooltip = 'negativePrompt'}
                 on:mouseleave={() => activeTooltip = null}>
               i
@@ -432,6 +442,8 @@
             <div class="label-container">
               <label for="steps">Steps</label>
               <div class="info-icon" 
+                  role="button"
+                  tabindex="0"
                   on:mouseenter={() => activeTooltip = 'steps'}
                   on:mouseleave={() => activeTooltip = null}>
                 i
@@ -453,6 +465,8 @@
             <div class="label-container">
               <label for="cfg">CFG</label>
               <div class="info-icon" 
+                  role="button"
+                  tabindex="0"
                   on:mouseenter={() => activeTooltip = 'cfg'}
                   on:mouseleave={() => activeTooltip = null}>
                 i
@@ -474,6 +488,8 @@
             <div class="label-container">
               <label for="seed">Seed</label>
               <div class="info-icon" 
+                  role="button"
+                  tabindex="0"
                   on:mouseenter={() => activeTooltip = 'seed'}
                   on:mouseleave={() => activeTooltip = null}>
                 i
@@ -573,7 +589,6 @@
                 <PromptResultCard 
                   prompt={result.prompt}
                   imageUrls={result.imageUrls}
-                  onEdit={(oldPrompt) => prompt = oldPrompt}
                   type="controlnet"
                 />
               </div>
@@ -680,7 +695,7 @@
     }
   }
   
-  h1, h2, h3 {
+  h1, h2 {
     font-family: 'IBM Plex Mono', monospace;
     color: #ffffff;
   }
@@ -1134,15 +1149,6 @@
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-top: none;
-  }
-  
-  .api-url-display h3 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #FCEA2B;
-    letter-spacing: 0.03em;
   }
   
   .url-box {
