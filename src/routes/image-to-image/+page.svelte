@@ -42,6 +42,9 @@
   let imageUrl: string | null = null;
   let error: string | null = null;
   
+  // Accordion state for API display
+  let showApiDisplay: boolean = false;
+  
   // Current user ID for reactive updates
   let currentUid: string | null = null;
   
@@ -412,17 +415,32 @@
           </div>
         </div>
         
-        <div class="api-url-display">
-          <h3>API Request</h3>
-          <div class="url-box">
-            <span class="method">POST</span> 
-            {`https://playground.transferscope.org/api/combine?cfg=${cfg}&steps=${steps}&seed=${seed}&uid=${$user.userid || 'default'}${prompt ? `&prompt=${encodeURIComponent(prompt)}` : ''}${negativePrompt ? `&negative_prompt=${encodeURIComponent(negativePrompt)}` : ''}`}
-            <div class="post-data">
-              <span class="post-label">Form Data:</span>
-              <span class="post-field">image1: {image1 ? image1.name : 'No image selected'}</span>
-              <span class="post-field">image2: {image2 ? image2.name : 'No image selected'}</span>
+        <!-- API URL Display with Accordion -->
+        <div class="api-accordion">
+          <button 
+            class="accordion-header" 
+            on:click={() => showApiDisplay = !showApiDisplay}
+            aria-expanded={showApiDisplay}
+          >
+            <span>API Request</span>
+            <svg class="accordion-icon" class:expanded={showApiDisplay} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          
+          {#if showApiDisplay}
+            <div class="api-url-display">
+              <div class="url-box">
+                <span class="method">POST</span> 
+                {`https://playground.transferscope.org/api/combine?cfg=${cfg}&steps=${steps}&seed=${seed}&uid=${$user.userid || 'default'}${prompt ? `&prompt=${encodeURIComponent(prompt)}` : ''}${negativePrompt ? `&negative_prompt=${encodeURIComponent(negativePrompt)}` : ''}`}
+                <div class="post-data">
+                  <span class="post-label">Form Data:</span>
+                  <span class="post-field">image1: {image1 ? image1.name : 'No image selected'}</span>
+                  <span class="post-field">image2: {image2 ? image2.name : 'No image selected'}</span>
+                </div>
+              </div>
             </div>
-          </div>
+          {/if}
         </div>
       </div>
       
@@ -885,14 +903,69 @@
     background-color: #ffe566;
   }
   
+  /* API Accordion Styles */
+  .api-accordion {
+    margin-top: 2rem;
+  }
+  
+  .accordion-header {
+    width: 100%;
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  
+  .accordion-header:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(252, 234, 43, 0.3);
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .accordion-header[aria-expanded="true"] {
+    border-radius: 6px 6px 0 0;
+    border-bottom-color: transparent;
+  }
+  
+  .accordion-icon {
+    width: 16px;
+    height: 16px;
+    transition: all 0.3s ease;
+    color: rgba(255, 255, 255, 0.5);
+    opacity: 0.8;
+  }
+  
+  .accordion-header:hover .accordion-icon {
+    color: #FCEA2B;
+    opacity: 1;
+  }
+  
+  .accordion-icon.expanded {
+    transform: rotate(180deg);
+    color: #FCEA2B;
+    opacity: 1;
+  }
+  
   /* API URL Display */
   .api-url-display {
-    margin-top: 2rem;
+    margin-top: 0;
     padding: 1.5rem;
     background-color: #262626;
-    border-radius: 10px;
+    border-radius: 0 0 8px 8px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
-    border-left: 3px solid #FCEA2B;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: none;
   }
   
   .api-url-display h3 {
