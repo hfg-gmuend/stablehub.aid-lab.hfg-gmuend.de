@@ -113,6 +113,25 @@
     align-items: center;
   }
 
+  /* Mobile Layout */
+  @media (max-width: 768px) {
+    .prompt-panel-component {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      gap: 1rem;
+      align-items: stretch;
+    }
+    
+    .generate-button-container {
+      width: 100%;
+    }
+    
+    .generate-button-container :global(button) {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
   .prompt-input-container {
     display: flex;
     flex-direction: column;
@@ -126,6 +145,14 @@
     gap: 0.75rem;
     margin-bottom: 0.5rem;
     flex-wrap: nowrap;
+  }
+  
+  /* Mobile Label Layout */
+  @media (max-width: 768px) {
+    .label-container {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
   }
 
   label {

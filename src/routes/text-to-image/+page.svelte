@@ -550,13 +550,16 @@
     min-height: 100vh;
     background-color: #121212;
     color: #e0e0e0;
+    align-items: center; /* Vertical centering */
   }
   
   main {
     flex: 1;
-    padding: 1rem; /* Konsistentes Padding für besseren Abstand ohne NavigationBar */
+    padding: 0rem 1rem 0rem 1rem;
     display: flex;
     flex-direction: column;
+    height: 100vh;
+    justify-content: center;
   }
 
   /* Mobile Responsive */
@@ -628,7 +631,8 @@
     }
     
     main {
-      padding-bottom: 120px; /* Add bottom padding for fixed prompt panel */
+      padding: 80px 1rem 120px 1rem; /* Add bottom padding only on mobile */
+      min-height: calc(100vh - 80px);
     }
     
     .content-wrapper {
