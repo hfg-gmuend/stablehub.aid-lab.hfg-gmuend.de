@@ -615,14 +615,14 @@
 
 <!-- Image Overlay -->
 {#if showImageOverlay && currentImage}
-  <div class="image-overlay" on:click={closeImageOverlay} on:keydown={handleKeydown} role="dialog" aria-modal="true" tabindex="-1">>
+  <div class="image-overlay" on:click={closeImageOverlay} on:keydown={handleKeydown} role="dialog" aria-modal="true" tabindex="-1">
     <div class="overlay-background"></div>
     
     <!-- Overlay Layout Container -->
     <div class="overlay-layout">
       <!-- Left Navigation Button -->
       {#if currentImageIndex > 0}
-        <button class="nav-button nav-prev" on:click|stopPropagation={prevImage} aria-label="Previous image">>
+        <button class="nav-button nav-prev" on:click|stopPropagation={prevImage} aria-label="Previous image">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M15 18l-6-6 6-6"/>
           </svg>
@@ -632,7 +632,7 @@
       {/if}
       
       <!-- Main Content -->
-      <div class="overlay-content" role="main" tabindex="-1">>
+      <div class="overlay-content" role="main" tabindex="-1">
         <div class="overlay-image-container">
           <img 
             src={currentImage.imageUrl} 
@@ -720,7 +720,7 @@
       
       <!-- Right Navigation Button -->
       {#if currentImageIndex < galleryItems.length - 1}
-        <button class="nav-button nav-next" on:click|stopPropagation={nextImage} aria-label="Next image">>
+        <button class="nav-button nav-next" on:click|stopPropagation={nextImage} aria-label="Next image">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 18l6-6-6-6"/>
           </svg>
@@ -732,7 +732,7 @@
     
     <!-- Close Button -->
     <div class="overlay-close-container">
-      <button class="close-button" on:click={closeImageOverlay} aria-label="Close fullscreen view">>
+      <button class="close-button" on:click={closeImageOverlay} aria-label="Close fullscreen view">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M18 6L6 18M6 6l12 12"/>
         </svg>
@@ -1406,11 +1406,15 @@
     display: flex;
     gap: 0.75rem;
     flex-wrap: wrap;
+    margin-top: 1rem;
+    align-items: center;
+    justify-content: flex-start;
   }
   
   .overlay-action-button {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
     border: none;
@@ -1422,28 +1426,165 @@
     transition: all 0.2s ease;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    position: relative;
+    z-index: 10;
+    white-space: nowrap;
+    min-height: 44px; /* Touch-friendly minimum */
+    user-select: none;
   }
   
+  .overlay-action-button img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+  
+  /* 🟨 COPY PROMPT Button - Hellgelb (#FFE033), hoher Kontrast */
   .copy-btn {
-    background: linear-gradient(135deg, #FCEA2B, #FFE566);
-    color: #121212;
-    border: 1px solid rgba(252, 234, 43, 0.3);
+    background: #FFE033;
+    color: #000000;
+    border: 2px solid #FFE033;
+    font-weight: 700; /* Bold */
   }
   
+  .copy-btn img {
+    filter: brightness(0) saturate(100%) invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%); /* Schwarzes Icon */
+  }
+  
+  .copy-btn:hover {
+    background: #E6C82D;
+    border-color: #E6C82D;
+    color: #000000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(255, 224, 51, 0.4);
+  }
+  
+  .copy-btn:hover img {
+    filter: brightness(0) saturate(100%) invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%); /* Bleibt schwarz */
+  }
+  
+  /* 🟡 DOWNLOAD Button - Transparent mit olive-gelbem Rand (#D9C300) */
   .download-btn {
-    background: linear-gradient(135deg, #4caf50, #81e785);
-    color: #121212;
-    border: 1px solid rgba(76, 175, 80, 0.3);
+    background: transparent;
+    color: #D9C300;
+    border: 1px solid #D9C300; /* Dünner Rand wie bei overlay-counter */
+    font-weight: 700; /* Bold */
   }
   
+  .download-btn img {
+    filter: brightness(0) saturate(100%) invert(82%) sepia(85%) saturate(2097%) hue-rotate(41deg) brightness(96%) contrast(97%); /* Gelbes Icon passend zu #D9C300 */
+  }
+  
+  .download-btn:hover {
+    background: rgba(217, 195, 0, 0.1);
+    border-color: #F0D400;
+    color: #F0D400;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 12px rgba(217, 195, 0, 0.3);
+  }
+  
+  .download-btn:hover img {
+    filter: brightness(0) saturate(100%) invert(88%) sepia(67%) saturate(447%) hue-rotate(42deg) brightness(96%) contrast(95%); /* Heller olive-gelb im Hover */
+  }
+  
+  /* ⬛ REMOVE Button - Dunkelgrau/schwarz, sekundäre Aktion */
   .remove-btn {
-    background: linear-gradient(135deg, #f44336, #ff7961);
-    color: #121212;
-    border: 1px solid rgba(244, 67, 54, 0.3);
+    background: rgba(40, 40, 40, 0.8);
+    color: #999999;
+    border: 1px solid #555555;
+    font-weight: 400; /* Normale Schriftstärke */
   }
   
-  .overlay-action-button:hover {
-    filter: brightness(1.1);
+  .remove-btn img {
+    filter: brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%); /* Hellgraues Icon */
+  }
+  
+  .remove-btn:hover {
+    background: rgba(50, 50, 50, 0.9);
+    border-color: #666666;
+    color: #BBBBBB;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .remove-btn:hover img {
+    filter: brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%); /* Etwas helleres Grau */
+  }
+  
+  /* Allgemeine Active-States für alle Action Buttons */
+  .overlay-action-button:active {
+    transform: translateY(0);
+  }
+  
+  /* Navigation Buttons */
+  .nav-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(30, 30, 30, 0.8);
+    color: #FCEA2B;
+    border: 2px solid rgba(252, 234, 43, 0.3);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1001;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+  
+  .nav-button:hover {
+    background: rgba(252, 234, 43, 0.9);
+    color: #121212;
+    border-color: #FCEA2B;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 4px 20px rgba(252, 234, 43, 0.4);
+  }
+  
+  .nav-button:active {
+    background: #E6C82D;
+    transform: translateY(-50%) scale(1.05);
+  }
+  
+  .nav-prev {
+    left: 120px;
+  }
+  
+  .nav-next {
+    right: 120px;
+  }
+  
+  /* Close Button */
+  .close-button {
+    background: rgba(30, 30, 30, 0.8);
+    color: #FCEA2B;
+    border: 2px solid rgba(252, 234, 43, 0.3);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+  
+  .close-button:hover {
+    background: rgba(252, 234, 43, 0.9);
+    color: #121212;
+    border-color: #FCEA2B;
+    transform: scale(1.1);
+    box-shadow: 0 4px 20px rgba(252, 234, 43, 0.4);
+  }
+  
+  .close-button:active {
+    background: #E6C82D;
+    transform: scale(1.05);
   }
   
   /* Mobile Styles for Overlay */
@@ -1451,10 +1592,49 @@
     .overlay-info {
       min-width: auto;
       width: 100%;
+      padding: 1rem;
     }
     
     .prompt-text {
       font-size: 0.8rem;
+    }
+    
+    .overlay-actions {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+    }
+    
+    .overlay-action-button {
+      width: 100%;
+      justify-content: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+    }
+    
+    .overlay-action-button img {
+      width: 18px;
+      height: 18px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .overlay-content {
+      max-width: 95vw;
+      max-height: 95vh;
+    }
+    
+    .overlay-info {
+      min-width: auto;
+    }
+    
+    .overlay-actions {
+      gap: 0.5rem;
+    }
+    
+    .overlay-action-button {
+      font-size: 0.75rem;
+      padding: 0.6rem 0.8rem;
     }
   }
 </style>
