@@ -174,18 +174,31 @@ class VoteService {
 
   /**
    * Top bewertete Bilder abrufen
-   * @param {number} limit 
-   * @param {string} period 
-   * @returns {Promise<any[]>}
+   * @param {number} limit - Anzahl der Top-Ergebnisse (1-100, Standard: 20)
+   * @param {string} period - Zeitraum für Top-Votes ('week', 'month', 'total', Standard: 'total')
+   * @returns {Promise<Array<{imageUrl: string, votes: number, prompt: string}>>} Array mit Top-Bildern
    */
   async getTopImages(limit = 20, period = 'total') {
+    // Parameter validieren
+    const validPeriods = ['week', 'month', 'total'];
+    if (!validPeriods.includes(period)) {
+      console.warn(`[VoteService] Invalid period '${period}', using 'total'`);
+      period = 'total';
+    }
+    
+    // Limit validieren (API-Limits: 1-100)
+    limit = Math.max(1, Math.min(100, parseInt(limit) || 20));
+    
     if (!this.isApiAvailable) {
       console.log('[VoteService] Mock: No top images (API unavailable)');
       return []; // Mock empty result
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}/votes/top?limit=${limit}&period=${period}`, {
+      const url = `${this.baseUrl}/votes/top?limit=${limit}&period=${period}`;
+      console.log(`[VoteService] Fetching top ${limit} images for period '${period}'`);
+      
+      const response = await fetch(url, {
         mode: 'cors'
       });
       
@@ -199,7 +212,9 @@ class VoteService {
         throw new Error(`Failed to get top images: ${response.status} ${errorText}`);
       }
 
-      return await response.json();
+      const topImages = await response.json();
+      console.log(`[VoteService] Successfully loaded ${topImages.length} top images for period '${period}'`);
+      return topImages;
     } catch (error) {
       if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
         console.warn('[VoteService] CORS or network error, switching to mock mode');

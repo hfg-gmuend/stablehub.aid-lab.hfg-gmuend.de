@@ -1,4 +1,7 @@
 <script>
+  import { onMount } from 'svelte';
+  import { voteService } from '../api/voteService.js';
+  
   export let visible = false;
   
   // Props für dynamische Inhalte (bereit für API-Integration)
@@ -16,6 +19,49 @@
     { icon: '⭐', label: 'Portfolio Feature' },
     { icon: '🎯', label: 'Creative Mentoring' }
   ];
+
+  // Zustand für das Top-Bild
+  let topImage = null;
+  let loading = true;
+  let error = null;
+
+  /**
+   * Lädt das Bild mit den meisten Votes
+   */
+  async function loadTopImage() {
+    try {
+      loading = true;
+      error = null;
+      
+      console.log('[MonthlySpotlight] Loading top image...');
+      
+      // Da 'month' und 'week' 500-Fehler werfen, verwenden wir 'total'
+      const topImages = await voteService.getTopImages(1, 'total');
+      
+      if (topImages && topImages.length > 0) {
+        topImage = topImages[0];
+        console.log('[MonthlySpotlight] Top image loaded:', topImage);
+        
+        // Wenn kein featuredImageUrl gesetzt ist, verwende das Top-Bild
+        if (!featuredImageUrl && topImage.imageUrl) {
+          featuredImageUrl = topImage.imageUrl;
+        }
+      } else {
+        console.log('[MonthlySpotlight] No top images found');
+      }
+      
+    } catch (err) {
+      error = err.message;
+      console.error('[MonthlySpotlight] Error loading top image:', err);
+    } finally {
+      loading = false;
+    }
+  }
+
+  // Beim Mount das Top-Bild laden
+  onMount(() => {
+    loadTopImage();
+  });
 </script>
 
 <!-- Featured Monthly Winner -->
@@ -38,8 +84,34 @@
   <div class="spotlight-content">
     <div class="spotlight-main">
       <div class="spotlight-image">
-        {#if featuredImageUrl}
-          <img src={featuredImageUrl} alt="Featured artwork by {winnerName}" />
+        {#if loading}
+          <div class="image-placeholder loading">
+            <span>Loading top image...</span>
+            <div class="glow-effect"></div>
+          </div>
+        {:else if error}
+          <div class="image-placeholder error">
+            <span>⚠️ Could not load image</span>
+            <div class="error-text">{error}</div>
+          </div>
+        {:else if featuredImageUrl || topImage?.imageUrl}
+          <img 
+            src={featuredImageUrl || topImage.imageUrl} 
+            alt="Featured artwork{topImage?.prompt ? ` - ${topImage.prompt}` : ''}" 
+          />
+          {#if topImage && topImage.votes}
+            <div class="image-overlay">
+              <div class="vote-badge">
+                <span class="vote-icon">❤️</span>
+                <span class="vote-count">{topImage.votes}</span>
+              </div>
+              {#if topImage.prompt}
+                <div class="prompt-badge">
+                  "{topImage.prompt}"
+                </div>
+              {/if}
+            </div>
+          {/if}
         {:else}
           <div class="image-placeholder">
             <span>Your creation here</span>
@@ -178,26 +250,90 @@
     overflow: hidden;
   }
 
+  .image-placeholder.loading {
+    border-color: rgba(252, 234, 43, 0.4);
+    background: rgba(252, 234, 43, 0.02);
+  }
+
+  .image-placeholder.error {
+    border-color: rgba(255, 100, 100, 0.4);
+    background: rgba(255, 100, 100, 0.02);
+    color: #ff6b6b;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .error-text {
+    font-size: 0.8rem;
+    color: #ff8888;
+    text-align: center;
+    max-width: 80%;
+  }
+
+  .image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      180deg, 
+      transparent 0%, 
+      transparent 50%, 
+      rgba(0, 0, 0, 0.7) 100%
+    );
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .spotlight-image:hover .image-overlay {
+    opacity: 1;
+  }
+
+  .vote-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 0.5rem 0.8rem;
+    border-radius: 20px;
+    margin-bottom: 0.5rem;
+    width: fit-content;
+    backdrop-filter: blur(10px);
+  }
+
+  .vote-icon {
+    font-size: 1.1rem;
+  }
+
+  .vote-count {
+    font-weight: 600;
+    color: #fff;
+    font-size: 0.9rem;
+  }
+
+  .prompt-badge {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #e0e0e0;
+    line-height: 1.3;
+    backdrop-filter: blur(10px);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .image-placeholder:hover {
     border-color: rgba(252, 234, 43, 0.4);
     background: rgba(255, 255, 255, 0.05);
-  }
-
-  .glow-effect {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100px;
-    height: 100px;
-    background: radial-gradient(circle, rgba(252, 234, 43, 0.1) 0%, transparent 70%);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    animation: glowPulse 3s ease-in-out infinite;
-  }
-
-  @keyframes glowPulse {
-    0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
-    50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.2); }
   }
 
   .spotlight-info h4 {
