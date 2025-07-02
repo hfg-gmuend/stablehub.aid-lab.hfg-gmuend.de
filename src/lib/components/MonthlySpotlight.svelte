@@ -6,11 +6,32 @@
   
   // Props für dynamische Inhalte (bereit für API-Integration)
   export let featuredImageUrl = '';
-  export let winnerName = '';
   export let prizeAmount = '50€';
-  export let countdownDays = '12 days';
   export let awardTitle = 'Creative Excellence Award';
   export let awardDescription = 'Submit your best AI artwork and compete for recognition, prizes, and campus exhibition.';
+  
+  // Dynamische Berechnung der verbleibenden Tage bis Monatsende
+  let daysUntilMonthEnd = 0;
+  
+  function calculateDaysUntilMonthEnd() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    
+    // Letzter Tag des aktuellen Monats
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+    
+    // Berechne die Differenz in Millisekunden und wandle in Tage um
+    const timeDiff = lastDayOfMonth.getTime() - now.getTime();
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    
+    return daysDiff;
+  }
+  
+  // Aktualisiere die Tage-Anzeige
+  function updateCountdown() {
+    daysUntilMonthEnd = calculateDaysUntilMonthEnd();
+  }
   
   // Features-Array für einfache Anpassung
   export let features = [
@@ -21,8 +42,10 @@
   ];
 
   // Zustand für das Top-Bild
+  /** @type {any} */
   let topImage = null;
   let loading = true;
+  /** @type {string | null} */
   let error = null;
 
   /**
@@ -51,16 +74,36 @@
       }
       
     } catch (err) {
-      error = err.message;
+      error = err instanceof Error ? err.message : 'An unknown error occurred';
       console.error('[MonthlySpotlight] Error loading top image:', err);
     } finally {
       loading = false;
     }
   }
 
-  // Beim Mount das Top-Bild laden
+  // Beim Mount das Top-Bild laden und Countdown initialisieren
   onMount(() => {
     loadTopImage();
+    updateCountdown();
+    
+    // Aktualisiere den Countdown täglich um Mitternacht
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    
+    const msUntilMidnight = tomorrow.getTime() - now.getTime();
+    
+    // Erste Aktualisierung um Mitternacht
+    setTimeout(() => {
+      updateCountdown();
+      
+      // Dann täglich aktualisieren
+      const dailyInterval = setInterval(updateCountdown, 24 * 60 * 60 * 1000);
+      
+      // Cleanup function für das Interval
+      return () => clearInterval(dailyInterval);
+    }, msUntilMidnight);
   });
 </script>
 
@@ -134,7 +177,9 @@
 
         <div class="submission-countdown">
           <div class="countdown-label">Submissions close in:</div>
-          <div class="countdown-timer">{countdownDays}</div>
+          <div class="countdown-timer">
+            {daysUntilMonthEnd} {daysUntilMonthEnd === 1 ? 'day' : 'days'}
+          </div>
         </div>
       </div>
     </div>
