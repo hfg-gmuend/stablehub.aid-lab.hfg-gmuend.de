@@ -4,6 +4,7 @@
   import TutorialHighlightCard from "$lib/components/uicomponents/TutorialHighlightCard.svelte";
   import CommunityFlow from "$lib/components/CommunityFlow.svelte";
   import PartnerLogos from "$lib/components/PartnerLogos.svelte";
+  import FloatingParticles from "$lib/components/FloatingParticles.svelte";
   import { base, assets } from '$app/paths';
   import { onMount } from 'svelte';
 
@@ -144,11 +145,7 @@
 
   <main class:expanded={sidebarCollapsed}>
     <!-- Floating particles background -->
-    <div class="particles">
-      {#each Array(6) as _, i}
-        <div class="particle" style="--delay: {i * 0.5}s; --duration: {8 + i * 2}s;"></div>
-      {/each}
-    </div>
+    <FloatingParticles />
 
     <!-- Enhanced Hero Section with Neural Network and Hologram Effects -->
     <div class="hero-container" class:visible={titleVisible}>
@@ -479,50 +476,6 @@
     height: 20px;
   }
 
-  /* Floating Particles Background */
-  .particles {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .particle {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: linear-gradient(45deg, #FCEA2B, rgba(252, 234, 43, 0.3));
-    border-radius: 50%;
-    animation: float var(--duration, 10s) infinite ease-in-out;
-    animation-delay: var(--delay, 0s);
-    opacity: 0.6;
-  }
-
-  .particle:nth-child(1) { top: 20%; left: 10%; }
-  .particle:nth-child(2) { top: 60%; left: 20%; }
-  .particle:nth-child(3) { top: 30%; left: 80%; }
-  .particle:nth-child(4) { top: 80%; left: 70%; }
-  .particle:nth-child(5) { top: 50%; left: 50%; }
-  .particle:nth-child(6) { top: 10%; left: 90%; }
-
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0px) translateX(0px) scale(1);
-      opacity: 0.6;
-    }
-    33% {
-      transform: translateY(-20px) translateX(10px) scale(1.1);
-      opacity: 0.8;
-    }
-    66% {
-      transform: translateY(10px) translateX(-5px) scale(0.9);
-      opacity: 0.4;
-    }
-  }
-  
   /* Enhanced Hero Section */
   .hero-container {
     position: relative;
@@ -830,56 +783,6 @@
   @keyframes orbFloat {
     0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
     50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.6; }
-  }
-
-  /* Enhanced Particle Animations */
-  /* Enhanced Particle Animations */
-  .particles {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .particle {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    background: linear-gradient(45deg, #FCEA2B, rgba(252, 234, 43, 0.4));
-    border-radius: 50%;
-    animation: float var(--duration, 12s) infinite ease-in-out;
-    animation-delay: var(--delay, 0s);
-    opacity: 0.8;
-    box-shadow: 0 0 10px rgba(252, 234, 43, 0.3);
-  }
-
-  .particle:nth-child(1) { top: 15%; left: 10%; }
-  .particle:nth-child(2) { top: 65%; left: 15%; }
-  .particle:nth-child(3) { top: 25%; left: 85%; }
-  .particle:nth-child(4) { top: 85%; left: 75%; }
-  .particle:nth-child(5) { top: 45%; left: 50%; }
-  .particle:nth-child(6) { top: 5%; left: 90%; }
-
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0px) translateX(0px) scale(1) rotate(0deg);
-      opacity: 0.8;
-    }
-    25% {
-      transform: translateY(-30px) translateX(15px) scale(1.2) rotate(90deg);
-      opacity: 1;
-    }
-    50% {
-      transform: translateY(-10px) translateX(-20px) scale(0.8) rotate(180deg);
-      opacity: 0.6;
-    }
-    75% {
-      transform: translateY(20px) translateX(10px) scale(1.1) rotate(270deg);
-      opacity: 0.9;
-    }
   }
 
   /* Main Features Section */
