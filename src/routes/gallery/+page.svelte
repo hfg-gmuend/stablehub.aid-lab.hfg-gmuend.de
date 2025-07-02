@@ -1,16 +1,33 @@
 <script>
   import MinimalSidebar from "$lib/components/uicomponents/SidePanel/MinimalSidebar.svelte";
+  import LikeButton from "$lib/components/LikeButton.svelte";
+  import GalleryFilters from "$lib/components/GalleryFilters.svelte";
   import { serverImages } from '$lib/stores/serverImages.js';
   import { user } from '$lib/stores/user.js';
+  import { voteService } from '$lib/api/voteService.js';
   import { onMount } from 'svelte';
   import { toast } from '$lib/stores/toastStore.js';
   
   // Zustand für die Gallery
   /** @type {any[]} */
   let galleryItems = [];
+  /** @type {any[]} */
+  let filteredGalleryItems = [];
   let loading = true;
   /** @type {string | null} */
   let error = null;
+  
+  // Vote-System State
+  /** @type {Map<string, boolean>} */
+  let userVotes = new Map(); // imageUrl -> boolean (liked/not liked)
+  /** @type {Map<string, number>} */
+  let voteCounts = new Map(); // imageUrl -> count
+  /** @type {Set<string>} */
+  let votingInProgress = new Set(); // imageUrls currently being voted on
+  
+  // Filter State
+  /** @type {'all' | 'my' | 'liked' | 'newest'} */
+  let activeFilter = 'all';
   
   // Set für Bilder, die gerade gelöscht werden
   /** @type {Set<string>} */
@@ -59,6 +76,12 @@
       
       console.log("Gallery loaded:", galleryItems.length, "valid items (from", rawGalleryItems.length, "total)");
       
+      // Vote-Daten laden
+      await loadVoteData();
+      
+      // Filter anwenden
+      applyFilter();
+      
       // Zusätzliche Bereinigung nach dem Laden
       cleanGalleryData();
     } catch (err) {
@@ -68,12 +91,124 @@
       loading = false;
     }
   }
-  
-  // Beim Mounten der Komponente
-  onMount(async () => {
-    await loadGallery();
-  });
-  
+
+  // Vote-System Funktionen
+  async function loadVoteData() {
+    try {
+      console.log('[Gallery] Loading vote data...');
+      
+      // Verwende vollständige imageUrls statt extrahierte IDs
+      const imageUrls = galleryItems.map(item => item.imageUrl).filter(url => url);
+      
+      if (imageUrls.length === 0) {
+        console.log('[Gallery] No images to load votes for');
+        return;
+      }
+      
+      // Lade Vote-Counts für alle Bilder (mit imageUrls als "imageId")
+      // getBatchVoteStats lädt jetzt User-Votes nur EINMAL intern
+      const voteStatsMap = await voteService.getBatchVoteStats(imageUrls, $user.userid || undefined);
+      
+      // ENTFERNT: Separater getUserVotes Aufruf da das bereits in getBatchVoteStats passiert
+      // Das reduziert API-Calls von 66+ auf nur 1!
+      
+      // Vote-Maps aktualisieren
+      voteCounts.clear();
+      userVotes.clear();
+      
+      voteStatsMap.forEach((stats, imageUrl) => {
+        voteCounts.set(imageUrl, stats.totalVotes);
+        userVotes.set(imageUrl, stats.userHasVoted);
+      });
+      
+      // Trigger reactivity
+      voteCounts = voteCounts;
+      userVotes = userVotes;
+      
+      console.log('[Gallery] Vote data loaded:', {
+        voteCounts: voteCounts.size,
+        userVotes: userVotes.size
+      });
+      
+    } catch (error) {
+      console.error('[Gallery] Error loading vote data:', error);
+      // Nicht kritisch, weiter machen
+    }
+  }
+
+  /** @param {any} imageUrl */
+  function extractImageId(imageUrl) {
+    if (!imageUrl || typeof imageUrl !== 'string') return null;
+    
+    try {
+      const url = new URL(imageUrl);
+      const pathname = url.pathname;
+      const filename = pathname.split('/').pop();
+      
+      if (filename) {
+        // Entferne Dateiendung
+        return filename.replace(/\.(jpg|jpeg|png|webp)$/i, '');
+      }
+      
+      return null;
+    } catch (error) {
+      console.warn('[Gallery] Error extracting image ID from URL:', imageUrl, error);
+      return null;
+    }
+  }
+
+  /** @param {any} event */
+  async function handleVoteToggle(event) {
+    const { imageId, isLiked } = event.detail;
+    
+    if (!$user.userid || $user.userid === 'default') {
+      toast.error('Please log in to like images');
+      return;
+    }
+    
+    // imageId ist hier eigentlich die imageUrl
+    const imageUrl = imageId;
+    
+    if (votingInProgress.has(imageUrl)) {
+      return; // Already processing
+    }
+    
+    try {
+      votingInProgress.add(imageUrl);
+      votingInProgress = votingInProgress;
+      
+      if (isLiked) {
+        // Remove vote
+        await voteService.removeVote(imageUrl, $user.userid);
+        userVotes.delete(imageUrl);
+        voteCounts.set(imageUrl, Math.max(0, (voteCounts.get(imageUrl) || 0) - 1));
+        toast.success('Removed like');
+      } else {
+        // Add vote
+        await voteService.addVote(imageUrl, $user.userid);
+        userVotes.set(imageUrl, true);
+        voteCounts.set(imageUrl, (voteCounts.get(imageUrl) || 0) + 1);
+        toast.success('Added like');
+      }
+      
+      // Trigger reactivity
+      userVotes = userVotes;
+      voteCounts = voteCounts;
+      
+      // Filter neu anwenden falls nötig
+      if (activeFilter === 'liked') {
+        applyFilter();
+      }
+      
+    } catch (error) {
+      console.error('[Gallery] Error toggling vote:', error);
+      toast.error('Failed to update like: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    } finally {
+      votingInProgress.delete(imageUrl);
+      votingInProgress = votingInProgress;
+    }
+  }
+
   // Funktion zum Bereinigen der Galerie-Daten
   function cleanGalleryData() {
     const originalLength = galleryItems.length;
@@ -97,12 +232,22 @@
     }
   }
   
-  // Reaktion auf UID-Änderungen
+  // Beim Mounten der Komponente
+  onMount(async () => {
+    await loadGallery();
+  });
+  
+  // Reaktive Statements
   $: {
     if (currentUid) {
       console.log("[Gallery] UID changed to:", currentUid);
       loadGallery();
     }
+  }
+
+  // Automatisch Filter anwenden wenn sich die Gallery Items ändern
+  $: if (galleryItems.length > 0) {
+    applyFilter();
   }
   
   // Funktion zum Kopieren des Prompts in die Zwischenablage
@@ -270,6 +415,54 @@
         break;
     }
   }
+  
+  // Funktion zum Behandeln von Filteränderungen
+  /** @param {CustomEvent} event */
+  function handleFilterChange(event) {
+    activeFilter = event.detail;
+    applyFilter();
+  }
+
+  // Funktion zum Anwenden des Filters
+  function applyFilter() {
+    let filtered = [...galleryItems];
+    
+    switch (activeFilter) {
+      case 'my':
+        if ($user.userid && $user.userid !== 'default') {
+          filtered = filtered.filter(item => item.userid === $user.userid);
+        } else {
+          filtered = [];
+        }
+        break;
+        
+      case 'liked':
+        // Sortiere nach Vote-Count (absteigend)
+        filtered = filtered.sort((a, b) => {
+          const aCount = voteCounts.get(a.imageUrl) || 0;
+          const bCount = voteCounts.get(b.imageUrl) || 0;
+          return bCount - aCount;
+        });
+        break;
+        
+      case 'newest':
+        // Sortiere nach Timestamp (neueste zuerst)
+        filtered = filtered.sort((a, b) => {
+          return new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime();
+        });
+        break;
+        
+      default: // 'all'
+        // Standard-Sortierung (neueste zuerst)
+        filtered = filtered.sort((a, b) => {
+          return new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime();
+        });
+        break;
+    }
+    
+    filteredGalleryItems = filtered;
+    console.log(`[Gallery] Applied filter '${activeFilter}': ${filtered.length} items`);
+  }
 </script>
 
 <svelte:head>
@@ -310,6 +503,13 @@
         </div>
       </div>
       
+      <!-- Gallery Filters -->
+      <GalleryFilters 
+        {activeFilter}
+        isLoggedIn={Boolean($user.userid && $user.userid !== 'default')}
+        on:filterChange={handleFilterChange}
+      />
+      
       {#if loading}
         <div class="loading-state">
           <div class="spinner"></div>
@@ -320,13 +520,21 @@
           <p>Error loading gallery: {error}</p>
           <button on:click={loadGallery} class="retry-button">Retry</button>
         </div>
-      {:else if galleryItems.length === 0}
+      {:else if filteredGalleryItems.length === 0}
         <div class="empty-gallery">
-          <p>No favorite images yet. Generate images and mark them as favorites to see them here.</p>
+          {#if activeFilter === 'my' && (!$user.userid || $user.userid === 'default')}
+            <p>Please log in to see your favorite images.</p>
+          {:else if activeFilter === 'my'}
+            <p>You haven't added any images to your favorites yet.</p>
+          {:else if activeFilter === 'liked'}
+            <p>No highly liked images found.</p>
+          {:else}
+            <p>No favorite images yet. Generate images and mark them as favorites to see them here.</p>
+          {/if}
         </div>
       {:else}
         <div class="image-grid">
-          {#each galleryItems as galleryItem, index (galleryItem.uniqueKey)}
+          {#each filteredGalleryItems as galleryItem, index (galleryItem.uniqueKey)}
             <div class="gallery-item" class:deleting={deletingImages.has(galleryItem.uniqueKey)}>
               {#if deletingImages.has(galleryItem.uniqueKey)}
                 <!-- Loading Placeholder während des Löschens -->
@@ -335,19 +543,36 @@
                   <p>Deleting...</p>
                 </div>
               {:else}
-                <img 
-                  src={galleryItem.imageUrl} 
-                  alt="Favorite image" 
-                  class="gallery-image"
-                  on:error={handleImageError}
+                <button 
+                  class="gallery-image-button"
                   on:click={() => openImageOverlay(galleryItem, index)}
-                />
+                  aria-label="View image in fullscreen"
+                >
+                  <img 
+                    src={galleryItem.imageUrl} 
+                    alt={galleryItem.prompt || 'Generated image'} 
+                    class="gallery-image"
+                    on:error={handleImageError}
+                  />
+                </button>
               {/if}
               
               <!-- User Info Badge - bleibt immer sichtbar -->
               <div class="user-badge">
                 <span class="user-id">{galleryItem.userid}</span>
                 <span class="image-type">{galleryItem.type || 'text-to-image'}</span>
+              </div>
+              
+              <!-- Like-Button - oben links -->
+              <div class="like-button-container">
+                <LikeButton
+                  imageId={galleryItem.imageUrl}
+                  isLiked={userVotes.get(galleryItem.imageUrl) || false}
+                  likeCount={voteCounts.get(galleryItem.imageUrl) || 0}
+                  loading={votingInProgress.has(galleryItem.imageUrl)}
+                  disabled={deletingImages.has(galleryItem.uniqueKey)}
+                  on:toggle={handleVoteToggle}
+                />
               </div>
               
               <!-- Action-Buttons - nur diese erscheinen beim Hover -->
@@ -390,14 +615,14 @@
 
 <!-- Image Overlay -->
 {#if showImageOverlay && currentImage}
-  <div class="image-overlay" on:click={closeImageOverlay}>
+  <div class="image-overlay" on:click={closeImageOverlay} on:keydown={handleKeydown} role="dialog" aria-modal="true" tabindex="-1">>
     <div class="overlay-background"></div>
     
     <!-- Overlay Layout Container -->
     <div class="overlay-layout">
       <!-- Left Navigation Button -->
       {#if currentImageIndex > 0}
-        <button class="nav-button nav-prev" on:click|stopPropagation={prevImage}>
+        <button class="nav-button nav-prev" on:click|stopPropagation={prevImage} aria-label="Previous image">>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M15 18l-6-6 6-6"/>
           </svg>
@@ -407,7 +632,7 @@
       {/if}
       
       <!-- Main Content -->
-      <div class="overlay-content" on:click|stopPropagation>
+      <div class="overlay-content" role="main" tabindex="-1">>
         <div class="overlay-image-container">
           <img 
             src={currentImage.imageUrl} 
@@ -495,7 +720,7 @@
       
       <!-- Right Navigation Button -->
       {#if currentImageIndex < galleryItems.length - 1}
-        <button class="nav-button nav-next" on:click|stopPropagation={nextImage}>
+        <button class="nav-button nav-next" on:click|stopPropagation={nextImage} aria-label="Next image">>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 18l6-6-6-6"/>
           </svg>
@@ -507,7 +732,7 @@
     
     <!-- Close Button -->
     <div class="overlay-close-container">
-      <button class="close-button" on:click={closeImageOverlay}>
+      <button class="close-button" on:click={closeImageOverlay} aria-label="Close fullscreen view">>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M18 6L6 18M6 6l12 12"/>
         </svg>
@@ -813,7 +1038,24 @@
     transition: transform 0.2s ease;
   }
   
-  .gallery-image:hover {
+  .gallery-image-button {
+    width: 100%;
+    height: 100%;
+    border: none;
+    padding: 0;
+    background: none;
+    cursor: pointer;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  
+  .gallery-image-button:focus {
+    outline: 2px solid #FCEA2B;
+    outline-offset: 2px;
+  }
+  
+  .gallery-image:hover,
+  .gallery-image-button:hover .gallery-image {
     transform: scale(1.02);
   }
   
@@ -825,6 +1067,14 @@
     flex-direction: column;
     gap: 0.25rem;
     align-items: flex-end;
+    z-index: 20;
+  }
+  
+  /* Like-Button Container */
+  .like-button-container {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
     z-index: 20;
   }
   
@@ -1177,182 +1427,34 @@
   .copy-btn {
     background: linear-gradient(135deg, #FCEA2B, #FFE566);
     color: #121212;
-    border: 1px solid rgba(252, 234, 43, 0.6);
-  }
-  
-  .copy-btn:hover {
-    background: linear-gradient(135deg, #FFE566, #FFED80);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(252, 234, 43, 0.4);
+    border: 1px solid rgba(252, 234, 43, 0.3);
   }
   
   .download-btn {
-    background: rgba(252, 234, 43, 0.15);
-    color: #FCEA2B;
-    border: 1px solid rgba(252, 234, 43, 0.5);
-  }
-  
-  .download-btn:hover {
-    background: rgba(252, 234, 43, 0.25);
-    color: #FFE566;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(252, 234, 43, 0.3);
+    background: linear-gradient(135deg, #4caf50, #81e785);
+    color: #121212;
+    border: 1px solid rgba(76, 175, 80, 0.3);
   }
   
   .remove-btn {
-    background: rgba(180, 180, 180, 0.15);
-    color: #b4b4b4;
-    border: 1px solid rgba(180, 180, 180, 0.4);
-  }
-  
-  .remove-btn:hover {
-    background: rgba(200, 200, 200, 0.25);
-    color: #d4d4d4;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(180, 180, 180, 0.2);
-  }
-  
-  .overlay-action-button img {
-    width: 16px;
-    height: 16px;
-  }
-  
-  .copy-btn img {
-    filter: brightness(0) saturate(100%) invert(8%) sepia(8%) saturate(1265%) hue-rotate(314deg) brightness(95%) contrast(92%);
-  }
-  
-  .download-btn img {
-    filter: brightness(0) saturate(100%) invert(85%) sepia(100%) saturate(348%) hue-rotate(4deg) brightness(105%) contrast(96%);
-  }
-  
-  .remove-btn img {
-    filter: brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(1%) hue-rotate(149deg) brightness(87%) contrast(86%);
-  }
-  
-  /* Navigation Buttons */
-  .nav-button {
-    position: relative;
-    z-index: 1002;
-    background: rgba(30, 30, 30, 0.9);
-    border: 2px solid rgba(252, 234, 43, 0.5);
-    color: #FCEA2B;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-    flex-shrink: 0;
-  }
-  
-  .nav-button:hover {
-    background: rgba(252, 234, 43, 0.9);
+    background: linear-gradient(135deg, #f44336, #ff7961);
     color: #121212;
-    transform: scale(1.1);
-    box-shadow: 0 4px 20px rgba(252, 234, 43, 0.4);
+    border: 1px solid rgba(244, 67, 54, 0.3);
   }
   
-  .close-button {
-    background: rgba(60, 60, 60, 0.9);
-    border: 1px solid rgba(120, 120, 120, 0.6);
-    color: #d4d4d4;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
+  .overlay-action-button:hover {
+    filter: brightness(1.1);
   }
   
-  .close-button:hover {
-    background: rgba(80, 80, 80, 0.95);
-    color: #ffffff;
-    transform: scale(1.1);
-    box-shadow: 0 4px 20px rgba(120, 120, 120, 0.3);
-  }
-  
-  /* Mobile Responsive Overlay */
-  @media (max-width: 768px) {
-    .overlay-layout {
-      flex-direction: column;
-      gap: 1rem;
-      padding: 1rem;
-    }
-    
-    /* Hide desktop navigation on mobile */
-    .nav-button, .nav-spacer {
-      display: none;
-    }
-    
-    .overlay-content {
-      max-width: 95vw;
-      max-height: 80vh;
-    }
-    
-    /* Show mobile navigation on mobile */
-    .mobile-nav-container {
-      display: flex;
-    }
-    
-    .overlay-image-container {
-      height: 50vh;
-      padding: 1rem;
-    }
-    
-    .overlay-info {
-      padding: 1rem;
-      min-width: auto;
-    }
-    
-    .overlay-header {
-      flex-direction: column;
-      gap: 0.5rem;
-      align-items: stretch;
-    }
-    
-    .overlay-user-info {
-      justify-content: center;
-    }
-    
-    .overlay-actions {
-      justify-content: center;
-    }
-    
-    .overlay-action-button {
-      flex: 1;
-      justify-content: center;
-      min-width: auto;
-    }
-    
-    .overlay-close-container {
-      top: 1rem;
-      right: 1rem;
-    }
-    
-    .close-button {
-      width: 45px;
-      height: 45px;
-    }
-    
-    .prompt-text {
-      font-size: 0.85rem;
-      padding: 0.75rem;
-    }
-  }
-  
+  /* Mobile Styles for Overlay */
   @media (max-width: 600px) {
     .overlay-info {
       min-width: auto;
+      width: 100%;
     }
     
-    .overlay-content {
-      max-width: 98vw;
+    .prompt-text {
+      font-size: 0.8rem;
     }
   }
 </style>
