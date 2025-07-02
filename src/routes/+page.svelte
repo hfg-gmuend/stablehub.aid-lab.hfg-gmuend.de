@@ -1,10 +1,11 @@
 <script lang="ts">
   import MinimalSidebar from "$lib/components/uicomponents/SidePanel/MinimalSidebar.svelte";
   import ImageCard from "$lib/components/ImageCard.svelte";
-  import TutorialHighlightCard from "$lib/components/uicomponents/TutorialHighlightCard.svelte";
   import CommunityFlow from "$lib/components/CommunityFlow.svelte";
   import PartnerLogos from "$lib/components/PartnerLogos.svelte";
   import FloatingParticles from "$lib/components/FloatingParticles.svelte";
+  import TutorialSection from "$lib/components/TutorialSection.svelte";
+  import SiteFooter from "$lib/components/SiteFooter.svelte";
   import { base, assets } from '$app/paths';
   import { onMount } from 'svelte';
 
@@ -311,83 +312,13 @@
     </section>
     
     <!-- Tutorial-Teaser-Abschnitt -->
-    <section class="tutorials-teaser" class:visible={tutorialsVisible}>
-      <div class="tutorials-header">
-        <h2>New here? Start with our tutorials</h2>
-        <p class="tutorials-subtitle">Master AI image generation with our step-by-step guides</p>
-      </div>
-      
-      <div class="tutorial-highlights">
-        <TutorialHighlightCard
-          icon="/icon/rocket.svg"
-          title="Quick Start"
-          description="Learn the basics of Stable Diffusion in just 10 minutes"
-          href="{base}/guided-tutorial/stable-diffusion-intro"
-          linkText="Start now"
-        />
-
-        <TutorialHighlightCard
-          icon="/icon/idea.svg"
-          title="Prompt Power"
-          description="Better prompts lead to better results"
-          href="{base}/guided-tutorial/prompt-basics"
-          linkText="Discover tips"
-        />
-
-        <TutorialHighlightCard
-          icon="/icon/tool.svg"
-          title="For Advanced Users"
-          description="Parameters, styles and advanced techniques"
-          href="{base}/guided-tutorial/core-parameters"
-          linkText="Go deeper"
-        />
-      </div>
-
-      <!-- Tutorial CTA -->
-      <div class="tutorial-cta-simple">
-        <a href="{base}/guided-tutorial" class="cta-link">
-          <span>View all tutorials</span>
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </a>
-      </div>
-    </section>
+    <TutorialSection visible={tutorialsVisible} />
     
     <!-- Powered by Section -->
     <PartnerLogos visible={tutorialsVisible} />
     
     <!-- Footer -->
-    <footer class="site-footer">
-      <div class="footer-content">
-        <div class="footer-section footer-legal">
-          <h3>Legal</h3>
-          <ul class="footer-links">
-            <li><a href="{base}/imprint">Imprint</a></li>
-            <li><a href="{base}/data-privacy">Data Privacy</a></li>
-          </ul>
-        </div>
-        
-        <div class="footer-section footer-powered">
-          <h3>Powered by</h3>
-          <div class="powered-grid">
-            <div class="powered-item">
-              <span class="institution-name">HfG Schwäbisch Gmünd</span>
-            </div>
-            <div class="powered-item">
-              <span class="institution-name">Federal Ministry of<br>Research, Technology<br>and Space</span>
-            </div>
-            <div class="powered-item">
-              <span class="institution-name">Ministerium für Wissenschaft,<br>Forschung und Kunst<br>Baden-Württemberg</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="footer-bottom">
-        <p>&copy; 2025 Stablehub. All rights reserved.</p>
-      </div>
-    </footer>
+    <SiteFooter />
   </main>
 </div>
 
@@ -1219,231 +1150,6 @@
     transform: translateX(4px);
   }
 
-  /* Enhanced Tutorial Section Animations */
-  .tutorials-teaser {
-    margin: 6rem 0 4rem 0;
-    padding-top: 0;
-    border-top: none;
-    opacity: 0;
-    transform: translateY(40px);
-    transition: all 1s ease-out;
-    position: relative;
-  }
-
-  .tutorials-teaser::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(252, 234, 43, 0.03) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .tutorials-teaser.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .tutorials-header {
-    text-align: center;
-    margin-bottom: 3rem;
-    position: relative;
-  }
-
-  .tutorials-header h2 {
-    font-size: 2.5rem;
-    font-weight: 600;
-    color: #f0f0f0;
-    margin-bottom: 1rem;
-    background: linear-gradient(135deg, #f0f0f0 0%, #FCEA2B 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    position: relative;
-  }
-
-  .tutorials-header h2::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #FCEA2B, transparent);
-    animation: underlineGlow 3s ease-in-out infinite;
-  }
-
-  .tutorials-subtitle {
-    font-size: 1.1rem;
-    color: #a0a0a0;
-    margin-bottom: 0;
-  }
-
-  .tutorial-highlights {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-    margin-top: 1rem;
-  }
-
-  /* Tutorial CTA - Same as Community CTA */
-  .tutorial-cta-simple {
-    text-align: center;
-    margin-top: 3rem;
-  }
-
-  /* Enhanced Tutorial Card Animations */
-  .tutorial-highlights :global(.tutorial-card) {
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-    position: relative;
-  }
-
-  .tutorial-highlights :global(.tutorial-card::before) {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(252, 234, 43, 0.08), transparent);
-    transition: left 0.6s ease;
-    z-index: 0;
-  }
-
-  .tutorial-highlights :global(.tutorial-card:hover::before) {
-    left: 100%;
-  }
-
-  .tutorial-highlights :global(.tutorial-card:hover) {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
-  }
-
-  /* Staggered tutorial card animations */
-  .tutorials-teaser.visible .tutorial-highlights :global(.tutorial-card:nth-child(1)) {
-    animation: slideInCard 0.8s ease-out 0.2s both;
-  }
-
-  .tutorials-teaser.visible .tutorial-highlights :global(.tutorial-card:nth-child(2)) {
-    animation: slideInCard 0.8s ease-out 0.4s both;
-  }
-
-  .tutorials-teaser.visible .tutorial-highlights :global(.tutorial-card:nth-child(3)) {
-    animation: slideInCard 0.8s ease-out 0.6s both;
-  }
-
-  /* Footer */
-  .site-footer {
-    background: rgba(18, 18, 18, 0.95);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 3rem 2rem 1.5rem;
-    margin-top: 4rem;
-    backdrop-filter: blur(10px);
-  }
-
-  .footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    gap: 8rem;
-    margin-bottom: 2rem;
-  }
-
-  .footer-legal {
-    min-width: 160px;
-  }
-
-  .footer-powered {
-    flex: 1;
-    max-width: 800px;
-  }
-
-  .footer-section h3 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #FCEA2B;
-    margin-bottom: 1rem;
-    letter-spacing: -0.01em;
-  }
-
-  .footer-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .footer-links li {
-    margin-bottom: 0.5rem;
-  }
-
-  .footer-links a {
-    color: #a0a0a0;
-    text-decoration: none;
-    transition: color 0.3s ease;
-    font-size: 0.95rem;
-  }
-
-  .footer-links a:hover {
-    color: #FCEA2B;
-  }
-
-  .powered-grid {
-    display: flex;
-    gap: 3rem;
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .powered-item {
-    position: relative;
-    padding-left: 1.2rem;
-    flex: 1;
-    min-width: 200px;
-  }
-
-  .powered-item::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0.4rem;
-    width: 6px;
-    height: 6px;
-    background: #FCEA2B;
-    border-radius: 50%;
-  }
-
-  .institution-name {
-    color: #a0a0a0;
-    font-size: 0.9rem;
-    line-height: 1.4;
-    display: block;
-    transition: color 0.3s ease;
-  }
-
-  .powered-item:hover .institution-name {
-    color: #c0c0c0;
-  }
-
-  .footer-bottom {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding-top: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    text-align: center;
-  }
-
-  .footer-bottom p {
-    color: #666;
-    font-size: 0.85rem;
-    margin: 0;
-  }
-
-  /* Mobile Footer */
   @media (max-width: 768px) {
     /* Hide desktop sidebar buttons on mobile - let MinimalSidebar handle mobile nav */
     .sidebar-expand-btn,
@@ -1510,45 +1216,6 @@
     .spotlight-features {
       grid-template-columns: 1fr;
       gap: 1rem;
-    }
-    
-    /* Tutorial highlights mobile */
-    .tutorial-highlights {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-    
-    /* Footer mobile */
-    .site-footer {
-      padding: 2rem 1rem 1rem;
-    }
-    
-    .footer-content {
-      flex-direction: column;
-      gap: 2.5rem;
-      align-items: stretch;
-    }
-
-    .footer-legal {
-      min-width: auto;
-    }
-
-    .footer-powered {
-      max-width: none;
-    }
-    
-    .powered-grid {
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    .powered-item {
-      min-width: auto;
-    }
-    
-    .institution-name {
-      font-size: 0.85rem;
-      line-height: 1.3;
     }
   }
 </style>
