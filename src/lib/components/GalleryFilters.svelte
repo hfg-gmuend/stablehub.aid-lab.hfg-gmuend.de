@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { createEventDispatcher } from 'svelte';
   
   const dispatch = createEventDispatcher();
@@ -15,7 +15,7 @@
     { id: 'my', label: 'My Images', requiresLogin: true }
   ];
   
-  function handleFilterChange(filterId) {
+  function handleFilterChange(filterId: 'all' | 'my' | 'liked') {
     if (filterId === 'my' && !isLoggedIn) {
       return; // Not available when not logged in
     }
@@ -31,7 +31,7 @@
         class:active={activeFilter === filter.id}
         class:disabled={filter.requiresLogin && !isLoggedIn}
         disabled={filter.requiresLogin && !isLoggedIn}
-        on:click={() => handleFilterChange(filter.id)}
+        on:click={() => handleFilterChange(filter.id as 'all' | 'my' | 'liked')}
         title={filter.requiresLogin && !isLoggedIn ? 'Login required' : filter.label}
       >
         <span class="filter-label">{filter.label}</span>
