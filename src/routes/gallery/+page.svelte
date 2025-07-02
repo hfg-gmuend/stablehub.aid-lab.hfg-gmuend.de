@@ -26,7 +26,7 @@
   let votingInProgress = new Set(); // imageUrls currently being voted on
   
   // Filter State
-  /** @type {'all' | 'my' | 'liked' | 'newest'} */
+  /** @type {'all' | 'my' | 'liked'} */
   let activeFilter = 'all';
   
   // Set für Bilder, die gerade gelöscht werden
@@ -442,13 +442,6 @@
           const aCount = voteCounts.get(a.imageUrl) || 0;
           const bCount = voteCounts.get(b.imageUrl) || 0;
           return bCount - aCount;
-        });
-        break;
-        
-      case 'newest':
-        // Sortiere nach Timestamp (neueste zuerst)
-        filtered = filtered.sort((a, b) => {
-          return new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime();
         });
         break;
         
