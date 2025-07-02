@@ -1,6 +1,8 @@
 <script>
   import MinimalSidebar from "$lib/components/uicomponents/SidePanel/MinimalSidebar.svelte";
-  import LikeButton from "$lib/components/LikeButton.svelte";
+  import VoteButton from "$lib/components/gallery/VoteButton.svelte";
+  import LoadingSpinner from "$lib/components/ui/LoadingSpinner.svelte";
+  import ErrorState from "$lib/components/ui/ErrorState.svelte";
   import GalleryFilters from "$lib/components/GalleryFilters.svelte";
   import { serverImages } from '$lib/stores/serverImages.js';
   import { user } from '$lib/stores/user.js';
@@ -159,7 +161,7 @@
 
   /** @param {any} event */
   async function handleVoteToggle(event) {
-    const { imageId, isLiked } = event.detail;
+    const { imageId, isVoted } = event.detail;
     
     if (!$user.userid || $user.userid === 'default') {
       toast.error('Please log in to like images');
@@ -177,18 +179,18 @@
       votingInProgress.add(imageUrl);
       votingInProgress = votingInProgress;
       
-      if (isLiked) {
+      if (isVoted) {
         // Remove vote
         await voteService.removeVote(imageUrl, $user.userid);
         userVotes.delete(imageUrl);
         voteCounts.set(imageUrl, Math.max(0, (voteCounts.get(imageUrl) || 0) - 1));
-        toast.success('Removed like');
+        toast.success('Removed vote');
       } else {
         // Add vote
         await voteService.addVote(imageUrl, $user.userid);
         userVotes.set(imageUrl, true);
         voteCounts.set(imageUrl, (voteCounts.get(imageUrl) || 0) + 1);
-        toast.success('Added like');
+        toast.success('Added vote');
       }
       
       // Trigger reactivity
@@ -202,7 +204,7 @@
       
     } catch (error) {
       console.error('[Gallery] Error toggling vote:', error);
-      toast.error('Failed to update like: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      toast.error('Failed to update vote: ' + (error instanceof Error ? error.message : 'Unknown error'));
     } finally {
       votingInProgress.delete(imageUrl);
       votingInProgress = votingInProgress;
@@ -504,15 +506,14 @@
       />
       
       {#if loading}
-        <div class="loading-state">
-          <div class="spinner"></div>
-          <p>Loading gallery...</p>
-        </div>
+        <LoadingSpinner message="Loading gallery..." size="large" />
       {:else if error}
-        <div class="error-state">
-          <p>Error loading gallery: {error}</p>
-          <button on:click={loadGallery} class="retry-button">Retry</button>
-        </div>
+        <ErrorState 
+          message="Error loading gallery" 
+          details={error} 
+          on:retry={loadGallery} 
+          size="large" 
+        />
       {:else if filteredGalleryItems.length === 0}
         <div class="empty-gallery">
           {#if activeFilter === 'my' && (!$user.userid || $user.userid === 'default')}
@@ -556,12 +557,12 @@
                 <span class="image-type">{galleryItem.type || 'text-to-image'}</span>
               </div>
               
-              <!-- Like-Button - oben links -->
-              <div class="like-button-container">
-                <LikeButton
+              <!-- Vote-Button - oben links -->
+              <div class="vote-button-container">
+                <VoteButton
                   imageId={galleryItem.imageUrl}
-                  isLiked={userVotes.get(galleryItem.imageUrl) || false}
-                  likeCount={voteCounts.get(galleryItem.imageUrl) || 0}
+                  isVoted={userVotes.get(galleryItem.imageUrl) || false}
+                  voteCount={voteCounts.get(galleryItem.imageUrl) || 0}
                   loading={votingInProgress.has(galleryItem.imageUrl)}
                   disabled={deletingImages.has(galleryItem.uniqueKey)}
                   on:toggle={handleVoteToggle}
@@ -873,59 +874,6 @@
     transform: scale(1.1);
   }
   
-  /* Loading State */
-  .loading-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 250px;
-    color: #888888;
-  }
-  
-  .spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #333333;
-    border-top: 4px solid #FCEA2B;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 1rem;
-  }
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  
-  /* Error State */
-  .error-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 250px;
-    color: #ff8a8a;
-    text-align: center;
-  }
-  
-  .retry-button {
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    background-color: #FCEA2B;
-    color: #121212;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: 'IBM Plex Mono', monospace;
-    font-weight: 500;
-    transition: background-color 0.2s;
-  }
-  
-  .retry-button:hover {
-    background-color: #ffe566;
-  }
-  
   .empty-gallery {
     display: flex;
     justify-content: center;
@@ -1059,8 +1007,8 @@
     z-index: 20;
   }
   
-  /* Like-Button Container */
-  .like-button-container {
+  /* Vote-Button Container */
+  .vote-button-container {
     position: absolute;
     top: 0.75rem;
     left: 0.75rem;
@@ -1462,9 +1410,6 @@
     font-weight: 700; /* Bold */
   }
   
-  .download-btn img {
-    filter: brightness(0) saturate(100%) invert(82%) sepia(85%) saturate(2097%) hue-rotate(41deg) brightness(96%) contrast(97%); /* Gelbes Icon passend zu #D9C300 */
-  }
   
   .download-btn:hover {
     background: rgba(217, 195, 0, 0.1);
@@ -1474,9 +1419,6 @@
     box-shadow: 0 2px 12px rgba(217, 195, 0, 0.3);
   }
   
-  .download-btn:hover img {
-    filter: brightness(0) saturate(100%) invert(88%) sepia(67%) saturate(447%) hue-rotate(42deg) brightness(96%) contrast(95%); /* Heller olive-gelb im Hover */
-  }
   
   /* ⬛ REMOVE Button - Dunkelgrau/schwarz, sekundäre Aktion */
   .remove-btn {
