@@ -762,8 +762,7 @@
     justify-content: space-between;
     gap: 1rem;
     padding: 1rem;
-    background: rgba(18, 18, 18, 0.9);
-    border-top: 1px solid rgba(68, 68, 68, 0.5);
+    background: transparent;
   }
   
   .mobile-nav-button {
@@ -771,15 +770,15 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
-    background: rgba(30, 30, 30, 0.9);
-    border: 2px solid rgba(252, 234, 43, 0.5);
+    background: rgba(30, 30, 30, 0.8);
+    border: 1px solid rgba(252, 234, 43, 0.3);
     color: #FCEA2B;
     border-radius: 8px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     backdrop-filter: blur(10px);
     flex: 1;
     justify-content: center;
@@ -788,28 +787,25 @@
   }
   
   .mobile-nav-button:hover:not(:disabled) {
-    background: rgba(252, 234, 43, 0.9);
-    color: #121212;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(252, 234, 43, 0.4);
+    background: rgba(252, 234, 43, 0.1);
+    border-color: #FCEA2B;
+    color: #FFE566;
   }
   
   .mobile-nav-button:disabled,
   .mobile-nav-button.disabled {
     opacity: 0.4;
     cursor: not-allowed;
-    transform: none;
-    background: rgba(30, 30, 30, 0.5);
+    background: rgba(30, 30, 30, 0.4);
     border-color: rgba(68, 68, 68, 0.3);
     color: #666;
   }
   
   .mobile-nav-button:disabled:hover,
   .mobile-nav-button.disabled:hover {
-    background: rgba(30, 30, 30, 0.5);
+    background: rgba(30, 30, 30, 0.4);
+    border-color: rgba(68, 68, 68, 0.3);
     color: #666;
-    transform: none;
-    box-shadow: none;
   }
   
   /* === GLOBAL STYLES === */
@@ -1187,6 +1183,7 @@
     align-items: center;
     justify-content: center;
     animation: overlayFadeIn 0.3s ease-out;
+    overflow: hidden;
   }
   
   .overlay-layout {
@@ -1558,36 +1555,110 @@
     right: 120px;
   }
   
+  /* Mobile Optimierungen für Navigation */
+  @media (max-width: 768px) {
+    .nav-button {
+      display: none; /* Verstecke Desktop Navigation auf Mobile */
+    }
+    
+    .mobile-nav-container {
+      display: flex; /* Zeige Mobile Navigation */
+    }
+    
+    .overlay-layout {
+      flex-direction: column;
+      gap: 1rem;
+      padding: 5rem 1rem 1rem 1rem;
+      justify-content: flex-start;
+      align-items: stretch;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    
+    .overlay-content {
+      max-width: 95vw;
+      min-width: auto;
+      width: 100%;
+      max-height: none;
+      height: auto;
+      order: 1;
+      flex-shrink: 0;
+      box-sizing: border-box;
+    }
+    
+    .mobile-nav-container {
+      order: 2;
+      margin-top: 0;
+      background: transparent;
+      border-radius: 0;
+      border: none;
+      flex-shrink: 0;
+    }
+    
+    .overlay-image-container {
+      height: 40vh;
+      min-height: 250px;
+      max-height: 400px;
+    }
+    
+    .image-overlay {
+      overflow-y: auto;
+    }
+  }
+  
   /* Close Button */
   .close-button {
-    background: rgba(30, 30, 30, 0.8);
+    background: rgba(30, 30, 30, 0.9);
     color: #FCEA2B;
-    border: 2px solid rgba(252, 234, 43, 0.3);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    border: 1px solid rgba(252, 234, 43, 0.3);
+    border-radius: 8px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     backdrop-filter: blur(10px);
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
   }
   
   .close-button:hover {
-    background: rgba(252, 234, 43, 0.9);
-    color: #121212;
+    background: rgba(252, 234, 43, 0.1);
     border-color: #FCEA2B;
-    transform: scale(1.1);
-    box-shadow: 0 4px 20px rgba(252, 234, 43, 0.4);
+    color: #FFE566;
   }
   
   .close-button:active {
-    background: #E6C82D;
-    transform: scale(1.05);
+    background: rgba(252, 234, 43, 0.2);
   }
   
   /* Mobile Styles for Overlay */
+  @media (max-width: 768px) {
+    .overlay-close-container {
+      top: 1rem;
+      right: 1rem;
+    }
+    
+    .close-button {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .image-overlay {
+      align-items: flex-start;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .overlay-layout {
+      min-height: 100vh;
+      align-items: stretch;
+      justify-content: flex-start;
+    }
+  }
+  
   @media (max-width: 600px) {
     .overlay-info {
       min-width: auto;
@@ -1597,6 +1668,7 @@
     
     .prompt-text {
       font-size: 0.8rem;
+      max-width: 100%;
     }
     
     .overlay-actions {
@@ -1616,25 +1688,21 @@
       width: 18px;
       height: 18px;
     }
-  }
-  
-  @media (max-width: 768px) {
-    .overlay-content {
-      max-width: 95vw;
-      max-height: 95vh;
-    }
     
-    .overlay-info {
-      min-width: auto;
-    }
-    
-    .overlay-actions {
+    .overlay-header {
+      flex-direction: column;
+      align-items: flex-start;
       gap: 0.5rem;
     }
     
-    .overlay-action-button {
-      font-size: 0.75rem;
-      padding: 0.6rem 0.8rem;
+    .overlay-counter {
+      align-self: flex-end;
+    }
+    
+    .overlay-image-container {
+      height: 35vh;
+      min-height: 200px;
+      max-height: 350px;
     }
   }
 </style>
