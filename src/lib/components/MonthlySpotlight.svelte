@@ -35,10 +35,10 @@
   
   // Features-Array für einfache Anpassung
   export let features = [
-    { icon: '💰', label: '50€ Print Credit' },
-    { icon: '🖼️', label: 'Campus Exhibition' },
-    { icon: '⭐', label: 'Portfolio Feature' },
-    { icon: '🎯', label: 'Creative Mentoring' }
+    { icon: '/monthlyspotlight/coin.png', label: '50€ Print Credit' },
+    { icon: '/monthlyspotlight/unicorn.png', label: 'Campus Exhibition' },
+    { icon: '/monthlyspotlight/star.png', label: 'Portfolio Feature' },
+    { icon: '/monthlyspotlight/student.png', label: 'Creative Mentoring' }
   ];
 
   // Zustand für das Top-Bild
@@ -169,7 +169,7 @@
         <div class="spotlight-features">
           {#each features as feature}
             <div class="feature-item">
-              <div class="feature-icon">{feature.icon}</div>
+              <img src={feature.icon} alt={feature.label} class="feature-icon" />
               <span>{feature.label}</span>
             </div>
           {/each}
@@ -423,7 +423,8 @@
   }
 
   .feature-icon {
-    font-size: 1.2rem;
+    width: 28px;
+    height: 28px;
     flex-shrink: 0;
   }
 
