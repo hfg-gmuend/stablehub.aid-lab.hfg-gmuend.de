@@ -14,18 +14,20 @@
   console.log(import.meta)
   
   // State
-  let userPrompt = '';
-  let isProcessing = false;
-  let generatedStyle = '';
-  let error = null;
-  let messages = [];
+  let userPrompt: string = '';
+  let isProcessing: boolean = false;
+  let generatedStyle: string = '';
+  let error: string | null = null;
+  let messages: any[] = [];
   
   // Quick selection suggestions
   const suggestions = [
-    "Futuristic neon city style with cyberpunk elements",
-    "Impressionist painting style like Claude Monet",
-    "Photorealistic portrait with studio photography look",
-    "Surreal fantasy illustration in the style of Salvador Dalí"
+    "Cinematic portrait with dramatic lighting and bokeh background",
+    "Cyberpunk neon-lit cityscape with rain reflections",
+    "Watercolor painting style with soft brush strokes and pastel colors",
+    "Photorealistic macro photography with shallow depth of field",
+    "Art nouveau illustration with flowing organic lines",
+    "Minimalist geometric composition with bold contrasting colors"
   ];
   
   // Function to close the modal
@@ -42,7 +44,7 @@
   }
   
   // Select a suggestion
-  function selectSuggestion(suggestion) {
+  function selectSuggestion(suggestion: string) {
     userPrompt = suggestion;
   }
   
@@ -66,33 +68,38 @@
       // Create system message and user message
       const systemMessage = {
         role: "system",
-        content: "You are an AI assistant that helps create high-quality prompts for Stable Diffusion. " +
-                 "Generate short, precise style descriptions without explanations or comments. " +
-                 "Focus on specific style elements, techniques, and visual details relevant for image generation. " +
-                 "Limit your response to a maximum of 30 words."
+        content: "You are an expert AI art style consultant specializing in creating detailed, effective prompts for Stable Diffusion and other image generation models. " +
+                 "Your role is to transform user style descriptions into precise, actionable prompt elements that will produce high-quality AI-generated images. " +
+                 "Focus on specific artistic techniques, lighting, composition, color palettes, and visual elements. " +
+                 "Generate concise but detailed style descriptions that include technical photography/art terms. " +
+                 "Limit your response to 40-50 words maximum, but make every word count for visual impact."
       };
       
       const userMessage = {
         role: "user",
-        content: `Create a concise style prompt for Stable Diffusion that corresponds to the following style: ${userPrompt}. ` +
-                 "Describe visual elements, color palettes, and technical aspects in no more than 30 words. " +
-                 "Return only the style prompt without any introduction or explanation."
+        content: `Transform this style description into a precise Stable Diffusion prompt enhancement: "${userPrompt}". ` +
+                 "Include specific visual elements like lighting (cinematic, soft, dramatic), composition (rule of thirds, close-up), " +
+                 "color palettes (warm tones, muted colors), artistic techniques (oil painting, photorealistic, impressionistic), " +
+                 "and quality keywords (highly detailed, sharp focus, 8k resolution). " +
+                 "Return only the enhanced style prompt, no explanations."
       };
       
       // Chat history for the API request
       messages = [systemMessage, userMessage];
       
       // API request
-      const response = await fetch("https://chat1.kitegg.de/api/chat/completions", {
+      const response = await fetch('https://playground.transferscope.org/api-llm/v1/chat/completions', {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "mistralai/Mistral-Small-3.1-24B-Instruct-2503",
+          model: "gpt-4.1",
           messages: messages,
-          stream: false
+          stream: false,
+          max_tokens: 300,
+          temperature: 0.8
         }),
       });
       
@@ -110,7 +117,7 @@
         throw new Error("Invalid response format from the API");
       }
       
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error generating style:", err);
       error = err.message || "Error connecting to the AI model";
     } finally {
@@ -128,7 +135,7 @@
       </div>
       
       <div class="modal-body">
-        <p class="description">Describe the style you want for your image:</p>
+        <p class="description">Describe the artistic style you want, and our AI will create enhanced prompt elements:</p>
         
         <div class="input-container">
           <textarea 
