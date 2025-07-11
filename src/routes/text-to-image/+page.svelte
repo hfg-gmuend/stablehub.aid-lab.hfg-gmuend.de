@@ -174,8 +174,8 @@
   }
   
   // Funktion zum Bearbeiten eines vorherigen Prompts
-  function editPrompt(oldPrompt: string): void {
-    prompt = oldPrompt;
+  function editPrompt(event: CustomEvent<string>): void {
+    prompt = event.detail;
     // Scrolle zum Prompt-Eingabefeld
     const promptElement = document.querySelector('#main-prompt');
     if (promptElement) {
@@ -503,9 +503,9 @@
               <PromptResultCard 
                 prompt={result.prompt}
                 imageUrls={result.imageUrls}
-                onEdit={editPrompt}
                 usedStyles={result.styles || []}
                 type="text-to-image"
+                on:edit={editPrompt}
               />
             {/each}
           </div>

@@ -472,7 +472,6 @@
                 <PromptResultCard 
                   prompt={result.prompt}
                   imageUrls={result.imageUrls}
-                  onEdit={editPrompt}
                   type="image-to-image"
                 />
               </div>
