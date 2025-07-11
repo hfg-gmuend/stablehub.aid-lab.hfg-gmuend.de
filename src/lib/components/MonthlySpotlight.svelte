@@ -145,7 +145,7 @@
           {#if topImage && topImage.votes}
             <div class="image-overlay">
               <div class="vote-badge">
-                <span class="vote-icon">❤️</span>
+                <span class="vote-icon">💛</span>
                 <span class="vote-count">{topImage.votes}</span>
               </div>
               {#if topImage.userid}

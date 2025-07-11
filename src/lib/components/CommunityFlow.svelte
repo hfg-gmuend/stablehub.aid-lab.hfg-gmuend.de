@@ -1,6 +1,6 @@
 <script lang="ts">
   // Props for customization (optional)
-  export let showComingSoon = true;
+  export let showNewBadge = true;
 </script>
 
 <div class="community-flow">
@@ -59,8 +59,8 @@
       </div>
       <h3>Like & Connect</h3>
       <p>Show appreciation and connect with creators</p>
-      {#if showComingSoon}
-        <div class="coming-soon-badge">Coming Soon</div>
+      {#if showNewBadge}
+        <div class="new-badge">New</div>
       {/if}
     </div>
   </div>
@@ -156,19 +156,31 @@
     line-height: 1.4;
   }
 
-  .coming-soon-badge {
+  .new-badge {
     position: absolute;
     top: 8px;
     right: 8px;
-    background: rgba(255, 107, 107, 0.1);
-    border: 1px solid rgba(255, 107, 107, 0.3);
-    color: #ff6b6b;
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    color: #4ade80;
     padding: 4px 8px;
     border-radius: 8px;
     font-size: 0.65rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    animation: newBadgeGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes newBadgeGlow {
+    0%, 100% { 
+      box-shadow: 0 0 5px rgba(74, 222, 128, 0.3);
+      opacity: 0.8;
+    }
+    50% { 
+      box-shadow: 0 0 15px rgba(74, 222, 128, 0.5);
+      opacity: 1;
+    }
   }
 
   .flow-arrow {
