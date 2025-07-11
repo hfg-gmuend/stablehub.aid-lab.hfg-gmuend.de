@@ -586,7 +586,7 @@
     }
     
     main {
-      padding: 80px 1rem 1rem; /* Extra top padding for burger menu */
+      padding: 80px 1rem 140px 1rem; /* Erhöht von 1rem auf 140px bottom padding */
       min-height: calc(100vh - 80px);
     }
     
@@ -595,6 +595,7 @@
       grid-template-rows: auto auto auto !important;
       gap: 1rem !important;
       height: auto !important;
+      padding-bottom: 2rem; /* Zusätzliches Padding für Sicherheit */
     }
     
     .parameters-panel {
@@ -607,6 +608,7 @@
       grid-column: 1 !important;
       grid-row: 2 !important;
       min-height: 300px;
+      margin-bottom: 8rem; /* Zusätzlicher Abstand nach unten */
     }
   }
   
@@ -645,15 +647,17 @@
       border-top: 1px solid #333;
       padding: 1rem;
       box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.3);
+      min-height: 80px; /* Definiere eine Mindesthöhe */
     }
     
     main {
-      padding: 80px 1rem 120px 1rem; /* Add bottom padding only on mobile */
+      padding: 80px 1rem 140px 1rem; /* Konsistenter bottom padding */
       min-height: calc(100vh - 80px);
     }
     
     .content-wrapper {
       grid-template-rows: auto auto !important;
+      padding-bottom: 2rem; /* Noch mehr Abstand für Sicherheit */
     }
     
     /* Hide the desktop prompt panel in content wrapper on mobile */
