@@ -546,6 +546,7 @@
                     src={galleryItem.imageUrl} 
                     alt={galleryItem.prompt || 'Generated image'} 
                     class="gallery-image"
+                    loading="lazy"
                     on:error={handleImageError}
                   />
                 </button>
@@ -632,6 +633,7 @@
             src={currentImage.imageUrl} 
             alt="Enlarged view" 
             class="overlay-image"
+            loading="lazy"
           />
         </div>
         
