@@ -108,7 +108,7 @@ class VoteService {
       console.log(`[VoteService] Vote added for ${imageUrl}, caches invalidated for user ${userid}`);
       
     } catch (error) {
-      if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
         console.warn('[VoteService] CORS or network error, switching to mock mode');
         this.isApiAvailable = false;
         return; // Mock success
@@ -163,7 +163,7 @@ class VoteService {
       console.log(`[VoteService] Vote removed for ${imageUrl}, caches invalidated for user ${userid}`);
       
     } catch (error) {
-      if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
         console.warn('[VoteService] CORS or network error, switching to mock mode');
         this.isApiAvailable = false;
         return; // Mock success
@@ -187,7 +187,7 @@ class VoteService {
     }
     
     // Limit validieren (API-Limits: 1-100)
-    limit = Math.max(1, Math.min(100, parseInt(limit) || 20));
+    limit = Math.max(1, Math.min(100, parseInt(String(limit)) || 20));
     
     if (!this.isApiAvailable) {
       console.log('[VoteService] Mock: No top images (API unavailable)');
@@ -216,7 +216,7 @@ class VoteService {
       console.log(`[VoteService] Successfully loaded ${topImages.length} top images for period '${period}'`);
       return topImages;
     } catch (error) {
-      if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
         console.warn('[VoteService] CORS or network error, switching to mock mode');
         this.isApiAvailable = false;
         return []; // Mock empty result
@@ -255,7 +255,7 @@ class VoteService {
         if (response.status === 404) {
           // 404 für User-Votes ist normal - bedeutet nur "User hat keine Votes"
           console.log(`[VoteService] No votes found for user ${userid} (404 - normal)`);
-          const emptyVotes = [];
+          const emptyVotes = /** @type {any[]} */ ([]);
           // Cache empty result too
           this.userVotesCache.set(userid, {
             votes: emptyVotes,
@@ -279,7 +279,7 @@ class VoteService {
       return votes;
       
     } catch (error) {
-      if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
         console.warn('[VoteService] CORS or network error, switching to mock mode');
         this.isApiAvailable = false;
         return []; // Mock empty result
@@ -317,7 +317,7 @@ class VoteService {
 
       return await response.json();
     } catch (error) {
-      if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
         console.warn('[VoteService] CORS or network error, switching to mock mode');
         this.isApiAvailable = false;
         return { totalVotes: 0, totalImages: 0 };
@@ -329,7 +329,7 @@ class VoteService {
   /**
    * Vote-Statistiken für ein Bild abrufen 
    * @param {string} imageUrl - Die vollständige URL des Bildes
-   * @param {string} [userid] 
+   * @param {string|null} [userid] 
    * @returns {Promise<{imageUrl: string, totalVotes: number, userHasVoted: boolean}>}
    */
   async getVoteStats(imageUrl, userid = null) {
@@ -368,7 +368,7 @@ class VoteService {
   /**
    * Vote-Statistiken für mehrere Bilder abrufen (Batch) - OPTIMIERT für Rate Limiting
    * @param {string[]} imageUrls - Array von vollständigen Bild-URLs
-   * @param {string} [userid] 
+   * @param {string|null} [userid] 
    * @returns {Promise<Map<string, {imageUrl: string, totalVotes: number, userHasVoted: boolean}>>}
    */
   async getBatchVoteStats(imageUrls, userid = null) {
@@ -458,7 +458,7 @@ class VoteService {
 
   /**
    * Clear the caches
-   * @param {string} [userid] - If specified, only clear user cache for this user
+   * @param {string|null} [userid] - If specified, only clear user cache for this user
    */
   clearCache(userid = null) {
     if (userid) {
