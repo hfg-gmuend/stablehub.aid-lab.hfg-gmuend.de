@@ -24,7 +24,7 @@
 
   // User setup popup state
   let showUserSetup = false;
-  let username = 'John Doe';
+  let username = 'Example: Ada Lovelace';
   let usernameError = '';
   let isSubmitting = false;
 
