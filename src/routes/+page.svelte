@@ -24,7 +24,7 @@
 
   // User setup popup state
   let showUserSetup = false;
-  let username = 'Example: Ada Lovelace';
+  let username = 'Ada Lovelace';
   let usernameError = '';
   let isSubmitting = false;
 
@@ -376,7 +376,7 @@
             id="username-input"
             type="text" 
             bind:value={username}
-            placeholder="Example: Ada Lovelace"
+            placeholder="Ada Lovelace"
             maxlength="50"
             class:error={usernameError}
             on:input={() => usernameError = ''}
