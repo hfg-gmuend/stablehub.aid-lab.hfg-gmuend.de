@@ -111,10 +111,10 @@
   }
 
   function skipUserSetup() {
-    // Set a default username using the user store
-    user.setUserId('Anonymous User');
+    // Just mark setup as completed, keep the existing UUID
     localStorage.setItem('stablehub_user_setup_completed', 'true');
     showUserSetup = false;
+    console.log('[UserSetup] Setup übersprungen, behalte UUID:', $user.userid);
   }
 
   function typewriterEffect() {
