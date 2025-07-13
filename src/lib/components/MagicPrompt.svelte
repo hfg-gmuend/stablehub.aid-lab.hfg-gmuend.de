@@ -19,12 +19,12 @@
     try {
       const systemMessage = {
         role: "system",
-        content: "You are an expert AI prompt enhancer focused on scene enhancement. Take the given prompt and add a simple, specific scene or context to make it more interesting. Examples: 'car' becomes 'car on a mountain road', 'woman' becomes 'woman in a coffee shop', 'cat' becomes 'cat sitting by a window'. Keep the enhancement to maximum 50 characters total. Only return the enhanced prompt, no explanations."
+        content: "You are an expert AI prompt enhancer for image generation. Take the given prompt and creatively expand it with vivid details, interesting scenes, or atmospheric elements. Focus on enhancing the scene, setting, lighting, mood, and context. Feel free to be creative and add variations that make the prompt more visually compelling. Add up to 20 words maximum to enhance the original concept. Examples: 'car' becomes 'vintage red sports car racing through misty mountain curves at golden hour', 'woman' becomes 'elegant woman in flowing dress walking through a sunlit lavender field'. Only return the enhanced prompt, no explanations."
       };
       
       const userMessage = {
         role: "user",
-        content: `Enhance this prompt by adding a simple scene context (max 90 chars total): "${currentPrompt}"`
+        content: `Creatively enhance this prompt by adding vivid scene details, setting, or atmospheric elements (add max 20 words): "${currentPrompt}"`
       };
       
       const response = await fetch('https://playground.transferscope.org/api-llm/v1/chat/completions', {
@@ -37,8 +37,8 @@
           model: "gpt-4.1",
           messages: [systemMessage, userMessage],
           stream: false,
-          max_tokens: 100,
-          temperature: 0.7
+          max_tokens: 150,
+          temperature: 0.8
         }),
       });
       
@@ -53,9 +53,9 @@
         // Remove quotes if the AI added them
         enhancedPrompt = enhancedPrompt.replace(/^["']|["']$/g, '');
         
-        // Ensure it's not longer than 50 characters
-        if (enhancedPrompt.length > 50) {
-          enhancedPrompt = enhancedPrompt.substring(0, 47) + '...';
+        // Allow longer prompts but cap at reasonable length for UI
+        if (enhancedPrompt.length > 200) {
+          enhancedPrompt = enhancedPrompt.substring(0, 197) + '...';
         }
         
         return enhancedPrompt;
