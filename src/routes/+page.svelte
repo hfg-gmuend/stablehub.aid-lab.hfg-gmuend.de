@@ -9,6 +9,8 @@
   import SiteFooter from "$lib/components/SiteFooter.svelte";
   import { base, assets } from '$app/paths';
   import { onMount } from 'svelte';
+  import { browser } from '$app/environment';
+  import { user } from '$lib/stores/user.js';
 
   // Desktop sidebar state (separate from MinimalSidebar mobile logic)
   let sidebarCollapsed = false;
@@ -19,6 +21,15 @@
   let subtitleVisible = false;
   let cardsVisible = false;
   let tutorialsVisible = false;
+
+  // User setup popup state
+  let showUserSetup = false;
+  let username = 'Max Mustermann';
+  let usernameError = '';
+  let isSubmitting = false;
+
+  // Reactive statement to watch user store changes
+  $: currentUserId = $user.userid;
 
   // Dynamic typewriter animation
   let currentWordIndex = 0;
@@ -47,6 +58,63 @@
   // Desktop sidebar toggle function
   function toggleSidebar() {
     sidebarCollapsed = !sidebarCollapsed;
+  }
+
+  // User setup functions
+  function validateUsername(name: string): boolean {
+    // Only allow letters, numbers, spaces, and basic punctuation
+    const validPattern = /^[a-zA-Z0-9\s\-_.]+$/;
+    return validPattern.test(name) && name.trim().length >= 2;
+  }
+
+  function sanitizeUsername(name: string): string {
+    // Remove any special characters and trim
+    return name.replace(/[^a-zA-Z0-9\s\-_.]/g, '').trim();
+  }
+
+  async function handleUserSetup() {
+    if (isSubmitting) return;
+
+    const sanitizedName = sanitizeUsername(username);
+    
+    if (!sanitizedName || sanitizedName.length < 2) {
+      usernameError = 'Benutzername muss mindestens 2 Zeichen lang sein.';
+      return;
+    }
+
+    if (!validateUsername(sanitizedName)) {
+      usernameError = 'Nur Buchstaben, Zahlen, Leerzeichen und _ - . sind erlaubt.';
+      return;
+    }
+
+    isSubmitting = true;
+    usernameError = '';
+
+    try {
+      // Set username using the user store
+      user.setUserId(sanitizedName);
+      
+      // Also store setup completion in localStorage
+      localStorage.setItem('stablehub_user_setup_completed', 'true');
+      
+      console.log('[UserSetup] Benutzername gesetzt:', sanitizedName);
+      
+      // Close popup
+      showUserSetup = false;
+      
+    } catch (error) {
+      console.error('Error setting up user:', error);
+      usernameError = 'Fehler beim Speichern. Bitte versuchen Sie es erneut.';
+    } finally {
+      isSubmitting = false;
+    }
+  }
+
+  function skipUserSetup() {
+    // Set a default username using the user store
+    user.setUserId('Anonymous User');
+    localStorage.setItem('stablehub_user_setup_completed', 'true');
+    showUserSetup = false;
   }
 
   function typewriterEffect() {
@@ -105,6 +173,22 @@
   }
 
   onMount(() => {
+    // Check if user setup is needed
+    if (browser) {
+      const setupCompleted = localStorage.getItem('stablehub_user_setup_completed');
+      const currentUserId = $user.userid;
+      
+      // Show setup if no setup completed AND user has UUID format (not human-readable)
+      const isUuidFormat = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(currentUserId);
+      
+      console.log('[UserSetup] Setup completed:', setupCompleted, 'Current UID:', currentUserId, 'Is UUID:', isUuidFormat);
+      
+      if (!setupCompleted && (currentUserId === 'default' || isUuidFormat)) {
+        showUserSetup = true;
+        console.log('[UserSetup] Showing user setup popup');
+      }
+    }
+
     // Staggered animation sequence
     setTimeout(() => mounted = true, 100);
     setTimeout(() => titleVisible = true, 300);
@@ -268,6 +352,76 @@
     <SiteFooter />
   </main>
 </div>
+
+<!-- User Setup Popup -->
+{#if showUserSetup}
+  <div 
+    class="user-setup-overlay" 
+    role="dialog" 
+    aria-modal="true"
+    aria-labelledby="user-setup-title"
+    on:click|self={skipUserSetup}
+    on:keydown={(e) => e.key === 'Escape' && skipUserSetup()}
+  >
+    <div class="user-setup-popup">
+      <div class="popup-header">
+        <h2 id="user-setup-title">Willkommen bei StableHub!</h2>
+        <p>Erstellen Sie Ihren Benutzernamen, um Ihre Kreationen zu speichern und zu teilen.</p>
+      </div>
+
+      <div class="popup-content">
+        <div class="input-group">
+          <label for="username-input">Ihr Benutzername:</label>
+          <input 
+            id="username-input"
+            type="text" 
+            bind:value={username}
+            placeholder="Max Mustermann"
+            maxlength="50"
+            class:error={usernameError}
+            on:input={() => usernameError = ''}
+          />
+          {#if usernameError}
+            <span class="error-message">{usernameError}</span>
+          {/if}
+        </div>
+
+        <div class="info-box">
+          <div class="info-item">
+            <span class="info-icon">💡</span>
+            <span>Wählen Sie einen <strong>einzigartigen Namen</strong>, um Verwechslungen zu vermeiden.</span>
+          </div>
+          <div class="info-item">
+            <span class="info-icon">🔐</span>
+            <span>Sie können sich jederzeit mit diesem Namen <strong>wieder einloggen</strong>.</span>
+          </div>
+          <div class="info-item">
+            <span class="info-icon">🖼️</span>
+            <span>Ihre gespeicherten Bilder bleiben mit Ihrem Namen <strong>verknüpft</strong>.</span>
+          </div>
+        </div>
+
+        <div class="popup-actions">
+          <button 
+            class="btn-primary" 
+            on:click={handleUserSetup}
+            disabled={isSubmitting}
+          >
+            {#if isSubmitting}
+              <span class="loading-spinner"></span>
+              Wird gespeichert...
+            {:else}
+              Benutzername festlegen
+            {/if}
+          </button>
+          <button class="btn-secondary" on:click={skipUserSetup}>
+            Später
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+{/if}
 
 <style>
   :global(body) {
@@ -908,6 +1062,201 @@
     transform: translateX(4px);
   }
 
+  /* User Setup Popup */
+  .user-setup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 1rem;
+  }
+
+  .user-setup-popup {
+    background: linear-gradient(135deg, #1a1a1a 0%, #242424 100%);
+    border: 1px solid rgba(252, 234, 43, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 100%;
+    position: relative;
+    animation: popupSlideIn 0.4s ease-out;
+  }
+
+  @keyframes popupSlideIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9) translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  .popup-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .popup-header h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #f0f0f0;
+    margin-bottom: 0.8rem;
+    background: linear-gradient(135deg, #f0f0f0 0%, #FCEA2B 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .popup-header p {
+    color: #a0a0a0;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .popup-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .input-group label {
+    font-weight: 500;
+    color: #e0e0e0;
+    font-size: 0.95rem;
+  }
+
+  .input-group input {
+    padding: 0.8rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #e0e0e0;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .input-group input:focus {
+    outline: none;
+    border-color: rgba(252, 234, 43, 0.5);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 2px rgba(252, 234, 43, 0.1);
+  }
+
+  .input-group input.error {
+    border-color: rgba(255, 100, 100, 0.5);
+    background: rgba(255, 100, 100, 0.05);
+  }
+
+  .error-message {
+    color: #ff6b6b;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+  }
+
+  .info-box {
+    background: rgba(252, 234, 43, 0.05);
+    border: 1px solid rgba(252, 234, 43, 0.15);
+    border-radius: 12px;
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    font-size: 0.9rem;
+    color: #d0d0d0;
+    line-height: 1.4;
+  }
+
+  .info-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .popup-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    flex: 1;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #FCEA2B 0%, #FFE566 100%);
+    color: #1a1a1a;
+    border: none;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #FFE566 0%, #FCEA2B 100%);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: #a0a0a0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #e0e0e0;
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid #1a1a1a;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   @media (max-width: 768px) {
     /* Hide desktop sidebar buttons on mobile - let MinimalSidebar handle mobile nav */
     .sidebar-expand-btn,
@@ -957,6 +1306,20 @@
       grid-template-columns: 1fr;
       gap: 1.5rem;
       margin: 2rem 0;
+    }
+
+    /* User Setup Popup mobile */
+    .user-setup-popup {
+      margin: 1rem;
+      padding: 1.5rem;
+    }
+
+    .popup-header h2 {
+      font-size: 1.5rem;
+    }
+
+    .popup-actions {
+      flex-direction: column;
     }
   }
 </style>

@@ -10,6 +10,11 @@
   // Reaktive Werte
   $: currentUid = $user.userid || 'default';
   
+  // Debug: Log UID changes
+  $: if (currentUid) {
+    console.log('[UidSwitcher] Current UID:', currentUid);
+  }
+  
   // Sanitize User ID - nur erlaubte Zeichen
   function sanitizeUid(input: string): string {
     // Nur alphanumerische Zeichen, Bindestriche und Unterstriche erlauben

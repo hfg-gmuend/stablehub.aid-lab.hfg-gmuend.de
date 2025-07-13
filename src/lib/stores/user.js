@@ -64,10 +64,20 @@ const createUserStore = () => {
   const getOrCreateUserId = () => {
     if (!browser) return "default"; // Fallback für Server-Side Rendering
     
+    // Check for existing user ID in cookies first
     const existingUserId = getCookie("userid");
     if (existingUserId) {
-      console.log("User Store: Existierende User ID gefunden:", existingUserId);
+      console.log("User Store: Existierende User ID aus Cookie gefunden:", existingUserId);
       return existingUserId;
+    }
+    
+    // Check for legacy username in localStorage
+    const legacyUsername = localStorage.getItem('stablehub_username');
+    if (legacyUsername) {
+      console.log("User Store: Legacy Username aus localStorage gefunden:", legacyUsername);
+      // Migrate to cookie and return
+      setCookie("userid", legacyUsername, 365);
+      return legacyUsername;
     }
     
     // Generiere neue UUID im gewünschten Format
@@ -90,6 +100,8 @@ const createUserStore = () => {
     setUserId: (userid) => {
       if (browser) {
         setCookie("userid", userid, 365);
+        // Clear legacy localStorage entry if it exists
+        localStorage.removeItem('stablehub_username');
       }
       update((state) => {
         const newState = { ...state, userid };
