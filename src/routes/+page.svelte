@@ -24,7 +24,7 @@
 
   // User setup popup state
   let showUserSetup = false;
-  let username = 'Max Mustermann';
+  let username = 'John Doe';
   let usernameError = '';
   let isSubmitting = false;
 
@@ -78,12 +78,12 @@
     const sanitizedName = sanitizeUsername(username);
     
     if (!sanitizedName || sanitizedName.length < 2) {
-      usernameError = 'Benutzername muss mindestens 2 Zeichen lang sein.';
+      usernameError = 'Username must be at least 2 characters long.';
       return;
     }
 
     if (!validateUsername(sanitizedName)) {
-      usernameError = 'Nur Buchstaben, Zahlen, Leerzeichen und _ - . sind erlaubt.';
+      usernameError = 'Only letters, numbers, spaces and _ - . are allowed.';
       return;
     }
 
@@ -104,7 +104,7 @@
       
     } catch (error) {
       console.error('Error setting up user:', error);
-      usernameError = 'Fehler beim Speichern. Bitte versuchen Sie es erneut.';
+      usernameError = 'Error saving. Please try again.';
     } finally {
       isSubmitting = false;
     }
@@ -365,18 +365,18 @@
   >
     <div class="user-setup-popup">
       <div class="popup-header">
-        <h2 id="user-setup-title">Willkommen bei StableHub!</h2>
-        <p>Erstellen Sie Ihren Benutzernamen, um Ihre Kreationen zu speichern und zu teilen.</p>
+        <h2 id="user-setup-title">Welcome to StableHub!</h2>
+        <p>Create your username to save and share your creations.</p>
       </div>
 
       <div class="popup-content">
         <div class="input-group">
-          <label for="username-input">Ihr Benutzername:</label>
+          <label for="username-input">Your Username:</label>
           <input 
             id="username-input"
             type="text" 
             bind:value={username}
-            placeholder="Max Mustermann"
+            placeholder="John Doe"
             maxlength="50"
             class:error={usernameError}
             on:input={() => usernameError = ''}
@@ -389,15 +389,15 @@
         <div class="info-box">
           <div class="info-item">
             <span class="info-icon">💡</span>
-            <span>Wählen Sie einen <strong>einzigartigen Namen</strong>, um Verwechslungen zu vermeiden.</span>
+            <span>Choose a <strong>unique name</strong> to avoid confusion.</span>
           </div>
           <div class="info-item">
             <span class="info-icon">🔐</span>
-            <span>Sie können sich jederzeit mit diesem Namen <strong>wieder einloggen</strong>.</span>
+            <span>You can always <strong>log back in</strong> with this name.</span>
           </div>
           <div class="info-item">
             <span class="info-icon">🖼️</span>
-            <span>Ihre gespeicherten Bilder bleiben mit Ihrem Namen <strong>verknüpft</strong>.</span>
+            <span>Your saved images stay <strong>linked</strong> to your name.</span>
           </div>
         </div>
 
@@ -409,13 +409,13 @@
           >
             {#if isSubmitting}
               <span class="loading-spinner"></span>
-              Wird gespeichert...
+              Saving...
             {:else}
-              Benutzername festlegen
+              Set Username
             {/if}
           </button>
           <button class="btn-secondary" on:click={skipUserSetup}>
-            Später
+            Later
           </button>
         </div>
       </div>
