@@ -376,7 +376,7 @@
             id="username-input"
             type="text" 
             bind:value={username}
-            placeholder="John Doe"
+            placeholder="Example: Ada Lovelace"
             maxlength="50"
             class:error={usernameError}
             on:input={() => usernameError = ''}
