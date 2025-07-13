@@ -24,7 +24,7 @@
 
   // User setup popup state
   let showUserSetup = false;
-  let username = 'Ada Lovelace';
+  let username = 'AdaLovelace';
   let usernameError = '';
   let isSubmitting = false;
 
@@ -389,7 +389,7 @@
             id="username-input"
             type="text" 
             bind:value={username}
-            placeholder="Ada Lovelace"
+            placeholder="AdaLovelace"
             maxlength="50"
             pattern="[a-zA-Z0-9\s\-_\.]*"
             class:error={usernameError}
