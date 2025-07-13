@@ -184,6 +184,19 @@
     }
   }
   
+  // Funktion zum Hinzufügen eines kopierten Prompts
+  function handleCopyPrompt(event: CustomEvent<{ prompt: string }>): void {
+    const copiedPrompt = event.detail.prompt;
+    // Ersetze den aktuellen Prompt komplett durch den kopierten
+    prompt = copiedPrompt;
+    // Scrolle zum Prompt-Eingabefeld
+    const promptElement = document.querySelector('#main-prompt');
+    if (promptElement) {
+      promptElement.scrollIntoView({ behavior: 'smooth' });
+      (promptElement as HTMLElement).focus();
+    }
+  }
+  
   // Parameter aus URL auslesen, wenn die Seite geladen wird
   onMount(async () => {
     console.log("[TextToImage] Component mounted, loading user images...");
@@ -506,6 +519,7 @@
                 usedStyles={result.styles || []}
                 type="text-to-image"
                 on:edit={editPrompt}
+                on:copyPrompt={handleCopyPrompt}
               />
             {/each}
           </div>

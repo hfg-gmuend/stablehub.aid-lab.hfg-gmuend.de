@@ -1,11 +1,14 @@
 <script>
   //MrNoLook
+  import { createEventDispatcher } from 'svelte';
   import { serverImages } from '$lib/stores/serverImages.js';
   import { user } from '$lib/stores/user.js';
   import { styles } from "$lib/config/styles.js";
   import { assets } from '$app/paths';
   import { onMount } from 'svelte';
   import { toast } from '$lib/stores/toastStore.js';
+  
+  const dispatch = createEventDispatcher();
   
   /** @type {string} */
   export let prompt = "";
@@ -186,6 +189,9 @@
     try {
       await navigator.clipboard.writeText(prompt);
       toast.success('Prompt copied to clipboard!');
+      
+      // Dispatch event to add prompt to prompt area
+      dispatch('copyPrompt', { prompt: prompt });
     } catch (error) {
       console.error('Error copying prompt:', error);
       toast.error('Failed to copy prompt');

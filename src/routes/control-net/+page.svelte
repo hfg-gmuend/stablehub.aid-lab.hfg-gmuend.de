@@ -97,6 +97,19 @@
   let isStyleCopilotOpen = false; // State for modal visibility
 
   // --- Functions ---
+  // Funktion zum Hinzufügen eines kopierten Prompts
+  function handleCopyPrompt(event: CustomEvent<{ prompt: string }>): void {
+    const copiedPrompt = event.detail.prompt;
+    // Ersetze den aktuellen Prompt komplett durch den kopierten
+    prompt = copiedPrompt;
+    // Scrolle zum Prompt-Eingabefeld
+    const promptElement = document.querySelector('#main-prompt');
+    if (promptElement) {
+      promptElement.scrollIntoView({ behavior: 'smooth' });
+      (promptElement as HTMLElement).focus();
+    }
+  }
+  
   // Funktionen zum Verarbeiten des Bild-Uploads
   function handleImageUpload(event: Event) {
     const target = event.target as HTMLInputElement;
@@ -590,6 +603,7 @@
                   prompt={result.prompt}
                   imageUrls={result.imageUrls}
                   type="controlnet"
+                  on:copyPrompt={handleCopyPrompt}
                 />
               </div>
             {/each}

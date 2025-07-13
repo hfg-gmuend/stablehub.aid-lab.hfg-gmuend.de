@@ -194,6 +194,19 @@
     }
   }
   
+  // Funktion zum Hinzufügen eines kopierten Prompts
+  function handleCopyPrompt(event: CustomEvent<{ prompt: string }>): void {
+    const copiedPrompt = event.detail.prompt;
+    // Ersetze den aktuellen Prompt komplett durch den kopierten
+    prompt = copiedPrompt;
+    // Scrolle zum Prompt-Eingabefeld
+    const promptElement = document.querySelector('#main-prompt');
+    if (promptElement) {
+      promptElement.scrollIntoView({ behavior: 'smooth' });
+      (promptElement as HTMLElement).focus();
+    }
+  }
+  
   // --- Copilot State ---
   let isStyleCopilotOpen = false;
 
@@ -473,6 +486,7 @@
                   prompt={result.prompt}
                   imageUrls={result.imageUrls}
                   type="image-to-image"
+                  on:copyPrompt={handleCopyPrompt}
                 />
               </div>
             {/each}
