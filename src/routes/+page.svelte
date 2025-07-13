@@ -72,6 +72,18 @@
     return name.replace(/[^a-zA-Z0-9\s\-_.]/g, '').trim();
   }
 
+  // Input Handler für Live-Sanitization (verhindert Sonderzeichen beim Tippen)
+  function handleUsernameInput(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const sanitized = sanitizeUsername(target.value);
+    if (target.value !== sanitized) {
+      target.value = sanitized;
+      username = sanitized;
+    }
+    // Clear error when user starts typing
+    usernameError = '';
+  }
+
   async function handleUserSetup() {
     if (isSubmitting) return;
 
@@ -360,6 +372,7 @@
     role="dialog" 
     aria-modal="true"
     aria-labelledby="user-setup-title"
+    tabindex="-1"
     on:click|self={skipUserSetup}
     on:keydown={(e) => e.key === 'Escape' && skipUserSetup()}
   >
@@ -378,8 +391,10 @@
             bind:value={username}
             placeholder="Ada Lovelace"
             maxlength="50"
+            pattern="[a-zA-Z0-9\s\-_\.]*"
             class:error={usernameError}
-            on:input={() => usernameError = ''}
+            on:input={handleUsernameInput}
+            on:keydown={(e) => e.key === 'Enter' && handleUserSetup()}
           />
           {#if usernameError}
             <span class="error-message">{usernameError}</span>
