@@ -24,7 +24,7 @@
       
       const userMessage = {
         role: "user",
-        content: `Enhance this prompt by adding a simple scene context (max 50 chars total): "${currentPrompt}"`
+        content: `Enhance this prompt by adding a simple scene context (max 90 chars total): "${currentPrompt}"`
       };
       
       const response = await fetch('https://playground.transferscope.org/api-llm/v1/chat/completions', {
