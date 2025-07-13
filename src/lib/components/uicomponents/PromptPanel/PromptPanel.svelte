@@ -3,7 +3,9 @@
   import TokenizedPromptArea from '$lib/components/uicomponents/PromptPanel/PromptPanel-SubComponents/TokenizedPromptArea.svelte';
   import GenerateButton from '$lib/components/uicomponents/PromptPanel/PromptPanel-SubComponents/GenerateButton.svelte';
   import CopilotButton from '$lib/components/uicomponents/PromptPanel/PromptPanel-SubComponents/CopilotButton.svelte';
+  import GenerateIconButton from '$lib/components/uicomponents/PromptPanel/PromptPanel-SubComponents/GenerateIconButton.svelte';
   import Tooltip from '$lib/components/uicomponents/Tooltip.svelte'; // Importiere die neue Komponente
+  import MagicPrompt from '$lib/components/MagicPrompt.svelte';
 
   // --- Props ---
   export let promptValue: string = "";
@@ -26,6 +28,11 @@
   const tokenTooltipText = `Shows token count (max ${tokenLimit}). Each token has progressively less weight/importance than the previous one in generation.`;
   let isCopilotHovered: boolean = false; // State for Copilot tooltip
   const copilotTooltipText = "Use Style Copilot to easily generate and insert a Stable Diffusion prompt."; // English tooltip text
+  let isGenerateIconHovered: boolean = false; // State for Generate Icon tooltip
+  const generateIconTooltipText = "Enhance your prompt with AI magic"; // Tooltip text for the new button
+  
+  // Magic Prompt Enhancement
+  let magicPromptComponent: any; // Reference to the MagicPrompt component
 
   // --- Events ---
   const dispatch = createEventDispatcher();
@@ -36,6 +43,22 @@
 
   function handleCopilotClick() {
     dispatch('copilot');
+  }
+
+  async function handleGenerateIconClick() {
+    if (!promptValue.trim()) {
+      return; // Do nothing if prompt is empty
+    }
+    
+    try {
+      // Show loading state on the button (we could add this later)
+      const enhancedPrompt = await magicPromptComponent.enhancePromptDirect(promptValue);
+      promptValue = enhancedPrompt;
+      dispatch('input', { value: promptValue });
+    } catch (error) {
+      console.error('Error enhancing prompt:', error);
+      // Could show a toast notification here
+    }
   }
 
   // Propagate input events for two-way binding
@@ -65,6 +88,17 @@
         </div>
         <Tooltip id="token-counter-tooltip" text={tokenTooltipText} visible={isTokenCounterHovered} minWidth={200} />
       </div> <!-- Korrektes Schließen des ersten Wrappers -->
+
+      <!-- Generate Icon Button Wrapper -->
+      <div
+        class="tooltip-wrapper"
+        on:mouseenter={() => isGenerateIconHovered = true}
+        on:mouseleave={() => isGenerateIconHovered = false}
+        role="group"
+      >
+        <GenerateIconButton on:click={handleGenerateIconClick} ariaDescribedby="generate-icon-tooltip" />
+        <Tooltip id="generate-icon-tooltip" text={generateIconTooltipText} visible={isGenerateIconHovered} maxWidth={450} minWidth={200} />
+      </div>
 
       <!-- Copilot Button Wrapper -->
       <div
@@ -100,6 +134,9 @@
     />
   </div>
 </div>
+
+<!-- Magic Prompt Component (hidden, used for function only) -->
+<MagicPrompt bind:this={magicPromptComponent} />
 
 <style>
   .prompt-panel-component {
