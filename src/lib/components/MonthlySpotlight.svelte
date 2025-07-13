@@ -125,7 +125,8 @@
   </div>
   
   <div class="spotlight-content">
-    <div class="spotlight-main">
+    <!-- Featured Image Section -->
+    <div class="spotlight-image-section">
       <div class="spotlight-image">
         {#if loading}
           <div class="image-placeholder loading">
@@ -162,24 +163,26 @@
           </div>
         {/if}
       </div>
-      <div class="spotlight-info">
-        <h4>{awardTitle}</h4>
-        <p>{awardDescription}</p>
-        
-        <div class="spotlight-features">
-          {#each features as feature}
-            <div class="feature-item">
-              <img src={feature.icon} alt={feature.label} class="feature-icon" />
-              <span>{feature.label}</span>
-            </div>
-          {/each}
-        </div>
+    </div>
 
-        <div class="submission-countdown">
-          <div class="countdown-label">Submissions close in:</div>
-          <div class="countdown-timer">
-            {daysUntilMonthEnd} {daysUntilMonthEnd === 1 ? 'day' : 'days'}
+    <!-- Award Information Section -->
+    <div class="spotlight-info">
+      <h4>{awardTitle}</h4>
+      <p>{awardDescription}</p>
+      
+      <div class="spotlight-features">
+        {#each features as feature}
+          <div class="feature-item">
+            <img src={feature.icon} alt={feature.label} class="feature-icon" />
+            <span>{feature.label}</span>
           </div>
+        {/each}
+      </div>
+
+      <div class="submission-countdown">
+        <div class="countdown-label">Submissions close in:</div>
+        <div class="countdown-timer">
+          {daysUntilMonthEnd} {daysUntilMonthEnd === 1 ? 'day' : 'days'}
         </div>
       </div>
     </div>
@@ -190,7 +193,7 @@
   /* Monthly Spotlight */
   .monthly-spotlight {
     margin: 4rem auto;
-    max-width: 80%;
+    max-width: 60%;
     background: linear-gradient(135deg, rgba(252, 234, 43, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
     border: 1px solid rgba(252, 234, 43, 0.1);
     border-radius: 20px;
@@ -254,9 +257,13 @@
   }
 
   .spotlight-content {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 2rem;
+  }
+
+  .spotlight-image-section {
+    width: 100%;
   }
 
   .spotlight-main {
@@ -267,8 +274,10 @@
   }
 
   .spotlight-image {
-    aspect-ratio: 4/3;
+    aspect-ratio: 1/1;
     position: relative;
+    max-width: 500px;
+    margin: 0 auto;
   }
 
   .spotlight-image img {
@@ -382,7 +391,7 @@
   }
 
   .spotlight-info h4 {
-    font-size: 1.3rem;
+    font-size: 1.8rem;
     font-weight: 600;
     margin-bottom: 1rem;
     color: #f0f0f0;
@@ -390,19 +399,25 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    text-align: center;
   }
 
   .spotlight-info p {
     color: #a0a0a0;
     line-height: 1.6;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    font-size: 1.1rem;
   }
 
   .spotlight-features {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.8rem;
-    margin-bottom: 1.5rem;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .feature-item {
@@ -440,6 +455,8 @@
     border-radius: 12px;
     padding: 1rem;
     text-align: center;
+    max-width: 400px;
+    margin: 0 auto;
   }
 
   .countdown-label {
@@ -465,9 +482,16 @@
       padding: 1.5rem;
     }
     
-    .spotlight-main {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
+    .spotlight-image {
+      max-width: 100%;
+    }
+    
+    .spotlight-info h4 {
+      font-size: 1.5rem;
+    }
+    
+    .spotlight-info p {
+      font-size: 1rem;
     }
     
     .spotlight-features {
