@@ -33,6 +33,7 @@
   
   // Magic Prompt Enhancement
   let magicPromptComponent: any; // Reference to the MagicPrompt component
+  let isMagicPromptLoading: boolean = false; // Loading state for magic prompt
 
   // --- Events ---
   const dispatch = createEventDispatcher();
@@ -46,18 +47,20 @@
   }
 
   async function handleGenerateIconClick() {
-    if (!promptValue.trim()) {
-      return; // Do nothing if prompt is empty
+    if (!promptValue.trim() || isMagicPromptLoading) {
+      return; // Do nothing if prompt is empty or already loading
     }
     
     try {
-      // Show loading state on the button (we could add this later)
+      isMagicPromptLoading = true;
       const enhancedPrompt = await magicPromptComponent.enhancePromptDirect(promptValue);
       promptValue = enhancedPrompt;
       dispatch('input', { value: promptValue });
     } catch (error) {
       console.error('Error enhancing prompt:', error);
       // Could show a toast notification here
+    } finally {
+      isMagicPromptLoading = false;
     }
   }
 
@@ -96,7 +99,7 @@
         on:mouseleave={() => isGenerateIconHovered = false}
         role="group"
       >
-        <GenerateIconButton on:click={handleGenerateIconClick} ariaDescribedby="generate-icon-tooltip" />
+        <GenerateIconButton on:click={handleGenerateIconClick} ariaDescribedby="generate-icon-tooltip" loading={isMagicPromptLoading} />
         <Tooltip id="generate-icon-tooltip" text={generateIconTooltipText} visible={isGenerateIconHovered} maxWidth={450} minWidth={200} />
       </div>
 
