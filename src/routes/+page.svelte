@@ -24,9 +24,10 @@
 
   // User setup popup state
   let showUserSetup = false;
-  let username = 'AdaLovelace';
+  let username = '';
   let usernameError = '';
   let isSubmitting = false;
+  let agreesToGuidelines = false;
 
   // Reactive statement to watch user store changes
   $: currentUserId = $user.userid;
@@ -96,6 +97,11 @@
 
     if (!validateUsername(sanitizedName)) {
       usernameError = 'Only letters, numbers, spaces and _ - . are allowed.';
+      return;
+    }
+
+    if (!agreesToGuidelines) {
+      usernameError = 'Please agree to the guidelines to continue.';
       return;
     }
 
@@ -382,56 +388,95 @@
         <p>Create your username to save and share your creations.</p>
       </div>
 
-      <div class="popup-content">
-        <div class="input-group">
-          <label for="username-input">Your Username:</label>
-          <input 
-            id="username-input"
-            type="text" 
-            bind:value={username}
-            placeholder="AdaLovelace"
-            maxlength="50"
-            pattern="[a-zA-Z0-9\s\-_\.]*"
-            class:error={usernameError}
-            on:input={handleUsernameInput}
-            on:keydown={(e) => e.key === 'Enter' && handleUserSetup()}
-          />
-          {#if usernameError}
-            <span class="error-message">{usernameError}</span>
-          {/if}
-        </div>
-
-        <div class="info-box">
-          <div class="info-item">
-            <span class="info-icon">💡</span>
-            <span>Choose a <strong>unique name</strong> to avoid confusion.</span>
-          </div>
-          <div class="info-item">
-            <span class="info-icon">🔐</span>
-            <span>You can always <strong>log back in</strong> with this name.</span>
-          </div>
-          <div class="info-item">
-            <span class="info-icon">🖼️</span>
-            <span>Your saved images stay <strong>linked</strong> to your name.</span>
-          </div>
-        </div>
-
-        <div class="popup-actions">
-          <button 
-            class="btn-primary" 
-            on:click={handleUserSetup}
-            disabled={isSubmitting}
-          >
-            {#if isSubmitting}
-              <span class="loading-spinner"></span>
-              Saving...
-            {:else}
-              Set Username
+      <div class="popup-main">
+        <!-- Left Side: Username Input -->
+        <div class="popup-content">
+          <div class="input-group">
+            <label for="username-input">Your Username:</label>
+            <input 
+              id="username-input"
+              type="text" 
+              bind:value={username}
+              placeholder="Example: AdaLovelace"
+              maxlength="50"
+              pattern="[a-zA-Z0-9\s\-_\.]*"
+              class:error={usernameError}
+              on:input={handleUsernameInput}
+              on:keydown={(e) => e.key === 'Enter' && handleUserSetup()}
+            />
+            {#if usernameError}
+              <span class="error-message">{usernameError}</span>
             {/if}
-          </button>
-          <button class="btn-secondary" on:click={skipUserSetup}>
-            Later
-          </button>
+          </div>
+
+          <div class="info-box">
+            <div class="info-item">
+              <span>Choose a <strong>unique name</strong> to avoid confusion.</span>
+            </div>
+            <div class="info-item">
+              <span>You can always <strong>log back in</strong> with this name.</span>
+            </div>
+            <div class="info-item">
+              <span>Your saved images stay <strong>linked</strong> to your name.</span>
+            </div>
+          </div>
+
+          <!-- Guidelines Checkbox -->
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input 
+                type="checkbox" 
+                bind:checked={agreesToGuidelines}
+                class="guidelines-checkbox"
+              />
+              <span class="checkmark"></span>
+              <span class="checkbox-text">I have read and agree to the guidelines</span>
+            </label>
+          </div>
+
+          <div class="popup-actions">
+            <button 
+              class="btn-primary" 
+              on:click={handleUserSetup}
+              disabled={isSubmitting || !agreesToGuidelines}
+            >
+              {#if isSubmitting}
+                <span class="loading-spinner"></span>
+                Saving...
+              {:else}
+                Set Username
+              {/if}
+            </button>
+            <button class="btn-secondary" on:click={skipUserSetup}>
+              Later
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Side: Guidelines -->
+        <div class="guidelines-panel">
+          <h3>Friendly Guidelines for Using the AI+D Image Generator</h3>
+          <p class="guidelines-intro">Welcome! When you create with our AI+D Image Generator, please keep these simple principles in mind:</p>
+          
+          <div class="guideline-section">
+            <h4>For Your Studies Only</h4>
+            <p>Use the tool to support your coursework and projects at HfG Schwäbisch Gmünd.</p>
+          </div>
+
+          <div class="guideline-section">
+            <h4>Keep It Positive and Safe</h4>
+            <p>Do not generate images that feature graphic violence, explicit sexual content, or hate speech.</p>
+            <p class="warning-note">Be aware that disturbing content may be generated unintentionally.</p>
+          </div>
+
+          <div class="guideline-section">
+            <h4>Your Data Helps Us Grow</h4>
+            <p>We use your prompts and results solely to evaluate and improve the generator and to conduct academic research—nothing more.</p>
+          </div>
+
+          <div class="guidelines-footer">
+            <p><strong>Thanks for helping us keep this space creative, respectful, and focused on learning!</strong></p>
+          </div>
         </div>
       </div>
     </div>
@@ -1098,7 +1143,7 @@
     border: 1px solid rgba(252, 234, 43, 0.2);
     border-radius: 20px;
     padding: 2rem;
-    max-width: 500px;
+    max-width: 900px;
     width: 100%;
     position: relative;
     animation: popupSlideIn 0.4s ease-out;
@@ -1136,6 +1181,13 @@
     font-size: 1.1rem;
     line-height: 1.5;
     margin: 0;
+  }
+
+  .popup-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-top: 2rem;
   }
 
   .popup-content {
@@ -1206,6 +1258,130 @@
   .info-icon {
     font-size: 1.1rem;
     flex-shrink: 0;
+  }
+
+  /* Guidelines Panel */
+  .guidelines-panel {
+    background: rgba(252, 234, 43, 0.03);
+    border: 1px solid rgba(252, 234, 43, 0.1);
+    border-radius: 16px;
+    padding: 1.5rem;
+    overflow-y: auto;
+    max-height: 500px;
+  }
+
+  .guidelines-panel h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #FCEA2B;
+    margin: 0 0 0.8rem 0;
+    line-height: 1.3;
+  }
+
+  .guidelines-intro {
+    color: #d0d0d0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    margin-bottom: 1.5rem;
+  }
+
+  .guideline-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .guideline-section h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #e0e0e0;
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .guideline-section p {
+    color: #b0b0b0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin: 0 0 0.3rem 0;
+  }
+
+  .warning-note {
+    color: #E0E0E0 !important;
+    font-style: italic;
+    font-size: 0.85rem !important;
+  }
+
+  .guidelines-footer {
+    background: rgba(252, 234, 43, 0.05);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+
+  .guidelines-footer p {
+    color: #FCEA2B;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin: 0;
+    text-align: center;
+  }
+
+  /* Checkbox Group */
+  .checkbox-group {
+    margin: 1rem 0;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #d0d0d0;
+    line-height: 1.4;
+  }
+
+  .guidelines-checkbox {
+    display: none;
+  }
+
+  .checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(252, 234, 43, 0.3);
+    border-radius: 4px;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    margin-top: 2px;
+  }
+
+  .checkmark::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 10px;
+    border: solid #1a1a1a;
+    border-width: 0 2px 2px 0;
+    transform: translate(-50%, -60%) rotate(45deg);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .guidelines-checkbox:checked + .checkmark {
+    background: #FCEA2B;
+    border-color: #FCEA2B;
+  }
+
+  .guidelines-checkbox:checked + .checkmark::after {
+    opacity: 1;
+  }
+
+  .checkbox-text {
+    flex: 1;
   }
 
   .popup-actions {
@@ -1327,10 +1503,21 @@
     .user-setup-popup {
       margin: 1rem;
       padding: 1.5rem;
+      max-width: none;
     }
 
     .popup-header h2 {
       font-size: 1.5rem;
+    }
+
+    .popup-main {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .guidelines-panel {
+      order: -1;
+      max-height: 300px;
     }
 
     .popup-actions {
