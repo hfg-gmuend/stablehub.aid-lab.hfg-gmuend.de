@@ -8,7 +8,7 @@
   import TutorialSection from "$lib/components/TutorialSection.svelte";
   import SiteFooter from "$lib/components/SiteFooter.svelte";
   import { base, assets } from '$app/paths';
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { browser } from '$app/environment';
   import { user } from '$lib/stores/user.js';
 
@@ -190,6 +190,17 @@
     }, 6500);
   }
 
+  // Reactive statement to manage body scroll when popup is open
+  $: if (browser) {
+    if (showUserSetup) {
+      // Disable body scroll when popup is open
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Re-enable body scroll when popup is closed
+      document.body.style.overflow = '';
+    }
+  }
+
   onMount(() => {
     // Check if user setup is needed
     if (browser) {
@@ -219,6 +230,13 @@
     }, 600);
     setTimeout(() => cardsVisible = true, 900);
     setTimeout(() => tutorialsVisible = true, 1200);
+  });
+
+  onDestroy(() => {
+    // Clean up: restore body scroll when component is destroyed
+    if (browser) {
+      document.body.style.overflow = '';
+    }
   });
 </script>
 
@@ -381,6 +399,8 @@
     tabindex="-1"
     on:click|self={skipUserSetup}
     on:keydown={(e) => e.key === 'Escape' && skipUserSetup()}
+    on:touchmove|self|preventDefault
+    on:wheel|self|preventDefault
   >
     <div class="user-setup-popup">
       <div class="popup-header">
