@@ -35,7 +35,7 @@
   
   // Features-Array für einfache Anpassung
   export let features = [
-    { icon: '/monthlyspotlight/coin.png', label: '50€ Print Credit' },
+    { icon: '/monthlyspotlight/coin.png', label: 'Win a Price' },
     { icon: '/monthlyspotlight/unicorn.png', label: 'Campus Exhibition' },
     { icon: '/monthlyspotlight/star.png', label: 'Portfolio Feature' },
     { icon: '/monthlyspotlight/student.png', label: 'Creative Mentoring' }
@@ -117,7 +117,7 @@
     </div>
     <div class="spotlight-text">
       <h3>Monthly Spotlight</h3>
-      <p>Win {prizeAmount} print credit & get featured at Stablehub Campus</p>
+      <p>You can win a prize & get featured at the HfG</p>
     </div>
     <div class="winner-badge">
       <span>🏆 This Month</span>
