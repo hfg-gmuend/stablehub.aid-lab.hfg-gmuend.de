@@ -438,7 +438,7 @@
             <button 
               class="btn-primary" 
               on:click={handleUserSetup}
-              disabled={isSubmitting || !agreesToGuidelines}
+              disabled={isSubmitting || !agreesToGuidelines || !username.trim() || username.trim().length < 2}
             >
               {#if isSubmitting}
                 <span class="loading-spinner"></span>
@@ -1219,7 +1219,7 @@
   }
 
   .input-group input:focus {
-    outline: none;
+    outline: none; 
     border-color: rgba(252, 234, 43, 0.5);
     background: rgba(255, 255, 255, 0.08);
     box-shadow: 0 0 0 2px rgba(252, 234, 43, 0.1);

@@ -87,7 +87,7 @@
     position: relative;
     width: 100%;
     border-radius: 6px;
-    border: 1px solid #444;
+    border: 1px solid #ffed2d7a;
     background-color: #2a2a2a;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
