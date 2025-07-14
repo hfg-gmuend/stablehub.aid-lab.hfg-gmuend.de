@@ -145,8 +145,8 @@
           <line x1="12" y1="17" x2="12.01" y2="17"/>
         </svg>
         <span>
-          Ihr Prompt enthält nicht erlaubte Begriffe: <strong>{blacklistValidation.foundWords.join(', ')}</strong>. 
-          Bitte entfernen Sie diese Wörter, um fortfahren zu können.
+          Your prompt contains prohibited terms: <strong>{blacklistValidation.foundWords.join(', ')}</strong>. 
+          Please remove these words to continue.
         </span>
       </div>
     {/if}
