@@ -1501,35 +1501,102 @@
 
     /* User Setup Popup mobile */
     .user-setup-popup {
-      margin: 1rem;
-      padding: 1.5rem;
+      margin: 0.5rem;
+      padding: 1rem;
       max-width: none;
-      max-height: 90vh;
+      max-height: 95vh;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
+      border-radius: 16px;
+    }
+
+    .popup-header {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(252, 234, 43, 0.1);
     }
 
     .popup-header h2 {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .popup-header p {
+      font-size: 1rem;
     }
 
     .popup-main {
       grid-template-columns: 1fr;
-      gap: 2rem;
+      gap: 1.5rem;
       flex: 1;
-      overflow-y: auto;
     }
 
     .guidelines-panel {
       order: -1;
-      max-height: 200px;
       flex-shrink: 0;
-      min-height: 200px;
+      padding: 1rem;
+      border-radius: 12px;
+    }
+
+    .guidelines-panel h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .guidelines-intro {
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .guideline-section {
+      margin-bottom: 1rem;
+    }
+
+    .guideline-section h4 {
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .guideline-section p {
+      font-size: 0.85rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .guidelines-footer {
+      padding: 0.8rem;
+      margin-top: 0.8rem;
+    }
+
+    .guidelines-footer p {
+      font-size: 0.85rem;
     }
 
     .popup-content {
       flex-shrink: 0;
+      gap: 1rem;
+    }
+
+    .input-group input {
+      padding: 0.7rem 1rem;
+      font-size: 0.95rem;
+    }
+
+    .info-box {
+      padding: 1rem;
+      gap: 0.6rem;
+    }
+
+    .info-item {
+      font-size: 0.85rem;
+    }
+
+    .checkbox-group {
+      margin: 0.8rem 0;
+    }
+
+    .checkbox-label {
+      font-size: 0.85rem;
     }
 
     .popup-actions {
