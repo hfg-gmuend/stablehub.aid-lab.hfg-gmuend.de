@@ -6,6 +6,7 @@
   import GenerateIconButton from '$lib/components/uicomponents/PromptPanel/PromptPanel-SubComponents/GenerateIconButton.svelte';
   import Tooltip from '$lib/components/uicomponents/Tooltip.svelte'; // Importiere die neue Komponente
   import MagicPrompt from '$lib/components/MagicPrompt.svelte';
+  import { checkForBlacklistWords } from '$lib/stores/blacklistStore';
 
   // --- Props ---
   export let promptValue: string = "";
@@ -35,10 +36,21 @@
   let magicPromptComponent: any; // Reference to the MagicPrompt component
   let isMagicPromptLoading: boolean = false; // Loading state for magic prompt
 
+  // --- Blacklist Validation ---
+  let blacklistValidation: { hasBlacklistWords: boolean; foundWords: string[] } = { hasBlacklistWords: false, foundWords: [] };
+  $: {
+    blacklistValidation = checkForBlacklistWords(promptValue);
+  }
+  $: isGenerateBlocked = generateDisabled || blacklistValidation.hasBlacklistWords;
+
   // --- Events ---
   const dispatch = createEventDispatcher();
 
   function handleGenerateClick() {
+    // Verhindere Generation wenn Blacklist-Wörter erkannt wurden
+    if (blacklistValidation.hasBlacklistWords) {
+      return;
+    }
     dispatch('generate');
   }
 
@@ -123,6 +135,21 @@
       {placeholder}
       on:input={handleInput}
     />
+
+    <!-- Blacklist Warning -->
+    {#if blacklistValidation.hasBlacklistWords}
+      <div class="blacklist-warning" role="alert">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span>
+          Ihr Prompt enthält nicht erlaubte Begriffe: <strong>{blacklistValidation.foundWords.join(', ')}</strong>. 
+          Bitte entfernen Sie diese Wörter, um fortfahren zu können.
+        </span>
+      </div>
+    {/if}
   </div>
 
   <div class="generate-button-container">
@@ -132,7 +159,7 @@
       iconSrc={generateIconSrc}
       fallbackIconSrc={generateFallbackIconSrc}
       loading={generateLoading}
-      disabled={generateDisabled}
+      disabled={isGenerateBlocked}
       on:click={handleGenerateClick}
     />
   </div>
@@ -236,5 +263,38 @@
   .generate-button-container {
     display: flex;
     align-items: center;
+  }
+
+  /* Blacklist Warning Styles */
+  .blacklist-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    background-color: rgba(255, 59, 48, 0.1);
+    border: 1px solid rgba(255, 59, 48, 0.3);
+    border-radius: 6px;
+    color: #ff3b30;
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .blacklist-warning svg {
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+    color: #ff3b30;
+  }
+
+  .blacklist-warning strong {
+    font-weight: 600;
+  }
+
+  /* Mobile adjustments for warning */
+  @media (max-width: 768px) {
+    .blacklist-warning {
+      font-size: 0.8rem;
+      padding: 0.6rem;
+    }
   }
 </style>
