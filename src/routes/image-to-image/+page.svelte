@@ -11,7 +11,7 @@
   import { assets } from '$app/paths';
   
   // Parameter für die API
-  let prompt = "combine these images";
+  let prompt = "a dog riding a bike";
   let negativePrompt = "";
   let cfg = 1.3;
   let steps = 6;

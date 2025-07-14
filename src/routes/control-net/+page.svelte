@@ -32,7 +32,7 @@
 
   // --- Component State ---
   // Parameter für die API
-  let prompt: string = "More Bubbles";
+  let prompt: string = "Portrait of a futuristic dog";
   let negativePrompt: string = "";
   let cfg: number = 1.3;
   let steps: number = 6;
