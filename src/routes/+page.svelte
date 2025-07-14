@@ -1504,6 +1504,10 @@
       margin: 1rem;
       padding: 1.5rem;
       max-width: none;
+      max-height: 90vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
     }
 
     .popup-header h2 {
@@ -1513,15 +1517,30 @@
     .popup-main {
       grid-template-columns: 1fr;
       gap: 2rem;
+      flex: 1;
+      overflow-y: auto;
     }
 
     .guidelines-panel {
       order: -1;
-      max-height: 300px;
+      max-height: 200px;
+      flex-shrink: 0;
+      min-height: 200px;
+    }
+
+    .popup-content {
+      flex-shrink: 0;
     }
 
     .popup-actions {
       flex-direction: column;
+      margin-top: 1.5rem;
+      flex-shrink: 0;
+      position: sticky;
+      bottom: 0;
+      background: linear-gradient(135deg, #1a1a1a 0%, #242424 100%);
+      padding: 1rem 0 0 0;
+      border-top: 1px solid rgba(252, 234, 43, 0.1);
     }
   }
 </style>
