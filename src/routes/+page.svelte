@@ -1557,6 +1557,7 @@
       flex-shrink: 0;
       padding: 1rem;
       border-radius: 12px;
+      max-height: 260px;
     }
 
     .guidelines-panel h3 {
