@@ -6,9 +6,10 @@
   export let subtitle = "Supported by institutions and organizations";
   export let visible = false;
   export let logos = [
+    { src: `${base}/credit/aidlab.png`, alt: "AID Lab", url: "https://aid-lab.hfg-gmuend.de/" },
+    { src: `${base}/credit/hfg.svg`, alt: "HfG Gmünd", url: "https://www.hfg-gmuend.de/" },
     { src: `${base}/credit/bw.png`, alt: "Baden-Württemberg" },
-    { src: `${base}/credit/DE.jpg`, alt: "Deutschland" },
-    { src: `${base}/credit/hfg.svg`, alt: "HfG Gmünd" }
+    { src: `${base}/credit/DE.jpg`, alt: "Deutschland" }
   ];
 </script>
 
@@ -21,7 +22,13 @@
   <div class="partner-logos">
     {#each logos as logo}
       <div class="partner-logo">
-        <img src={logo.src} alt={logo.alt} />
+        {#if logo.url}
+          <a href={logo.url} target="_blank" rel="noopener noreferrer" class="logo-link">
+            <img src={logo.src} alt={logo.alt} />
+          </a>
+        {:else}
+          <img src={logo.src} alt={logo.alt} />
+        {/if}
       </div>
     {/each}
   </div>
@@ -112,14 +119,12 @@
     backdrop-filter: blur(15px);
     height: 250px;
     width: 380px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   }
 
   .partner-logo:hover {
     background: #FFFFFF;
     border-color: rgba(255, 255, 255, 0.2);
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
   }
 
   .partner-logo img {
@@ -129,12 +134,19 @@
     height: auto;
     object-fit: contain;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.08));
+  }
+
+  .logo-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
   }
 
   .partner-logo:hover img {
     transform: scale(1.05);
-    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.12));
   }
 
   /* Mobile responsive styles */

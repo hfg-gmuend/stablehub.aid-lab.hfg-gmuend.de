@@ -18,6 +18,7 @@
       <div class="powered-grid">
         <div class="powered-item">
           <span class="institution-name">HfG Schwäbisch Gmünd</span>
+          <span class="institution-name">AI+D Lab</span>
         </div>
         <div class="powered-item">
           <span class="institution-name">Federal Ministry of<br>Research, Technology<br>and Space</span>
